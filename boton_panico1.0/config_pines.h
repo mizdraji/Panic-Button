@@ -1,7 +1,7 @@
 //configuracion de pines
-#define led1 16  //led1
-#define led2 17 //led 2
-#define led3 4 //led 3
+#define led1 16 
+#define led2 17 
+#define led3 4 
 #define button1 37
 #define button2 38
 #define button3 39
