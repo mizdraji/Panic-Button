@@ -5,9 +5,9 @@
 * Módulo SIM800L
 
 ## GPIO Utilizados:
-* GPIO34 Reservado Lora -> DIO2
-* GPIO35 Reservado Lora -> DIO1
-* GPIO26 Reservado Lora -> DIO0
+* GPIO34 Reservado Lora -> DIO2      //se pueden conectar juntos a traves de diodos shotky para ir a un solo GPIO, cuando no se usa heltec
+* GPIO35 Reservado Lora -> DIO1      //se pueden conectar juntos a traves de diodos shotky para ir a un solo GPIO, cuando no se usa heltec 
+* GPIO26 Reservado Lora -> DIO0      //se pueden conectar juntos a traves de diodos shotky para ir a un solo GPIO, cuando no se usa heltec
 * GPIO27 Reservado Lora -> MOSI
 * GPIO14 Reservado Lora -> RST
 * GPIO19 Reservado Lora -> MISO
