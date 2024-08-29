@@ -1,10 +1,10 @@
 //configuracion de pines
-#define led1 16 
-#define led2 17 
-#define led3 4 
-#define button1 37
-#define button2 38
-#define button3 39
+#define led1 16           //led indicador que se presiono correctamente boton1
+#define led2 17           //led indicador que se presiono correctamente boton2
+#define led3 4            //led indicador que se presiono correctamente boton3
+#define button1 37        //boton de policia
+#define button2 38        //boton de bomberos
+#define button3 39        //boton de ambulancia
 
 #define tipo_modulo 1
 
