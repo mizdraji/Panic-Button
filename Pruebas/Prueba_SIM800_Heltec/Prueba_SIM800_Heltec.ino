@@ -1,15 +1,22 @@
 #include <SoftwareSerial.h>
 
+//pines para sim800
 #define TX 17         //GPIO17 HELTEC
 #define RX 16         //GPIO16 HELTEC
+//#define SIMRST 2      //GPIO2 HELTEC
 
-#define SIMRST 2      //GPIO2 HELTEC
+#define button1 37
+
 
 SoftwareSerial SIM800L(RX, TX);   //RX y TX de heltec
 
 String Numero_Remitente = "3794003039";
 
+bool statebutton1 = LOW;
+
 void setup(){
+
+pinMode(button1, INPUT);
 
 SIM800L.begin(9600);
 Serial.begin(115200);
@@ -20,6 +27,17 @@ Enviar_msj(Numero_Remitente, "Inicializacion completa");
 }
 
 void loop(){
+
+statebutton1 = digitalRead(button1);
+Serial.print("statebutton1: ");Serial.println(statebutton1);
+  if(statebutton1) { 
+    
+    Enviar_msj(Numero_Remitente, "Se presiono el boton de policia!! Auxilio!!"); 
+    
+    }
+
+delay(1000);
+
 
 }
 
