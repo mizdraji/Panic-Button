@@ -21,4 +21,8 @@
 * GPIO38 boton2 - pulsador con resistencia pull-down
 * GPIO39 boton3 - pulsador con resistencia pull-down
 * *****************************
-completar GPIO LEDS
+* completar GPIO LEDS
+*******************************
+* Full Document TaskScheduler:
+* https://github.com/arkhipenko/TaskScheduler/wiki/Full-Document
+
