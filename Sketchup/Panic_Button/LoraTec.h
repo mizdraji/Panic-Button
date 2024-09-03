@@ -1,3 +1,4 @@
+//rta_type
 #define espera_ACK 0
 #define espera_Dato 1
 #define no_espera_ACK 2
@@ -6,6 +7,7 @@
 #define INPUTBUFF 255
 char datoEntrante[INPUTBUFF] = {0};
 char cmd_rcv;
+byte recvStatus = 0;
 
 
 

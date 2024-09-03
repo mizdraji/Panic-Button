@@ -169,7 +169,7 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
         //Serial.println(">>esperando dato<<");
         rcv  = lora.readData(datoEntrante);   //cargo los datos leidos en el array, luego los proceso, si el procesamiento esta okey, ahi recien es dato_ok = 1
         if (rcv > 1) {
-          dato_ok = procesarDatoEntrante();
+          //dato_ok = procesarDatoEntrante();
         }
         delay(tick_time);
         cont_timeout++; //contador de time out

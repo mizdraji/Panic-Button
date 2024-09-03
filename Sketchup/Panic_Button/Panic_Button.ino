@@ -4,7 +4,6 @@
 //********************************************************
 //librerias utilizadas
 #include <TaskScheduler.h>          //libreria tareas programadas
-#include "Scheduler.h"              //libreria de cronograma para tareas
 #include "Task.h"                   //librerias tareas a realizar
 #include <lorawan.h>                //libreria lora
 #include "LoraTec.h"
@@ -20,11 +19,7 @@ String Numero_Remitente = "3794003039";
 
 //Scheduler: Este objeto es el programador encargado de la ejecución de las tareas, el cual se tendrá que ejecutar en cada loop
 //Creamos el Scheduler que se encargará de gestionar las tareas
-Scheduler taskManager;
-
-
-
-
+Scheduler tareas;
 
 
 
@@ -38,6 +33,13 @@ void setup() {
       ;
   }
   Serial.println("RFM95 detected");
+
+  tareas.init();
+  Serial.println("Initialized scheduler");
+  tareas.addTask(TareaLED);           // Añadimos la tarea al programador de tareas
+  TareaLED.enable();                  // Activamos la tarea
+  tareas.addTask(SendLora);
+  SendLora.enable();
 
   //configure pines
   //pinMode(button1, INPUT);
@@ -54,18 +56,20 @@ void setup() {
   Serial.println(devID);  //Activacion Manual, devID predefinido
   }
    
-  taskManager.addTask(TareaLED);         // Añadimos la tarea al programador de tareas
-  TareaLED.enable();                 // Activamos la tarea
+  
 
 }
 
 void loop() {
 
-  if (lora.readData(datoEntrante) > 1) {
-      procesarDatoEntrante();
-    }
+  recvStatus = lora.readData(datoEntrante);
+  if(recvStatus) {
+    Serial.print("====>> ");
+    Serial.println(datoEntrante);
+  }
 
-  taskManager.execute();             // Es necesario ejecutar el runner en cada loop
+
+  tareas.execute();             // Es necesario ejecutar el runner en cada loop
   lora.update();                     //actualizacion lora
 
 }
