@@ -47,7 +47,9 @@ void setup() {                              //setup run in core1
   blink2.enable();
 
   //configure pines
-  //pinMode(button1, INPUT);
+  pinMode(button1, INPUT);
+  pinMode(button2, INPUT);
+  pinMode(button3, INPUT);
   pinMode(led1, OUTPUT);
   pinMode(led2, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);

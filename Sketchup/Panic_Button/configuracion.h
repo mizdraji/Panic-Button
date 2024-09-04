@@ -14,4 +14,6 @@
 #define dbspk 1                           //lora send pakage
 
 
-String Numero_Remitente = "3794003039";
+String Numero_Remitente = "3794003039";     //NUMERO REMITENTE 1
+String Numero_Remitente2 = "";              //NUMERO REMITENTE 2
+String Numero_Remitente3 = "";              //NUMERO REMITENTE 3
