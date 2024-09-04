@@ -24,7 +24,7 @@ String Numero_Remitente = "3794003039";
 //Creamos el Scheduler que se encargará de gestionar las tareas
 Scheduler taskManager;
 
-
+int count=0;
 
 void setup() {
   SIM800L.begin(SERIAL_SIM);
@@ -61,12 +61,21 @@ void setup() {
   Serial.print("-->devID: TLV2_DPEC_");
   Serial.println(devID);  //Activacion Manual, devID predefinido
   }
+
+  Serial.print("setup() running on core ");
+  Serial.println(xPortGetCoreID());
    
   
 
 }
 
 void loop() {
+  
+  if(count== 0){
+  Serial.print("loop() running on core ");
+  Serial.println(xPortGetCoreID());
+  count++;
+  }
 
   recvStatus = lora.readData(datoEntrante);
   if(recvStatus) {
