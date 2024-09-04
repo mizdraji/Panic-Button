@@ -1,5 +1,5 @@
 //Version
-#define VERSION "V1.0"
+#define VERSION "V1.1"
 
 //Serial
 #define SERIAL_SPEED  115200
@@ -12,3 +12,6 @@
 #define DEFAULT_SF SF7BW125               // Set Data Rate
 #define DEBUG 0 
 #define dbspk 1                           //lora send pakage
+
+
+String Numero_Remitente = "3794003039";
