@@ -458,12 +458,12 @@ void LoRaWANClass::update(void)
         if ((Buffer_Rx.Data[0] & 0x60) == 0x60){ //if received a confirmed Downlink. Send ACK
             //Enviar ACK
             LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
-            Serial.println("ACK 0x60");
+            //Serial.println("ACK 0x60");                       // Se comenta porque envia muchas respuestas ACK
         }
         if ((Buffer_Rx.Data[0] & 0x40) == 0x40){ //if received a confirmed Downlink. Send ACK
             //Enviar ACK
             LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
-            Serial.println("ACK 0x40");
+            //Serial.println("ACK 0x40");                       // Se comenta porque envia muchas respuestas ACK
         }
         if(Buffer_Rx.Counter != 0x00)
         {

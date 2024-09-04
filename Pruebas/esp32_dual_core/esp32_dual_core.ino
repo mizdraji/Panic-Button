@@ -15,8 +15,12 @@ void setup() {                          //setup run in core1
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(led2, OUTPUT);
 
+  
+
   //create a task that will be executed in the loop0() function, with priority 1 and executed on core 0
-  xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);              
+  xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0); 
+
+         
 
 }
 //xTaskCreatePinnedToCore(TaskFunction, "name_of_task", Stack_size_of_task, parameter_of_the_task, priority_of_the_task, &Task_handle_to_keep_track_of_created_task, pin_task_to_core_0)
@@ -41,13 +45,14 @@ void loop() {                           //loop run in core1
 }
 
 void loop0(void *parameter){            //loop run in core0
-  while(1==1){
+  while(1){
   digitalWrite(led1, HIGH);
   delay(1500);
   digitalWrite(led1, LOW);
   Serial.print("loop0() running on core ");
   Serial.println(xPortGetCoreID());
   delay(1500);
-
+  //vTaskDelay(10);                                       //se recomienda por alertas del wdt
   }
+  
 }
