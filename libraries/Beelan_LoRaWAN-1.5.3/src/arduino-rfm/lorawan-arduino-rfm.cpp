@@ -445,26 +445,26 @@ void LoRaWANClass::update(void)
         //     LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
         //     Serial.println("ACK 0x31");
         // }
-        if ((Buffer_Rx.Data[0] & 0x80) == 0x80){ //if received a confirmed Downlink. Send ACK
+        if ((Buffer_Rx.Data[0] & 0x80) == 0x80){ //if received a confirmed Uplink. Send ACK
             //Enviar ACK
-            LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
+            //LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
             Serial.println("ACK 0x80");
         }
-        if ((Buffer_Rx.Data[0] & 0xA0) == 0xA0){ //if received a confirmed Downlink. Send ACK
+        if ((Buffer_Rx.Data[0] & 0xA0) == 0xA0){                    //if received a confirmed Downlink. Send ACK
             //Enviar ACK
             LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
             Serial.println("ACK 0xA0");
         }
-        if ((Buffer_Rx.Data[0] & 0x60) == 0x60){ //if received a confirmed Downlink. Send ACK
+        //if ((Buffer_Rx.Data[0] & 0x60) == 0x60){ //if received a unconfirmed Downlink. Send ACK
             //Enviar ACK
-            LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
+            //LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
             //Serial.println("ACK 0x60");                       // Se comenta porque envia muchas respuestas ACK
-        }
-        if ((Buffer_Rx.Data[0] & 0x40) == 0x40){ //if received a confirmed Downlink. Send ACK
+        //}
+        //if ((Buffer_Rx.Data[0] & 0x40) == 0x40){             //if received a unconfirmed Uplink. Send ACK
             //Enviar ACK
-            LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
+            //LORA_Send_ACK(&Buffer_ACK, &Session_Data, &LoRa_Settings);
             //Serial.println("ACK 0x40");                       // Se comenta porque envia muchas respuestas ACK
-        }
+        //}
         if(Buffer_Rx.Counter != 0x00)
         {
             #ifdef DEBUG3

@@ -4,6 +4,11 @@ const unsigned long ledOnTime = 500;      // Tiempo de encendido en milisegundos
 const unsigned long ledOffTime = 10000;   // Tiempo de apagado en milisegundos (5 segundos)
 bool LED_state = LOW;                     // Estado actual del LED
 
+//button status:
+bool Statebutton1 = LOW;        //boton de policia
+bool Statebutton2 = LOW;        //boton de bomberos
+bool Statebutton3 = LOW;        //boton de ambulancia
+
 bool statusLED = false;
 void led_blink();
 void blinkstb();

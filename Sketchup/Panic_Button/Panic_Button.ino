@@ -1,6 +1,8 @@
 /*Detalle de versiones:
-* V1.1: 
-* Se agrega procesamiento lora.update y lora.readData en core0 mientras que el resto se ejecuta en core1.
+* V1.2: 
+* se cambia config pines por pinout y se crea funcion config_pines.
+* Se crea Hardware.h y Hardware.ino
+* Se crea funcion pdr para prueba de red pero aun no esta funcional.
 */
 
 //librerias utilizadas
@@ -9,11 +11,13 @@
 #include <lorawan.h>                //libreria lora
 #include "LoraTec.h"
 #include "ABPcredentials.h"         //librerias lora credenciales
-#include "config_pines.h"           //libreria para configuraciones de pines
+#include "pinout.h"                 //libreria para asignacion de pines.
+#include "Hardware.h"
 #include "configuracion.h"
 #include <SoftwareSerial.h>         //Libreria para definir tx y rx de sim800
 
-
+//int32_t prevMillis = 0;
+//#define interval 1000
 
 SoftwareSerial SIM800L(RX, TX);   //RX y TX de heltec
 
@@ -29,7 +33,9 @@ TaskHandle_t Task0;     //Task0 para ejecutar en core0
 void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
   Serial.begin(SERIAL_SPEED);
-  delay(5000);
+  config_pines();
+
+  delay(5000);                              //falta crear variable para initial random time
   if (!lora.init()) {
     Serial.println("RFM95 not detected");
     while (1)
@@ -39,18 +45,12 @@ void setup() {                              //setup run in core1
 
   taskManager.init();
   Serial.println("Initialized scheduler");
-  taskManager.addTask(TareaLED);           // Añadimos la tarea al programador de tareas
-  TareaLED.enable();                  // Activamos la tarea
+  //taskManager.addTask(TareaLED);           // Añadimos la tarea al programador de tareas
+  //TareaLED.enable();                  // Activamos la tarea
   taskManager.addTask(SendLora);
   SendLora.enable();
-  taskManager.addTask(blink2);
+  taskManager.addTask(blink2);          //blink cada 10 segundos
   blink2.enable();
-
-  //configure pines
-  //pinMode(button1, INPUT);
-  pinMode(led1, OUTPUT);
-  pinMode(led2, OUTPUT);
-  pinMode(LED_BUILTIN, OUTPUT);
   
   //Se crea una tarea que se ejecutará en la función loop0(), con prioridad 1 y se ejecutará en el core0.
   xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
@@ -63,16 +63,20 @@ void setup() {                              //setup run in core1
   Serial.print("-->devID: TLV2_DPEC_");
   Serial.println(devID);  //Activacion Manual, devID predefinido
   }
+  
    
 }
 
 void loop() {                                           //loop run in core1
-
+  // if ((millis() - prevMillis > interval) && (nodo.pdr_ok == 0)) {               //entra cada 1 segundo solo si no se establecio la conexion LORA
+  // prevMillis = millis();
+  // //Serial.println("entramos al if de pdr_function");
+  //   pdr_function();
+  // }
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
 
 }
 
-uint8_t count = 0;
 
 void loop0(void *parameter){                    //loop0 run in core0
   while(1){
@@ -80,10 +84,6 @@ void loop0(void *parameter){                    //loop0 run in core0
   if(recvStatus) {
     Serial.print("====>> ");
     Serial.println(datoEntrante);
-  }
-  if(count==0){
-  Serial.print("loop0: ");Serial.println(xPortGetCoreID());
-  count++;
   }
   lora.update();                     //actualizacion lora
   vTaskDelay(10);                     //delay para fallas de wtd
