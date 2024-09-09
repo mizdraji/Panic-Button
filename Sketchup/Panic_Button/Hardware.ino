@@ -10,6 +10,45 @@ void config_pines( void )
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
+
+void Enviar_msj(String numero, String msj)
+{
+  //Se establece el formato de SMS en ASCII
+  String config_numero = "AT+CMGS=\"+549" + numero + "\"\r\n";
+  Serial.println(config_numero);
+
+  //configurar modulo como modo SMS
+  SIM800L.write("AT+CMGF=1\r\n");
+  delay(1000);
+  
+  //Enviar comando para un nuevos SMS al numero establecido
+  SIM800L.print(config_numero);
+  delay(1000);
+
+  //Enviar contenido del SMS
+  SIM800L.print(msj);
+  delay(1000);
+
+  //Enviar Ctrl+Z
+  SIM800L.write((char)26);
+  delay(1000);
+  Serial.println("Mensaje enviado");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //Prueba de Red: Es el primer paquete LoRa. Envia un cero para establecer la conexion con la red LoRaWAN.
 void pdr_function() {
   if (nodo.pdr_ok == 0) {

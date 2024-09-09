@@ -23,6 +23,11 @@ struct str {
 str nodo;
 
 
+//estados de los pulsadores
+volatile bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
+volatile bool statebutton2 = false;         //monitorea el estado del button1 en pin 38
+volatile bool statebutton3 = false;         //monitorea el estado del button1 en pin 39
+
 
 int16_t random_time(unsigned int MIN_,unsigned int MAX_);
 void pdr_function();

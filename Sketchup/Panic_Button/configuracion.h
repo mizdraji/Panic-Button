@@ -1,5 +1,5 @@
 //Version
-#define VERSION "V1.1"
+#define VERSION "V1.3"
 
 //Serial
 #define SERIAL_SPEED  115200
@@ -13,7 +13,14 @@
 #define DEBUG 0 
 #define dbspk 1                           //lora send pakage
 
-
+//configuracion GSM
 String Numero_Remitente = "3794003039";     //NUMERO REMITENTE 1
 String Numero_Remitente2 = "";              //NUMERO REMITENTE 2
 String Numero_Remitente3 = "";              //NUMERO REMITENTE 3
+
+struct mensajes {
+  String policia = "ayuda policia!!";
+  String bomberos = "ayuda bomberos!!";
+  String ambulancia = "ayuda ambulancia!!";
+};
+mensajes msj;

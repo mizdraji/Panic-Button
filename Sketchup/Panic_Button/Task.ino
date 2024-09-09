@@ -34,3 +34,49 @@ void loraSend() {
   Serial.println("se envia uncmd");
 
 }
+
+//TASK4: Envia mensaje
+
+//TASK5: interrupcion por pulsador
+void buttonTask1() {
+  if (statebutton1) {
+    // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
+    Serial.println("buttonTask1 ejecutada después de interrupción por pulsador");
+    
+    // Reinicia el estado del botón
+    statebutton1 = false;
+  }
+}
+
+//TASK6: interrupcion por pulsador
+void buttonTask2() {
+  if (statebutton2) {
+    // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
+    Serial.println("buttonTask2 ejecutada después de interrupción por pulsador");
+    
+    // Reinicia el estado del botón
+    statebutton2 = false;
+  }
+}
+//TASK7: interrupcion por pulsador
+void buttonTask3() {
+  if (statebutton3) {
+    // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
+    Serial.println("buttonTask3 ejecutada después de interrupción por pulsador");
+    
+    // Reinicia el estado del botón
+    statebutton3 = false;
+  }
+}
+
+void buttonInterrupt1() {
+  statebutton1 = true;
+}
+
+void buttonInterrupt2() {
+  statebutton2 = true;
+}
+
+void buttonInterrupt3() {
+  statebutton3 = true;
+}
