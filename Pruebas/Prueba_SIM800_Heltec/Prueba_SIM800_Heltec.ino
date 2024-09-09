@@ -81,8 +81,6 @@ void Enviar_msj(String numero, String msj) {
   String config_numero = "AT+CMGS=\"+549" + numero + "\"\r\n";
   Serial.println(config_numero);
 
-
-
   //Enviar comando para un nuevos SMS al numero establecido
   SIM800L.print(config_numero);
   delay(1000);
