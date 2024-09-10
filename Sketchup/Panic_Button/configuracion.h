@@ -13,14 +13,18 @@
 #define DEBUG 0 
 #define dbspk 1                           //lora send pakage
 
-//configuracion GSM
-String Numero_Remitente = "3794003039";     //NUMERO REMITENTE 1
-String Numero_Remitente2 = "";              //NUMERO REMITENTE 2
-String Numero_Remitente3 = "";              //NUMERO REMITENTE 3
+//configuracion GSM numeros de remitentes
+struct remitente {
+String Remitente1 = "3794003039";    //NUMERO REMITENTE 1
+String Remitente2 = "";              //NUMERO REMITENTE 2
+String Remitente3 = "";              //NUMERO REMITENTE 3
+};
+remitente numero;
 
+//mensajes para enviar por sms
 struct mensajes {
-  String policia = "ayuda policia!!";
-  String bomberos = "ayuda bomberos!!";
-  String ambulancia = "ayuda ambulancia!!";
+  String policia  = "policia";              //mensaje1
+  String bomberos = "bomberos";             //mensaje2
+  String medica   = "medica";               //mensaje3
 };
 mensajes msj;
