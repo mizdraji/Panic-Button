@@ -13,4 +13,9 @@
 * * Se crea Hardware.h y Hardware.ino.
 * * Se crea función pdr_function() para prueba inicial de red LORA pero aun no está funcional.
 
-
+* V1.3: 
+* * Se configuran los 3 pulsadores como tareas que se activan a travez de interrupciones. (pendiente mejorar rebote)
+* * Se crea el objeto Scheduler interrupt para establecer como alta prioridad
+* * Se cambian los nombres de las tareas por t1-t7
+* * Se crean las tareas t5, t6 y t7 para interrupciones
+* * Se crea estructura de mensajes para continuar con SMS en proxima version.
