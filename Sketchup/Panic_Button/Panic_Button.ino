@@ -55,7 +55,7 @@ void setup() {                              //setup run in core1
   //configurar modulo GSM como modo SMS
   Serial.println("iniciando .........");
   ReceiveMode();
-  Enviar_msj(remitente.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
+  Enviar_msj(numero.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
 
   //config interrupt
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
