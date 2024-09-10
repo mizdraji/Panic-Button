@@ -16,7 +16,7 @@ struct str {
   uint8_t MIN_RANDOM            = 10;        //10 segundos
   uint8_t MAX_RANDOM            = 40;        //40 segundos
   
-  uint16_t UN_DIA               = 86400;     //24hs en s
+  uint16_t UN_DIA               = 84600;     //24hs = 86400 segundos
 
 
 };

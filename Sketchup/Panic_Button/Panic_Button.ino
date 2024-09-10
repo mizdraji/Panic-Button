@@ -55,7 +55,7 @@ void setup() {                              //setup run in core1
   //configurar modulo GSM como modo SMS
   Serial.println("iniciando .........");
   ReceiveMode();
-  Enviar_msj(Numero_Remitente, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
+  Enviar_msj(remitente.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
 
   //config interrupt
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
@@ -64,11 +64,11 @@ void setup() {                              //setup run in core1
 }
 
 void loop() {                                           //loop run in core1
-  // if ((millis() - prevMillis > interval) && (nodo.pdr_ok == 0)) {               //entra cada 1 segundo solo si no se establecio la conexion LORA
-  // prevMillis = millis();
-  // //Serial.println("entramos al if de pdr_function");
-  //   pdr_function();
-  // }
+  //  if ((millis() - prevMillis > interval) && (nodo.pdr_ok == 0)) {               //entra cada 1 segundo solo si no se establecio la conexion LORA
+  //  prevMillis = millis();
+  //  //Serial.println("entramos al if de pdr_function");
+  //    pdr_function();
+  //  }
 
   while(SIM800L.available()>0) {
     char Received_SMS; 

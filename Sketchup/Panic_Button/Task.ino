@@ -17,7 +17,7 @@ void blinkstb() {
     LED_state = LOW;                  // Cambiar estado del LED
     previousMillis = currentMillis;   // Actualizar tiempo anterior
     digitalWrite(LED_BUILTIN, LED_state);  // Apagar el LED
-    Serial.println("blink blink");
+    //Serial.println("blink blink");
     
   } else if (LED_state == LOW && (currentMillis - previousMillis >= ledOffTime)) {
     // Encender el LED después de 7 segundos
