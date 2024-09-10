@@ -3,7 +3,7 @@
 //TASK1
 void led_blink() {
   statusLED = !statusLED;
-  digitalWrite(LED_BUILTIN, statusLED);
+  digitalWrite(led3, statusLED);
   //Serial.println((String)millis() + " - Led: " + (String)statusLED);
 
 }
@@ -41,7 +41,11 @@ void loraSend() {
 void buttonTask1() {
   if (statebutton1) {
     // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
+    Enviar_msj(numero.Remitente1, msj.policia);
+    //Falta agregar enviar mensaje LORA
     Serial.println("Enviar mensaje1 y prender led1");
+    digitalWrite(led3, HIGH);
+    
     
     statebutton1 = false;             // Reinicia el estado del pulsador
   }
@@ -51,6 +55,8 @@ void buttonTask1() {
 void buttonTask2() {
   if (statebutton2) {
     // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
+    Enviar_msj(numero.Remitente1, msj.bomberos);
+    //Falta agregar enviar mensaje LORA
     Serial.println("Enviar mensaje2 y prender led2");
     
     statebutton2 = false;           // Reinicia el estado del pulsador
@@ -60,9 +66,11 @@ void buttonTask2() {
 void buttonTask3() {
   if (statebutton3) {
     // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
+    Enviar_msj(numero.Remitente1, msj.medica);
+    //Falta agregar enviar mensaje LORA
     Serial.println("Enviar mensaje3 y prender led3");
-    
-    statebutton3 = false;         // Reinicia el estado del pulsador
+    //led_blink();
+    statebutton3 = false;           // Reinicia el estado del pulsador
   }
 }
 

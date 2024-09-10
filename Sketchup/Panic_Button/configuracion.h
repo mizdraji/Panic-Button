@@ -15,7 +15,7 @@
 
 //configuracion GSM numeros de remitentes
 struct remitente {
-String Remitente1 = "3794003039";     //NUMERO REMITENTE 1
+String Remitente1 = "3794003039";    //NUMERO REMITENTE 1
 String Remitente2 = "";              //NUMERO REMITENTE 2
 String Remitente3 = "";              //NUMERO REMITENTE 3
 };
@@ -23,8 +23,8 @@ remitente numero;
 
 //mensajes para enviar por sms
 struct mensajes {
-  String policia = "policia";
-  String bomberos = "bomberos";
-  String ambulancia = "medica";
+  String policia  = "policia";              //mensaje1
+  String bomberos = "bomberos";             //mensaje2
+  String medica   = "medica";               //mensaje3
 };
 mensajes msj;

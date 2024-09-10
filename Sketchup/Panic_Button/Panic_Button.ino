@@ -1,7 +1,9 @@
 /*Detalle de versiones:
 * V1.4: 
-* Se agregan funciones Serialcom y ReceiveMode en Hardware.ino para enviar/recibir SMS
+* Se agregan funciones Serialcom y ReceiveMode en Hardware.ino para enviar/recibir SMS.
 * Se envia uncero al iniciar el setup por LORA para establecer la conexión.
+* Pulsadores ahora envian mensajes y prende led para confirmar que se envio el mensaje. Pendiente solucionar rebote!!!
+* Se bajan delays en funcion Enviar_msj para mejorar rendimiento.
 */
 
 //librerias utilizadas
