@@ -41,10 +41,9 @@ void loraSend() {
 void buttonTask1() {
   if (statebutton1) {
     // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
-    Serial.println("buttonTask1 ejecutada después de interrupción por pulsador");
+    Serial.println("Enviar mensaje1 y prender led1");
     
-    // Reinicia el estado del botón
-    statebutton1 = false;
+    statebutton1 = false;             // Reinicia el estado del pulsador
   }
 }
 
@@ -52,31 +51,29 @@ void buttonTask1() {
 void buttonTask2() {
   if (statebutton2) {
     // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
-    Serial.println("buttonTask2 ejecutada después de interrupción por pulsador");
+    Serial.println("Enviar mensaje2 y prender led2");
     
-    // Reinicia el estado del botón
-    statebutton2 = false;
+    statebutton2 = false;           // Reinicia el estado del pulsador
   }
 }
 //TASK7: interrupcion por pulsador
 void buttonTask3() {
   if (statebutton3) {
     // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
-    Serial.println("buttonTask3 ejecutada después de interrupción por pulsador");
+    Serial.println("Enviar mensaje3 y prender led3");
     
-    // Reinicia el estado del botón
-    statebutton3 = false;
+    statebutton3 = false;         // Reinicia el estado del pulsador
   }
 }
 
-void buttonInterrupt1() {
+void buttonInterrupt1() {           //interrupcion pulsador1
   statebutton1 = true;
 }
 
-void buttonInterrupt2() {
+void buttonInterrupt2() {           //interrupcion pulsador2
   statebutton2 = true;
 }
 
-void buttonInterrupt3() {
+void buttonInterrupt3() {           //interrupcion pulsador3
   statebutton3 = true;
 }

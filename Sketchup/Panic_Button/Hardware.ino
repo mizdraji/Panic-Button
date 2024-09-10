@@ -10,9 +10,8 @@ void config_pines( void )
   pinMode(LED_BUILTIN, OUTPUT);
 }
 
-
-void Enviar_msj(String numero, String msj)
-{
+//Función para enviar mensaje SMS
+void Enviar_msj(String numero, String msj) {
   //Se establece el formato de SMS en ASCII
   String config_numero = "AT+CMGS=\"+549" + numero + "\"\r\n";
   Serial.println(config_numero);
@@ -33,6 +32,30 @@ void Enviar_msj(String numero, String msj)
   SIM800L.write((char)26);
   delay(1000);
   Serial.println("Mensaje enviado");
+}
+
+//This is used with ReceiveMode function, it's okay to use for tests with Serial monitor
+void Serialcom() {      
+  //delay(500);
+  while(Serial.available()) {
+    SIM800L.write(Serial.read());//Forward what Serial received to Software Serial Port
+  }
+  while(SIM800L.available()) {
+    Serial.write(SIM800L.read());//Forward what Software Serial received to Serial Port
+  }
+}
+
+//Set the SIM800L Receive mode  
+void ReceiveMode() {       
+  SIM800L.println("AT"); //If everything is Okay it will show "OK" on the serial monitor
+  delay(500);
+  Serialcom();
+  SIM800L.println("AT+CMGF=1"); // Configuring TEXT mode
+  delay(500);
+  Serialcom();
+  SIM800L.println("AT+CNMI=2,2,0,0,0"); //Configure the SIM800L on how to manage the Received SMS... Check the SIM800L AT commands manual
+  delay(500);
+  Serialcom();
 }
 
 

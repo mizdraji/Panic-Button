@@ -1,6 +1,6 @@
 /*Detalle de versiones:
 * V1.4: 
-
+* Se agregan funciones Serialcom y ReceiveMode en Hardware.ino para enviar/recibir SMS
 */
 
 //librerias utilizadas
@@ -51,9 +51,9 @@ void setup() {                              //setup run in core1
   Serial.println(devID);  //Activacion Manual, devID predefinido
   }
 
-  attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);
-  attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);
-  attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);
+  attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
+  attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
+  attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
 }
 
 void loop() {                                           //loop run in core1
