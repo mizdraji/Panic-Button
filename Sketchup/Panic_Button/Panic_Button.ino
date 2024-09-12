@@ -3,6 +3,9 @@
 * Se agregan los pinout faltantes de leds.
 * Se agrega mensajes recibidos de confirmación.
 * Se agregan funciones prender y apagar led para trabajar con tareas programadas.
+* Se prende el led_recibido cuando se recibe una respuesta correcta durante 50 segundos.
+* Se agrega capacitor de 1000uF 10V entre VCC y GND del modulo GSM para evitar errores de lectura y reseteos del ESP32
+por baja tension que genera el modulo SIM800.
 
 */
 
@@ -65,28 +68,26 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
 
-  
+  prevMillis = millis();
 }
 
 void loop() {                                           //loop run in core1
+//PLAN B APAGAR LED POR SI NO SALE CON TAREAS
   //   if (millis() - prevMillis > interval) { // && (nodo.pdr_ok == 0)) {               //entra cada 1 segundo solo si no se establecio la conexion LORA
   //   prevMillis = millis();
   //   //if(powerON()) digitalWrite(25, HIGH);
   //   //else  digitalWrite(25, LOW);
   //   digitalWrite(led_recibido, LOW);
-    
-    
-  //   //Serial.println("entramos al if de pdr_function");
-  //  //pdr_function();
-  //   }
+  //   Serial.println("apagar led");
+
+  // //  //pdr_function();
+  //  }
 
   while(SIM800L.available()>0) {
-    char Received_SMS;
     String mensaje_recibido = "";
-    //mensaje_recibido = SIM800L.readString(); 
-    Received_SMS=SIM800L.read();                  //"char Received_SMS" is now containing the full SMS received
-    Serial.print(Received_SMS);                   //Show it on the serial monitor (optional)  - 
-    //Serial.print(mensaje_recibido);
+    mensaje_recibido = SIM800L.readString(); 
+
+    Serial.print(mensaje_recibido);
     if(mensaje_recibido.indexOf(msj.rcv_policia) != -1) {encenderLED(led_recibido);}
   }
 

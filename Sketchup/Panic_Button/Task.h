@@ -32,11 +32,11 @@ void apagarLED();
 //Task: Este objeto te permitirá configurar la ejecución de la función, así como su número de ejecuciones y cada cuanto tiempo.
 
 
-//TASK0
-//Task t_encenderLED(0, TASK_ONCE, []() { encenderLED(LED); }, &taskManager);  // Ejecuta inmediatamente
+//TASK0 - REVISAR LUEGO, NO SE PUEDE INTRODUCIR TAREAS DENTRO DE OTRAS FUNCIONES.
+//Task t_encenderLED(0, TASK_FOREVER, []() { encenderLED(led_recibido); }, &taskManager);  // Ejecuta inmediatamente
 
 //TASK1
-Task t_apagarLED(5000, TASK_ONCE, &apagarLED, &taskManager);   // Se ejecuta una vez después de 5 segundos   
+Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);   // Se ejecuta una vez durante    
 
 
 //TASK2:  blink de stand by, es un blink de baja frecuencia para indicar que el dispositivo esta funcionando.
