@@ -4,8 +4,10 @@
 #define led3          4      //led indicador que se presiono correctamente boton3
 
 #define led_powerON   23     //led indicador de alimentacion/encendido del modulo
-#define led_recibido  0      //led de confirmacion de mensaje recibido
+#define led_recibido  12      //led de confirmacion de mensaje recibido
 #define led_atendido  22     //led de alerta atendida - enviado por operario en base central.
+
+#define ADC_powerON   13
 
 #define button1       37     //boton de policia
 #define button2       38     //boton de bomberos

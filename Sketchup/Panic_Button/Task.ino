@@ -74,6 +74,20 @@ void buttonTask3() {
   }
 }
 
+//LED ON
+void encenderLED(uint8_t LED) {
+  digitalWrite(LED, HIGH);  // Encender el LED
+  //t_apagarLED.restartDelayed(5000);  // Programar el apagado del LED después de 5 segundos
+  //taskManager.addTask(t_apagarLED);
+  //t_apagarLED.enable();  // Habilitar la tarea para apagar el LED después de 5 segundos
+}
+
+//LED OFF
+void apagarLED() {
+  digitalWrite(led_recibido, LOW);  // Apagar el LED
+  Serial.println("funcion apagarled");
+}
+
 void buttonInterrupt1() {           //interrupcion pulsador1
   statebutton1 = true;
 }

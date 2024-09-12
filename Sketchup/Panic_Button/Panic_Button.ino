@@ -1,5 +1,8 @@
 /*Detalle de versiones:
 * V1.5: 
+* Se agregan los pinout faltantes de leds.
+* Se agrega mensajes recibidos de confirmación.
+* Se agregan funciones prender y apagar led para trabajar con tareas programadas.
 
 */
 
@@ -15,8 +18,8 @@
 #include "configuracion.h"
 #include <SoftwareSerial.h>         //Libreria para definir tx y rx de sim800
 
-//int32_t prevMillis = 0;
-//#define interval 1000
+int32_t prevMillis = 0;
+#define interval 15000
 
 SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
@@ -47,6 +50,7 @@ void setup() {                              //setup run in core1
   Serial.println("Initialized scheduler");
   taskManager.setHighPriorityScheduler(&interrupt);          //Configura Scheduler interrupt como alta prioridad
   taskManager.enableAll(true);                               //this will recursively enable the higher priority tasks as well
+  t_apagarLED.disable();
   
   //Se crea una tarea que se ejecutará en la función loop0(), con prioridad 1 y se ejecutará en el core0.
   xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
@@ -60,19 +64,30 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
+
+  
 }
 
 void loop() {                                           //loop run in core1
-  //  if ((millis() - prevMillis > interval) && (nodo.pdr_ok == 0)) {               //entra cada 1 segundo solo si no se establecio la conexion LORA
-  //  prevMillis = millis();
-  //  //Serial.println("entramos al if de pdr_function");
-  //    pdr_function();
-  //  }
+  //   if (millis() - prevMillis > interval) { // && (nodo.pdr_ok == 0)) {               //entra cada 1 segundo solo si no se establecio la conexion LORA
+  //   prevMillis = millis();
+  //   //if(powerON()) digitalWrite(25, HIGH);
+  //   //else  digitalWrite(25, LOW);
+  //   digitalWrite(led_recibido, LOW);
+    
+    
+  //   //Serial.println("entramos al if de pdr_function");
+  //  //pdr_function();
+  //   }
 
   while(SIM800L.available()>0) {
-    char Received_SMS; 
+    char Received_SMS;
+    String mensaje_recibido = "";
+    //mensaje_recibido = SIM800L.readString(); 
     Received_SMS=SIM800L.read();                  //"char Received_SMS" is now containing the full SMS received
     Serial.print(Received_SMS);                   //Show it on the serial monitor (optional)  - 
+    //Serial.print(mensaje_recibido);
+    if(mensaje_recibido.indexOf(msj.rcv_policia) != -1) {encenderLED(led_recibido);}
   }
 
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
