@@ -27,3 +27,6 @@
 * * Se bajan delays en funcion Enviar_msj para mejorar rendimiento.
 * * Se agregan fotos en documentación.
 * * Pendiente circuito esquematico para primer prototipo en placa.
+
+* V1.5
+* * S
