@@ -1,6 +1,6 @@
 /*Detalle de versiones:
 * V1.6: 
-* Se agregan recepcion de mensajes faltantes para sms bomberos y medica.
+* Se agregan recepcion de mensajes faltantes para sms bomberos, medica y atendido.
 
 */
 

@@ -29,6 +29,6 @@ struct mensajes {
   String rcv_policia      = "policiarcv";           //policia recibido confirmacion
   String rcv_bomberos     = "bomberosrcv";          //bomberos recibido confirmacion
   String rcv_medica       = "medicarcv";            //medica recibido confirmacion
-  String rcv_atendido     = "atendido";             //Respuesta de operario, alerta atendida
+  String rcv_atendido     = "atendidorcv";          //Respuesta de operario, alerta atendida
 };
 mensajes msj;
