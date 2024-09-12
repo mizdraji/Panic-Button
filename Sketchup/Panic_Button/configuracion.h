@@ -32,3 +32,13 @@ struct mensajes {
   String rcv_atendido     = "atendidorcv";          //Respuesta de operario, alerta atendida
 };
 mensajes msj;
+
+//mensajes para enviar y recibir por lora
+  char policia_lora[]     = "Lpolicia";
+  char bomberos_lora[]    = "Lbomberos";
+  char medica_lora[]      = "Lmedica";
+  char policiarcv_lora[]  = "Lpoliciarcv";
+  char bomberosrcv_lora[] = "Lbomberosrcv";
+  char medicarcv_lora[]   = "Lmedicarcv";
+  char atendidorcv_lora[] = "Latendidorcv";
+  

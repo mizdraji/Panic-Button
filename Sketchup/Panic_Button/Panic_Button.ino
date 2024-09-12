@@ -1,6 +1,7 @@
 /*Detalle de versiones:
 * V1.6: 
 * Se agregan recepcion de mensajes faltantes para sms bomberos, medica y atendido.
+* Se agregan mensajes de recepcion para lora.
 
 */
 
@@ -100,6 +101,11 @@ void loop0(void *parameter){                    //loop0 run in core0
   if(recvStatus) {
     Serial.print("====>> ");
     Serial.println(datoEntrante);
+    if(strcmp(datoEntrante,atendidorcv_lora) == 0) encenderLED(led_atendido);
+    if(strcmp(datoEntrante, policiarcv_lora) == 0 ||
+       strcmp(datoEntrante,bomberosrcv_lora) == 0 ||
+       strcmp(datoEntrante,medicarcv_lora) == 0) encenderLED(led_recibido);
+
   }
   lora.update();                     //actualizacion lora
   vTaskDelay(10);                     //delay para fallas de wtd
