@@ -27,3 +27,12 @@
 * * Se bajan delays en funcion Enviar_msj para mejorar rendimiento.
 * * Se agregan fotos en documentación.
 * * Pendiente circuito esquematico para primer prototipo en placa.
+
+* V1.5
+* * * V1.5: 
+* * Se agregan los pinout faltantes de leds.
+* * Se agrega mensajes recibidos de confirmación. Pendiente agregar todos los mensajes recibidos sms, aun falta todo LORA.
+* * Se agregan funciones prender y apagar led para trabajar con tareas programadas.
+* * Se prende el led_recibido cuando se recibe una respuesta correcta durante 50 segundos.
+* * Se agrega capacitor de 1000uF 10V entre VCC y GND del modulo GSM para evitar errores de lectura y reseteos del ESP32
+por baja tension que genera el modulo SIM800.

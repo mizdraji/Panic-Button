@@ -1,5 +1,5 @@
 //Version
-#define VERSION "V1.4"
+#define VERSION "V1.5"
 
 //Serial
 #define SERIAL_SPEED  115200
@@ -21,10 +21,13 @@ String Remitente3 = "";              //NUMERO REMITENTE 3
 };
 remitente numero;
 
-//mensajes para enviar por sms
+//mensajes para enviar y recibir por sms
 struct mensajes {
-  String policia  = "policia";              //mensaje1
-  String bomberos = "bomberos";             //mensaje2
-  String medica   = "medica";               //mensaje3
+  String policia          = "policia";              //mensaje1 para enviar
+  String bomberos         = "bomberos";             //mensaje2 para enviar
+  String medica           = "medica";               //mensaje3 para enviar
+  String rcv_policia      = "policiarcv";          //policia recibido confirmacion
+  String rcv_bomberos     = "bomberosrcv";         //bomberos recibido confirmacion
+  String rcv_medica       = "medicarcv";           //medica recibido confirmacion
 };
 mensajes msj;

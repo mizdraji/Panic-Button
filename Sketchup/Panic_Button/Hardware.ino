@@ -5,9 +5,13 @@ void config_pines( void )
   pinMode(button1, INPUT);            //boton de policia      - GPIO 37
   pinMode(button2, INPUT);            //boton de bomberos     - GPIO 38
   pinMode(button3, INPUT);            //boton de ambulancia   - GPIO 39
+  pinMode(ADC_powerON, INPUT);
   pinMode(led1, OUTPUT);              //LED1 confirm policia  - GPIO 15
   pinMode(led2, OUTPUT);              //LED2 confirm bomberos - GPIO 2
   pinMode(led3, OUTPUT);              //LED3 confirm medica   - GPIO 4
+  pinMode(led_powerON, OUTPUT);
+  pinMode(led_recibido, OUTPUT);
+  pinMode(led_atendido, OUTPUT);
   pinMode(LED_BUILTIN, OUTPUT);       //LED integrado         - GPIO 25
 }
 
@@ -121,6 +125,12 @@ void pdr_function() {
 
 
 
+//powerON
+bool powerON (void) {
+  ADC_powerON_value = analogRead(ADC_powerON);
+  if(ADC_powerON_value > 2300)  return true;
+  else return false;
+}
 
 int16_t random_time(unsigned int MIN_,unsigned int MAX_) {
   //calcula un nuevo tiempo

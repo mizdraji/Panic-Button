@@ -74,6 +74,26 @@ void buttonTask3() {
   }
 }
 
+//LED ON
+void encenderLED(uint8_t LED) {
+  //prevMillis = millis();                CORRESPONDE AL PLAN B APAGAR LED EN CASO DE QUE NO FUNCIONEN LAS TAREAS
+  digitalWrite(LED, HIGH);  // Encender el LED
+  //Serial.println("encender led");
+
+  
+  t_apagarLED.enable();           // Habilitar la tarea para apagar el LED después de 5 segundos
+  t_apagarLED.delay(50000);       //se ejecuta la tarea apagarLED con un delay de 50 segundos
+  
+  
+}
+
+//LED OFF
+void apagarLED() {
+  digitalWrite(led_recibido, LOW);  // Apagar el LED
+  //Serial.println("funcion apagarled");
+  t_apagarLED.disable();
+}
+
 void buttonInterrupt1() {           //interrupcion pulsador1
   statebutton1 = true;
 }

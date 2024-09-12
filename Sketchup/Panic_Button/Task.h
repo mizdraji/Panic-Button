@@ -1,3 +1,5 @@
+#include "pinout.h"
+
 unsigned long previousMillis = 0;         // Variable para almacenar el tiempo anterior
 const unsigned long ledOnTime = 500;      // Tiempo de encendido en milisegundos (0.5 segundos)
 const unsigned long ledOffTime = 10000;   // Tiempo de apagado en milisegundos (5 segundos)
@@ -22,14 +24,19 @@ void loraSend();
 void buttonTask1();       //button1 pin 37 policia
 void buttonTask2();       //button2 pin 38 bomberos
 void buttonTask3();       //button3 pin 39 ambulancia
+void encenderLED(uint8_t LED); 
+void apagarLED();
 
 
 //Tareas:
 //Task: Este objeto te permitirá configurar la ejecución de la función, así como su número de ejecuciones y cada cuanto tiempo.
 
 
+//TASK0 - REVISAR LUEGO, NO SE PUEDE INTRODUCIR TAREAS DENTRO DE OTRAS FUNCIONES.
+//Task t_encenderLED(0, TASK_FOREVER, []() { encenderLED(led_recibido); }, &taskManager);  // Ejecuta inmediatamente
+
 //TASK1
-//Task t1(1000, TASK_FOREVER, &led_blink, &taskManager);    
+Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);   // Se ejecuta una vez durante    
 
 
 //TASK2:  blink de stand by, es un blink de baja frecuencia para indicar que el dispositivo esta funcionando.
