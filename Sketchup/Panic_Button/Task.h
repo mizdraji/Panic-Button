@@ -5,6 +5,8 @@ const unsigned long ledOnTime = 500;      // Tiempo de encendido en milisegundos
 const unsigned long ledOffTime = 10000;   // Tiempo de apagado en milisegundos (5 segundos)
 bool LED_state = LOW;                     // Estado actual del LED
 
+uint32_t delay_apagarLED = 5000;            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
+
 //button status:
 bool Statebutton1 = LOW;        //boton de policia
 bool Statebutton2 = LOW;        //boton de bomberos

@@ -1,5 +1,6 @@
 /*Detalle de versiones:
 * V1.6: 
+* Se agregan recepcion de mensajes faltantes para sms bomberos y medica.
 
 */
 
@@ -82,8 +83,11 @@ void loop() {                                           //loop run in core1
     mensaje_recibido = SIM800L.readString(); 
 
     Serial.print(mensaje_recibido);
-    if(mensaje_recibido.indexOf(msj.rcv_policia) != -1) {encenderLED(led_recibido);}
-  }
+    if (mensaje_recibido.indexOf(msj.rcv_atendido) != -1) encenderLED(led_atendido);
+    if (mensaje_recibido.indexOf(msj.rcv_policia) != -1 ||
+        mensaje_recibido.indexOf(msj.rcv_bomberos) != -1 ||
+        mensaje_recibido.indexOf(msj.rcv_medica) != -1) encenderLED(led_recibido);
+}
 
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
 

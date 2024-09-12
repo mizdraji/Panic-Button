@@ -1,3 +1,6 @@
+
+
+
 //Definimos nuestras tareas:
 
 //TASK1
@@ -82,13 +85,14 @@ void encenderLED(uint8_t LED) {
 
   
   t_apagarLED.enable();           // Habilitar la tarea para apagar el LED después de 5 segundos
-  t_apagarLED.delay(50000);       //se ejecuta la tarea apagarLED con un delay de 50 segundos
+  t_apagarLED.delay(delay_apagarLED);       //se ejecuta la tarea apagarLED con un delay de 50 segundos
   
   
 }
 
 //LED OFF
 void apagarLED() {
+  digitalWrite(led_atendido, LOW);  // Apagar el LED
   digitalWrite(led_recibido, LOW);  // Apagar el LED
   //Serial.println("funcion apagarled");
   t_apagarLED.disable();

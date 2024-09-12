@@ -26,8 +26,9 @@ struct mensajes {
   String policia          = "policia";              //mensaje1 para enviar
   String bomberos         = "bomberos";             //mensaje2 para enviar
   String medica           = "medica";               //mensaje3 para enviar
-  String rcv_policia      = "policiarcv";          //policia recibido confirmacion
-  String rcv_bomberos     = "bomberosrcv";         //bomberos recibido confirmacion
-  String rcv_medica       = "medicarcv";           //medica recibido confirmacion
+  String rcv_policia      = "policiarcv";           //policia recibido confirmacion
+  String rcv_bomberos     = "bomberosrcv";          //bomberos recibido confirmacion
+  String rcv_medica       = "medicarcv";            //medica recibido confirmacion
+  String rcv_atendido     = "atendido";             //Respuesta de operario, alerta atendida
 };
 mensajes msj;
