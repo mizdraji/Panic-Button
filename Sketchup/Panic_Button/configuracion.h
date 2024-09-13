@@ -34,11 +34,11 @@ struct mensajes {
 mensajes msj;
 
 //mensajes para enviar y recibir por lora
-  char policia_lora[]     = "Lpolicia";
-  char bomberos_lora[]    = "Lbomberos";
-  char medica_lora[]      = "Lmedica";
-  char policiarcv_lora[]  = "Lpoliciarcv";
-  char bomberosrcv_lora[] = "Lbomberosrcv";
-  char medicarcv_lora[]   = "Lmedicarcv";
-  char atendidorcv_lora[] = "Latendidorcv";
+  char policia_lora[]     = "Lpolicia";       //mensaje1 para enviar por lora.
+  char bomberos_lora[]    = "Lbomberos";      //mensaje1 para enviar por lora.
+  char medica_lora[]      = "Lmedica";        //mensaje1 para enviar por lora.
+  char policiarcv_lora[]  = "Lpoliciarcv";    //policia recibido por lora confirmacion - enviado de servidor de forma automática.
+  char bomberosrcv_lora[] = "Lbomberosrcv";   //bomberos recibido por lora confirmacion - enviado de servidor de forma automática.
+  char medicarcv_lora[]   = "Lmedicarcv";     //medica recibido por lora confirmacion - enviado de servidor de forma automática.
+  char atendidorcv_lora[] = "Latendidorcv";   //Respuesta por lora de operario, alerta atendida - enviado por operario de forma manual.
   

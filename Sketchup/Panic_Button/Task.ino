@@ -44,7 +44,7 @@ void loraSend() {
 void buttonTask1() {
   if (statebutton1) {
     Enviar_msj(numero.Remitente1, msj.policia);               //SMS
-    sendPackage(policia_lora, 1, no_espera_ACK,  1);         //LORA
+    sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);         //LORA
     //Serial.println("Enviar mensaje1 y prender led1");
     digitalWrite(led1, HIGH);
     
@@ -56,7 +56,7 @@ void buttonTask1() {
 void buttonTask2() {
   if (statebutton2) {
     Enviar_msj(numero.Remitente1, msj.bomberos);          //SMS
-    sendPackage(bomberos_lora, 1, no_espera_ACK,  1);      //LORA
+    sendPackage(bomberos_lora, strlen(bomberos_lora), no_espera_ACK,  1);      //LORA
     //Serial.println("Enviar mensaje2 y prender led2");
     digitalWrite(led2, HIGH);
     
@@ -67,7 +67,7 @@ void buttonTask2() {
 void buttonTask3() {
   if (statebutton3) {
     Enviar_msj(numero.Remitente1, msj.medica);            //SMS
-    sendPackage(medica_lora, 1, no_espera_ACK,  1);      //LORA
+    sendPackage(medica_lora, strlen(medica_lora), no_espera_ACK,  1);      //LORA
     //Serial.println("Enviar mensaje3 y prender led3");
     digitalWrite(led3, HIGH);
     
