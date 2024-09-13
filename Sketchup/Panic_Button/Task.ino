@@ -42,15 +42,20 @@ void loraSend() {
 
 //TASK5: interrupcion por pulsador button1
 void buttonTask1() {
+  //Serial.println("buttontask");
   if (statebutton1) {
     Enviar_msj(numero.Remitente1, msj.policia);               //SMS
     sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);         //LORA
     #if DEBUG
     Serial.println("Enviar mensaje1 y prender led1");
     #endif
+
     digitalWrite(led1, HIGH);
+    t_apagarLED1.enable();
+    t_apagarLED1.delay(delay_apagarLED1);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton1 = false;             // Reinicia el estado del pulsador
+    t5.disable();
   }
 }
 
@@ -62,9 +67,13 @@ void buttonTask2() {
     #if DEBUG
     Serial.println("Enviar mensaje2 y prender led2");
     #endif
+
     digitalWrite(led2, HIGH);
+    t_apagarLED1.enable();
+    t_apagarLED2.delay(delay_apagarLED2);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton2 = false;           // Reinicia el estado del pulsador
+    t6.disable();
   }
 }
 //TASK7: interrupcion por pulsador button3
@@ -75,9 +84,13 @@ void buttonTask3() {
     #if DEBUG
     Serial.println("Enviar mensaje3 y prender led3");
     #endif
+
     digitalWrite(led3, HIGH);
+    t_apagarLED1.enable();
+    t_apagarLED3.delay(delay_apagarLED3);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton3 = false;           // Reinicia el estado del pulsador
+    t7.disable();
   }
 }
 
@@ -92,31 +105,26 @@ void encenderLED(uint8_t LED) {
   
   t_apagarLED.enable();           // Habilitar la tarea para apagar el LED después de 5 segundos
   t_apagarLED.delay(delay_apagarLED);       //se ejecuta la tarea apagarLED con un delay de 50 segundos
-  
-  
 }
 
 //LED OFF
 void apagarLED() {
   digitalWrite(led_atendido, LOW);  // Apagar el LED
   digitalWrite(led_recibido, LOW);  // Apagar el LED
-  //Serial.println("funcion apagarled");
   t_apagarLED.disable();
 }
 
-volatile unsigned long lastDebounceTime = 0;
-const unsigned long debounceDelay = 50; // 50 ms
-
-
-//IMPORTANTE!! NO USAR SERIAL EN FUNCION DE INTERRUPCIONES
-void buttonInterrupt1() {           //interrupcion pulsador1
-  statebutton1 = true;
+void apagarLED1() {
+  digitalWrite(led1, LOW);  // Apagar el LED
+  t_apagarLED1.disable();
+}
+void apagarLED2() {
+  digitalWrite(led2, LOW);  // Apagar el LED
+  t_apagarLED2.disable();
+}
+void apagarLED3() {
+  digitalWrite(led3, LOW);  // Apagar el LED
+  t_apagarLED3.disable();
 }
 
-void buttonInterrupt2() {           //interrupcion pulsador2
-  statebutton2 = true;
-}
 
-void buttonInterrupt3() {           //interrupcion pulsador3
-  statebutton3 = true;
-}

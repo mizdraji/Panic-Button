@@ -4,9 +4,11 @@
 * Se agregan mensajes de recepcion para lora.
 * Se completan mensajes enviados lora al presionar pulsador.
 * Se agregan algunos print por DEBUG.
-
-
-
+* Se cambia GPIO37 de button1 por GPIO36, el 37 generaba problemas.
+* Se agregan tareas para apagar leds1,2 y 3.
+* Pendiente corregir BUG detectado: al presionar un boton para enviar un mensaje, envia 1 mensaje SMS pero se reciben 2 o 3 de lora (PASA EN EL GW DE LABORATORIO).
+* Pendiente actualizar esquematico.
+* Pendiente configurar tiempos de encendido y apagado de leds.
 
 */
 
@@ -29,6 +31,19 @@ SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
 
 TaskHandle_t Task0;                         //Task0 para ejecutar en core0
+
+//IMPORTANTE!! NO USAR SERIAL EN FUNCION DE INTERRUPCIONES
+void IRAM_ATTR buttonInterrupt1() {           //interrupcion pulsador1
+  statebutton1 = true;
+}
+
+void IRAM_ATTR buttonInterrupt2() {           //interrupcion pulsador2
+  statebutton2 = true;
+}
+
+void IRAM_ATTR buttonInterrupt3() {           //interrupcion pulsador3
+  statebutton3 = true;
+}
 
 void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
@@ -54,7 +69,13 @@ void setup() {                              //setup run in core1
   Serial.println("Initialized scheduler");
   taskManager.setHighPriorityScheduler(&interrupt);          //Configura Scheduler interrupt como alta prioridad
   taskManager.enableAll(true);                               //this will recursively enable the higher priority tasks as well
-  //t_apagarLED.disable();
+  t_apagarLED.disable();
+  t_apagarLED1.disable();
+  t_apagarLED2.disable();
+  t_apagarLED3.disable();
+  t5.disable();
+  t6.disable();
+  t7.disable();
   
   //Se crea una tarea que se ejecutará en la función loop0(), con prioridad 1 y se ejecutará en el core0.
   xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
@@ -84,6 +105,27 @@ void loop() {                                           //loop run in core1
   // //  //pdr_function();
   //  }
 
+  // Verificar si el botón 1 fue presionado
+  if (statebutton1) {
+    statebutton1 = true;  // Reiniciar el estado
+    Serial.println("Botón 1 presionado");
+    t5.enable();
+  }
+
+  // Verificar si el botón 2 fue presionado
+  if (statebutton2) {
+    statebutton2 = true;
+    Serial.println("Botón 2 presionado");
+    t6.enable();
+  }
+
+  // Verificar si el botón 3 fue presionado
+  if (statebutton3) {
+    statebutton3 = true;
+    Serial.println("Botón 3 presionado");
+    t7.enable();
+  }
+
   while(SIM800L.available()>0) {
     String mensaje_recibido = "";
     mensaje_recibido = SIM800L.readString(); 
@@ -96,6 +138,7 @@ void loop() {                                           //loop run in core1
 }
 
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
+  interrupt.execute();
 
 }
 
@@ -119,5 +162,6 @@ void loop0(void *parameter){                    //loop0 run in core0
 
   //vTaskDelay(10);                     //delay para fallas de wtd
 }
+
 
 

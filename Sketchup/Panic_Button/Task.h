@@ -6,6 +6,9 @@ const unsigned long ledOffTime = 10000;   // Tiempo de apagado en milisegundos (
 bool LED_state = LOW;                     // Estado actual del LED
 
 uint32_t delay_apagarLED = 5000;            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
+uint32_t delay_apagarLED1 = 5000;            //delay para apagar el led1 despues de cierto tiempo de que se envio un mensaje
+uint32_t delay_apagarLED2 = 5000;            //delay para apagar el led2 despues de cierto tiempo de que se envio un mensaje
+uint32_t delay_apagarLED3 = 5000;            //delay para apagar el led3 despues de cierto tiempo de que se envio un mensaje
 
 //estados de los pulsadores
 volatile bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
@@ -28,6 +31,9 @@ void buttonTask2();       //button2 pin 38 bomberos
 void buttonTask3();       //button3 pin 39 ambulancia
 void encenderLED(uint8_t LED); 
 void apagarLED();
+void apagarLED1();
+void apagarLED2();
+void apagarLED3();
 
 
 //Tareas:
@@ -55,6 +61,11 @@ Task t5(100, TASK_FOREVER, &buttonTask1, &interrupt);                  // Ejecut
 Task t6(100, TASK_FOREVER, &buttonTask2, &interrupt);                  // Ejecutar la tarea cada 100 ms
 //TASK7: buttontask3
 Task t7(100, TASK_FOREVER, &buttonTask3, &interrupt);                  // Ejecutar la tarea cada 100 ms
+
+//tareas para apagar leds:
+Task t_apagarLED1(5000, TASK_FOREVER, &apagarLED1, &taskManager);   // Se ejecuta una vez durante 
+Task t_apagarLED2(5000, TASK_FOREVER, &apagarLED2, &taskManager);   // Se ejecuta una vez durante 
+Task t_apagarLED3(5000, TASK_FOREVER, &apagarLED3, &taskManager);   // Se ejecuta una vez durante 
 
 
 
