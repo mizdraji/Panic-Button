@@ -2,6 +2,7 @@
 * V1.6: 
 * Se agregan recepcion de mensajes faltantes para sms bomberos, medica y atendido.
 * Se agregan mensajes de recepcion para lora.
+* Se completan mensajes enviados lora al presionar pulsador.
 
 */
 

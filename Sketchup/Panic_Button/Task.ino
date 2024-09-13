@@ -40,39 +40,37 @@ void loraSend() {
 
 //TASK4: Envia mensaje
 
-//TASK5: interrupcion por pulsador
+//TASK5: interrupcion por pulsador button1
 void buttonTask1() {
   if (statebutton1) {
-    // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
-    Enviar_msj(numero.Remitente1, msj.policia);
-    //Falta agregar enviar mensaje LORA
-    Serial.println("Enviar mensaje1 y prender led1");
-    digitalWrite(led3, HIGH);
-    
+    Enviar_msj(numero.Remitente1, msj.policia);               //SMS
+    sendPackage(policia_lora, 1, no_espera_ACK,  1);         //LORA
+    //Serial.println("Enviar mensaje1 y prender led1");
+    digitalWrite(led1, HIGH);
     
     statebutton1 = false;             // Reinicia el estado del pulsador
   }
 }
 
-//TASK6: interrupcion por pulsador
+//TASK6: interrupcion por pulsador button2
 void buttonTask2() {
   if (statebutton2) {
-    // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
-    Enviar_msj(numero.Remitente1, msj.bomberos);
-    //Falta agregar enviar mensaje LORA
-    Serial.println("Enviar mensaje2 y prender led2");
+    Enviar_msj(numero.Remitente1, msj.bomberos);          //SMS
+    sendPackage(bomberos_lora, 1, no_espera_ACK,  1);      //LORA
+    //Serial.println("Enviar mensaje2 y prender led2");
+    digitalWrite(led2, HIGH);
     
     statebutton2 = false;           // Reinicia el estado del pulsador
   }
 }
-//TASK7: interrupcion por pulsador
+//TASK7: interrupcion por pulsador button3
 void buttonTask3() {
   if (statebutton3) {
-    // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
-    Enviar_msj(numero.Remitente1, msj.medica);
-    //Falta agregar enviar mensaje LORA
-    Serial.println("Enviar mensaje3 y prender led3");
-    //led_blink();
+    Enviar_msj(numero.Remitente1, msj.medica);            //SMS
+    sendPackage(medica_lora, 1, no_espera_ACK,  1);      //LORA
+    //Serial.println("Enviar mensaje3 y prender led3");
+    digitalWrite(led3, HIGH);
+    
     statebutton3 = false;           // Reinicia el estado del pulsador
   }
 }
