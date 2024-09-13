@@ -3,6 +3,10 @@
 * Se agregan recepcion de mensajes faltantes para sms bomberos, medica y atendido.
 * Se agregan mensajes de recepcion para lora.
 * Se completan mensajes enviados lora al presionar pulsador.
+* Se agregan algunos print por DEBUG.
+
+
+
 
 */
 
@@ -50,7 +54,7 @@ void setup() {                              //setup run in core1
   Serial.println("Initialized scheduler");
   taskManager.setHighPriorityScheduler(&interrupt);          //Configura Scheduler interrupt como alta prioridad
   taskManager.enableAll(true);                               //this will recursively enable the higher priority tasks as well
-  t_apagarLED.disable();
+  //t_apagarLED.disable();
   
   //Se crea una tarea que se ejecutará en la función loop0(), con prioridad 1 y se ejecutará en el core0.
   xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  

@@ -7,10 +7,10 @@ bool LED_state = LOW;                     // Estado actual del LED
 
 uint32_t delay_apagarLED = 5000;            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
 
-//button status:
-bool Statebutton1 = LOW;        //boton de policia
-bool Statebutton2 = LOW;        //boton de bomberos
-bool Statebutton3 = LOW;        //boton de ambulancia
+//estados de los pulsadores
+volatile bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
+volatile bool statebutton2 = false;         //monitorea el estado del button1 en pin 38
+volatile bool statebutton3 = false;         //monitorea el estado del button1 en pin 39
 
 bool statusLED = false;
 

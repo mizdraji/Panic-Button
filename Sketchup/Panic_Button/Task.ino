@@ -45,7 +45,9 @@ void buttonTask1() {
   if (statebutton1) {
     Enviar_msj(numero.Remitente1, msj.policia);               //SMS
     sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);         //LORA
-    //Serial.println("Enviar mensaje1 y prender led1");
+    #if DEBUG
+    Serial.println("Enviar mensaje1 y prender led1");
+    #endif
     digitalWrite(led1, HIGH);
     
     statebutton1 = false;             // Reinicia el estado del pulsador
@@ -57,7 +59,9 @@ void buttonTask2() {
   if (statebutton2) {
     Enviar_msj(numero.Remitente1, msj.bomberos);          //SMS
     sendPackage(bomberos_lora, strlen(bomberos_lora), no_espera_ACK,  1);      //LORA
-    //Serial.println("Enviar mensaje2 y prender led2");
+    #if DEBUG
+    Serial.println("Enviar mensaje2 y prender led2");
+    #endif
     digitalWrite(led2, HIGH);
     
     statebutton2 = false;           // Reinicia el estado del pulsador
@@ -68,7 +72,9 @@ void buttonTask3() {
   if (statebutton3) {
     Enviar_msj(numero.Remitente1, msj.medica);            //SMS
     sendPackage(medica_lora, strlen(medica_lora), no_espera_ACK,  1);      //LORA
-    //Serial.println("Enviar mensaje3 y prender led3");
+    #if DEBUG
+    Serial.println("Enviar mensaje3 y prender led3");
+    #endif
     digitalWrite(led3, HIGH);
     
     statebutton3 = false;           // Reinicia el estado del pulsador
@@ -79,7 +85,9 @@ void buttonTask3() {
 void encenderLED(uint8_t LED) {
   //prevMillis = millis();                CORRESPONDE AL PLAN B APAGAR LED EN CASO DE QUE NO FUNCIONEN LAS TAREAS
   digitalWrite(LED, HIGH);  // Encender el LED
-  //Serial.println("encender led");
+  #if DEBUG
+  Serial.print("encender led: ");Serial.println(LED);
+  #endif
 
   
   t_apagarLED.enable();           // Habilitar la tarea para apagar el LED después de 5 segundos
@@ -96,6 +104,11 @@ void apagarLED() {
   t_apagarLED.disable();
 }
 
+volatile unsigned long lastDebounceTime = 0;
+const unsigned long debounceDelay = 50; // 50 ms
+
+
+//IMPORTANTE!! NO USAR SERIAL EN FUNCION DE INTERRUPCIONES
 void buttonInterrupt1() {           //interrupcion pulsador1
   statebutton1 = true;
 }
