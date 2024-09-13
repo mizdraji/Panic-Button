@@ -9,7 +9,7 @@
 
 #define ADC_powerON   13
 
-#define button1       37     //boton de policia
+#define button1       36     //boton de policia
 #define button2       38     //boton de bomberos
 #define button3       39     //boton de ambulancia
 

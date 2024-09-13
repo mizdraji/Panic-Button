@@ -1,5 +1,5 @@
 //Version
-#define VERSION "V1.5"
+#define VERSION "V1.6"
 
 //Serial
 #define SERIAL_SPEED  115200
@@ -26,8 +26,19 @@ struct mensajes {
   String policia          = "policia";              //mensaje1 para enviar
   String bomberos         = "bomberos";             //mensaje2 para enviar
   String medica           = "medica";               //mensaje3 para enviar
-  String rcv_policia      = "policiarcv";          //policia recibido confirmacion
-  String rcv_bomberos     = "bomberosrcv";         //bomberos recibido confirmacion
-  String rcv_medica       = "medicarcv";           //medica recibido confirmacion
+  String rcv_policia      = "policiarcv";           //policia recibido confirmacion
+  String rcv_bomberos     = "bomberosrcv";          //bomberos recibido confirmacion
+  String rcv_medica       = "medicarcv";            //medica recibido confirmacion
+  String rcv_atendido     = "atendidorcv";          //Respuesta de operario, alerta atendida
 };
 mensajes msj;
+
+//mensajes para enviar y recibir por lora
+  char policia_lora[]     = "Lpolicia";       //mensaje1 para enviar por lora.
+  char bomberos_lora[]    = "Lbomberos";      //mensaje1 para enviar por lora.
+  char medica_lora[]      = "Lmedica";        //mensaje1 para enviar por lora.
+  char policiarcv_lora[]  = "Lpoliciarcv";    //policia recibido por lora confirmacion - enviado de servidor de forma automática.
+  char bomberosrcv_lora[] = "Lbomberosrcv";   //bomberos recibido por lora confirmacion - enviado de servidor de forma automática.
+  char medicarcv_lora[]   = "Lmedicarcv";     //medica recibido por lora confirmacion - enviado de servidor de forma automática.
+  char atendidorcv_lora[] = "Latendidorcv";   //Respuesta por lora de operario, alerta atendida - enviado por operario de forma manual.
+  

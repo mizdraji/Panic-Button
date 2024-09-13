@@ -1,3 +1,6 @@
+
+
+
 //Definimos nuestras tareas:
 
 //TASK1
@@ -37,40 +40,57 @@ void loraSend() {
 
 //TASK4: Envia mensaje
 
-//TASK5: interrupcion por pulsador
+//TASK5: interrupcion por pulsador button1
 void buttonTask1() {
+  //Serial.println("buttontask");
   if (statebutton1) {
-    // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
-    Enviar_msj(numero.Remitente1, msj.policia);
-    //Falta agregar enviar mensaje LORA
+    Enviar_msj(numero.Remitente1, msj.policia);               //SMS
+    sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);         //LORA
+    #if DEBUG
     Serial.println("Enviar mensaje1 y prender led1");
-    digitalWrite(led3, HIGH);
-    
+    #endif
+
+    digitalWrite(led1, HIGH);
+    t_apagarLED1.enable();
+    t_apagarLED1.delay(delay_apagarLED1);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton1 = false;             // Reinicia el estado del pulsador
+    t5.disable();
   }
 }
 
-//TASK6: interrupcion por pulsador
+//TASK6: interrupcion por pulsador button2
 void buttonTask2() {
   if (statebutton2) {
-    // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
-    Enviar_msj(numero.Remitente1, msj.bomberos);
-    //Falta agregar enviar mensaje LORA
+    Enviar_msj(numero.Remitente1, msj.bomberos);          //SMS
+    sendPackage(bomberos_lora, strlen(bomberos_lora), no_espera_ACK,  1);      //LORA
+    #if DEBUG
     Serial.println("Enviar mensaje2 y prender led2");
+    #endif
+
+    digitalWrite(led2, HIGH);
+    t_apagarLED1.enable();
+    t_apagarLED2.delay(delay_apagarLED2);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton2 = false;           // Reinicia el estado del pulsador
+    t6.disable();
   }
 }
-//TASK7: interrupcion por pulsador
+//TASK7: interrupcion por pulsador button3
 void buttonTask3() {
   if (statebutton3) {
-    // Realiza la tarea que deseas ejecutar después de la interrupción por pulsador
-    Enviar_msj(numero.Remitente1, msj.medica);
-    //Falta agregar enviar mensaje LORA
+    Enviar_msj(numero.Remitente1, msj.medica);            //SMS
+    sendPackage(medica_lora, strlen(medica_lora), no_espera_ACK,  1);      //LORA
+    #if DEBUG
     Serial.println("Enviar mensaje3 y prender led3");
-    //led_blink();
+    #endif
+
+    digitalWrite(led3, HIGH);
+    t_apagarLED1.enable();
+    t_apagarLED3.delay(delay_apagarLED3);       //se ejecuta la tarea apagarLED con un delay de X segundos
+    
     statebutton3 = false;           // Reinicia el estado del pulsador
+    t7.disable();
   }
 }
 
@@ -78,30 +98,33 @@ void buttonTask3() {
 void encenderLED(uint8_t LED) {
   //prevMillis = millis();                CORRESPONDE AL PLAN B APAGAR LED EN CASO DE QUE NO FUNCIONEN LAS TAREAS
   digitalWrite(LED, HIGH);  // Encender el LED
-  //Serial.println("encender led");
+  #if DEBUG
+  Serial.print("encender led: ");Serial.println(LED);
+  #endif
 
   
   t_apagarLED.enable();           // Habilitar la tarea para apagar el LED después de 5 segundos
-  t_apagarLED.delay(50000);       //se ejecuta la tarea apagarLED con un delay de 50 segundos
-  
-  
+  t_apagarLED.delay(delay_apagarLED);       //se ejecuta la tarea apagarLED con un delay de 50 segundos
 }
 
 //LED OFF
 void apagarLED() {
+  digitalWrite(led_atendido, LOW);  // Apagar el LED
   digitalWrite(led_recibido, LOW);  // Apagar el LED
-  //Serial.println("funcion apagarled");
   t_apagarLED.disable();
 }
 
-void buttonInterrupt1() {           //interrupcion pulsador1
-  statebutton1 = true;
+void apagarLED1() {
+  digitalWrite(led1, LOW);  // Apagar el LED
+  t_apagarLED1.disable();
+}
+void apagarLED2() {
+  digitalWrite(led2, LOW);  // Apagar el LED
+  t_apagarLED2.disable();
+}
+void apagarLED3() {
+  digitalWrite(led3, LOW);  // Apagar el LED
+  t_apagarLED3.disable();
 }
 
-void buttonInterrupt2() {           //interrupcion pulsador2
-  statebutton2 = true;
-}
 
-void buttonInterrupt3() {           //interrupcion pulsador3
-  statebutton3 = true;
-}

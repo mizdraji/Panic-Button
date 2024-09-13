@@ -9,8 +9,5 @@ char datoEntrante[INPUTBUFF] = {0};
 char cmd_rcv;
 byte recvStatus = 0;
 
-
-
-
 uint8_t initLoraTec( void );
 uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type,  bool canal_por_defecto );
