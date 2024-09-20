@@ -34,6 +34,8 @@ void apagarLED();
 void apagarLED1();
 void apagarLED2();
 void apagarLED3();
+void trecibido();
+void tatendido();
 
 
 //Tareas:
@@ -42,9 +44,6 @@ void apagarLED3();
 
 //TASK0 - REVISAR LUEGO, NO SE PUEDE INTRODUCIR TAREAS DENTRO DE OTRAS FUNCIONES.
 //Task t_encenderLED(0, TASK_FOREVER, []() { encenderLED(led_recibido); }, &taskManager);  // Ejecuta inmediatamente
-
-//TASK1
-Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);   // Se ejecuta una vez durante    
 
 
 //TASK2:  blink de stand by, es un blink de baja frecuencia para indicar que el dispositivo esta funcionando.
@@ -63,10 +62,13 @@ Task t6(100, TASK_FOREVER, &buttonTask2, &interrupt);                  // Ejecut
 Task t7(100, TASK_FOREVER, &buttonTask3, &interrupt);                  // Ejecutar la tarea cada 100 ms
 
 //tareas para apagar leds:
+Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);   // Se ejecuta una vez durante 
 Task t_apagarLED1(5000, TASK_FOREVER, &apagarLED1, &taskManager);   // Se ejecuta una vez durante 
 Task t_apagarLED2(5000, TASK_FOREVER, &apagarLED2, &taskManager);   // Se ejecuta una vez durante 
 Task t_apagarLED3(5000, TASK_FOREVER, &apagarLED3, &taskManager);   // Se ejecuta una vez durante 
 
+Task t_recibido(1000, TASK_FOREVER, &trecibido, &taskManager);
+Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
 
 
 

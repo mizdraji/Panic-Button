@@ -3,8 +3,10 @@
 * Se cambian algunas variables por define para mejorar rendimiento, ya que estas no eran modificadas durante el programa.
 * Se agrega control de rebotes para los tres pulsadores.
 * Se corrige la falla que enviaba dos veces lora.
-
-
+* Se cambia secuencia de leds: al presionar boton led1/2/3 -> se recibe respuesta led_recibido -> se recibe respuesta atendido led_atendido -> luego de cierto tiempo se apagan todos los leds.
+* Pendiente, ver cuestion: que pasa con las tareas cuando se recibe lora y sms a la vez.
+* Pendiente configurar led encendido en GPIO23con ADC en GPIO13.
+* Pendiente mejorar Tasks en setup.
 */
 
 //librerias utilizadas
@@ -60,6 +62,8 @@ void setup() {                              //setup run in core1
   t5.disable();
   t6.disable();
   t7.disable();
+  t_recibido.disable();
+  t_atendido.disable();
   
   //Se crea una tarea que se ejecutará en la función loop0(), con prioridad 1 y se ejecutará en el core0.
   xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
@@ -78,29 +82,16 @@ void setup() {                              //setup run in core1
 }
 
 void loop() {                                           //loop run in core1
-//PLAN B APAGAR LED POR SI NO SALE CON TAREAS
-  //   if (millis() - prevMillis > interval) { // && (nodo.pdr_ok == 0)) {               //entra cada 1 segundo solo si no se establecio la conexion LORA
-  //   prevMillis = millis();
-  //   //if(powerON()) digitalWrite(25, HIGH);
-  //   //else  digitalWrite(25, LOW);
-  //   digitalWrite(led_recibido, LOW);
-  //   Serial.println("apagar led");
-
-  // //  //pdr_function();
-  //  }
-
   // Verificar si el botón 1 fue presionado
   if (statebutton1) {
     Serial.println("Botón 1 presionado");
     t5.enable();
   }
-
   // Verificar si el botón 2 fue presionado
   if (statebutton2) {
     Serial.println("Botón 2 presionado");
     t6.enable();
   }
-
   // Verificar si el botón 3 fue presionado
   if (statebutton3) {
     Serial.println("Botón 3 presionado");
@@ -112,10 +103,10 @@ void loop() {                                           //loop run in core1
     mensaje_recibido = SIM800L.readString(); 
 
     Serial.print(mensaje_recibido);
-    if (mensaje_recibido.indexOf(msj.rcv_atendido) != -1) encenderLED(led_atendido);
+    if (mensaje_recibido.indexOf(msj.rcv_atendido) != -1) t_atendido.enable();    //se ejecuta task de atendido
     if (mensaje_recibido.indexOf(msj.rcv_policia) != -1 ||
         mensaje_recibido.indexOf(msj.rcv_bomberos) != -1 ||
-        mensaje_recibido.indexOf(msj.rcv_medica) != -1) encenderLED(led_recibido);
+        mensaje_recibido.indexOf(msj.rcv_medica) != -1) t_recibido.enable();      //se ejecuta task de recibido
 }
 
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
@@ -133,7 +124,7 @@ void loop0(void *parameter){                    //loop0 run in core0
     if(strcmp(datoEntrante,atendidorcv_lora) == 0) encenderLED(led_atendido);
     if(strcmp(datoEntrante, policiarcv_lora) == 0 ||
        strcmp(datoEntrante,bomberosrcv_lora) == 0 ||
-       strcmp(datoEntrante,medicarcv_lora) == 0) encenderLED(led_recibido);
+       strcmp(datoEntrante,medicarcv_lora) == 0)  encenderLED(led_recibido);
 
   }
   lora.update();                     //actualizacion lora
