@@ -1,6 +1,8 @@
 /*Detalle de versiones:
 * V1.7: 
 * Se cambian algunas variables por define para mejorar rendimiento, ya que estas no eran modificadas durante el programa.
+* Se agrega control de rebotes para los tres pulsadores.
+* Se corrige la falla que enviaba dos veces lora.
 
 
 */
@@ -25,18 +27,7 @@ SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
 TaskHandle_t Task0;                         //Task0 para ejecutar en core0
 
-//IMPORTANTE!! NO USAR SERIAL EN FUNCION DE INTERRUPCIONES
-void IRAM_ATTR buttonInterrupt1() {           //interrupcion pulsador1
-  statebutton1 = true;
-}
 
-void IRAM_ATTR buttonInterrupt2() {           //interrupcion pulsador2
-  statebutton2 = true;
-}
-
-void IRAM_ATTR buttonInterrupt3() {           //interrupcion pulsador3
-  statebutton3 = true;
-}
 
 void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
@@ -100,21 +91,18 @@ void loop() {                                           //loop run in core1
 
   // Verificar si el botón 1 fue presionado
   if (statebutton1) {
-    statebutton1 = true;  // Reiniciar el estado
     Serial.println("Botón 1 presionado");
     t5.enable();
   }
 
   // Verificar si el botón 2 fue presionado
   if (statebutton2) {
-    statebutton2 = true;
     Serial.println("Botón 2 presionado");
     t6.enable();
   }
 
   // Verificar si el botón 3 fue presionado
   if (statebutton3) {
-    statebutton3 = true;
     Serial.println("Botón 3 presionado");
     t7.enable();
   }

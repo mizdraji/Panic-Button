@@ -21,6 +21,11 @@ str nodo;
 //variables para adc en GPIO13
 int ADC_powerON_value = 0;            //voltage = ADC_powerON_value * (3.3 / 4095.0);     ADC_powerON_value = analogRead(ADC_powerON);
 
+//interrupciones:
+void IRAM_ATTR buttonInterrupt1();
+void IRAM_ATTR buttonInterrupt2();
+void IRAM_ATTR buttonInterrupt3();
+
 int16_t random_time(unsigned int MIN_,unsigned int MAX_);
 void pdr_function();
 void config_pines( void );
