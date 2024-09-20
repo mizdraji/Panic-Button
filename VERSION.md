@@ -14,7 +14,7 @@
 * * Se crea función pdr_function() para prueba inicial de red LORA pero aun no está funcional.
 
 * V1.3: 
-* * Se configuran los 3 pulsadores como tareas que se activan a travez de interrupciones. (pendiente mejorar rebote)
+* * Se configuran los 3 pulsadores como tareas que se activan a travez de interrupciones.
 * * Se crea el objeto Scheduler interrupt para establecer como alta prioridad.
 * * Se cambian los nombres de las tareas por t1-t7.
 * * Se crean las tareas t5, t6 y t7 para interrupciones.
@@ -23,7 +23,7 @@
 * V1.4: 
 * * Se agregan funciones Serialcom y ReceiveMode en Hardware.ino para enviar/recibir SMS.
 * * Se envia uncero al iniciar el setup por LORA para establecer la conexión.
-* * Pulsadores ahora envian mensajes y prende led para confirmar que se envio el mensaje. Pendiente solucionar rebote!!!
+* * Pulsadores ahora envian mensajes y prende led para confirmar que se envio el mensaje.
 * * Se bajan delays en funcion Enviar_msj para mejorar rendimiento.
 * * Se agregan fotos en documentación.
 
@@ -44,9 +44,9 @@ por baja tension que genera el modulo SIM800.
 * * Se agregan tareas para apagar leds1,2 y 3.
 * * BUG detectado: al presionar un boton para enviar un mensaje, envia 1 mensaje SMS pero se reciben 2 o 3 de lora (PASA EN EL GW DE LABORATORIO).
 * * Se actualiza esquematico y se crea PCB para prototipo.
-* * Pendiente configurar tiempos de encendido y apagado de leds.
 
 * V1.7
 * * Se cambian algunas variables por define para mejorar rendimiento, ya que estas no eran modificadas durante el programa.
 * * Se agrega control de rebotes para los tres pulsadores.
 * * Se corrige la falla que enviaba dos veces lora.
+* * Se cambia secuencia de leds: al presionar boton led1/2/3 -> se recibe respuesta led_recibido -> se recibe respuesta atendido led_atendido -> luego de cierto tiempo se apagan todos los leds.
