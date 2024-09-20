@@ -47,4 +47,4 @@ por baja tension que genera el modulo SIM800.
 * * Pendiente configurar tiempos de encendido y apagado de leds.
 
 * V1.7
-* *
+* * Se cambian algunas variables por define para mejorar rendimiento, ya que estas no eran modificadas durante el programa.
