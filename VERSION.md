@@ -47,5 +47,5 @@ por baja tension que genera el modulo SIM800.
 * * Pendiente actualizar esquematico.
 * * Pendiente configurar tiempos de encendido y apagado de leds.
 
-* V1.6
+* V1.7
 * *
