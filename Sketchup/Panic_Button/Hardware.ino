@@ -84,7 +84,7 @@ void pdr_function() {
       char uncero[1]={0};
       if (sendPackage(uncero, 1, espera_ACK, 0)) {        //si llega el ACK se pone en 1 y entra al if
         nodo.pdr_ok = 1;
-        nodo.t_wait = random_time(0,nodo.MAX_RANDOM_LARGO);
+        nodo.t_wait = random_time(0,MAX_RANDOM_LARGO);
         nodo.pausa_larga = 0;
         nodo.cont_pausas_largas=0;
         nodo.cont_reintento_corto = 0;
@@ -93,22 +93,22 @@ void pdr_function() {
       else {
         nodo.pdr_ok = 0;
         nodo.cont_reintento_corto++;
-        if (nodo.cont_reintento_corto >= nodo.MAX_REINTENTOS) {
+        if (nodo.cont_reintento_corto >= MAX_REINTENTOS) {
           nodo.cont_reintento_corto = 0;
           nodo.pausa_larga = 1;
           nodo.cont_pausas_largas++;
-          if (nodo.cont_pausas_largas >= nodo.MAX_PAUSAS_LARGAS) {
+          if (nodo.cont_pausas_largas >= MAX_PAUSAS_LARGAS) {
             nodo.cont_pausas_largas = 0;
-            nodo.t_wait = nodo.UN_DIA; //esperar un dia completo
+            nodo.t_wait = UN_DIA; //esperar un dia completo
           }
-          else nodo.t_wait = nodo.LONG_TIME_TO_WAIT; //este es un tiempo largo y fijo
+          else nodo.t_wait = LONG_TIME_TO_WAIT; //este es un tiempo largo y fijo
           Serial.println("-->Cant Max de reintentos para PDR excedido, pausa larga");
           
           Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
           
         }
         else {
-          nodo.t_wait = random_time(nodo.MIN_RANDOM,nodo.MAX_RANDOM); //devuelve en segundos
+          nodo.t_wait = random_time(MIN_RANDOM,MAX_RANDOM); //devuelve en segundos
           Serial.println("-->PRUEBA DE RED: FALLO");
           
           Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");

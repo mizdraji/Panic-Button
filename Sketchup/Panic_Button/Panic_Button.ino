@@ -1,5 +1,6 @@
 /*Detalle de versiones:
 * V1.7: 
+* Se cambian algunas variables por define para mejorar rendimiento, ya que estas no eran modificadas durante el programa.
 
 
 */

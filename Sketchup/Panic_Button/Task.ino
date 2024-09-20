@@ -1,6 +1,3 @@
-
-
-
 //Definimos nuestras tareas:
 
 //TASK1
