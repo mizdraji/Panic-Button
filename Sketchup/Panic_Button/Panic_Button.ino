@@ -1,14 +1,6 @@
 /*Detalle de versiones:
-* V1.6: 
-* Se agregan recepcion de mensajes faltantes para sms bomberos, medica y atendido.
-* Se agregan mensajes de recepcion para lora.
-* Se completan mensajes enviados lora al presionar pulsador.
-* Se agregan algunos print por DEBUG.
-* Se cambia GPIO37 de button1 por GPIO36, el 37 generaba problemas.
-* Se agregan tareas para apagar leds1,2 y 3.
-* Pendiente corregir BUG detectado: al presionar un boton para enviar un mensaje, envia 1 mensaje SMS pero se reciben 2 o 3 de lora (PASA EN EL GW DE LABORATORIO).
-* Pendiente actualizar esquematico.
-* Pendiente configurar tiempos de encendido y apagado de leds.
+* V1.7: 
+
 
 */
 

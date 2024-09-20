@@ -46,5 +46,6 @@ por baja tension que genera el modulo SIM800.
 * * Pendiente corregir BUG detectado: al presionar un boton para enviar un mensaje, envia 1 mensaje SMS pero se reciben 2 o 3 de lora (PASA EN EL GW DE LABORATORIO).
 * * Pendiente actualizar esquematico.
 * * Pendiente configurar tiempos de encendido y apagado de leds.
-* *
+
+* V1.6
 * *
