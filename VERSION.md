@@ -26,7 +26,6 @@
 * * Pulsadores ahora envian mensajes y prende led para confirmar que se envio el mensaje. Pendiente solucionar rebote!!!
 * * Se bajan delays en funcion Enviar_msj para mejorar rendimiento.
 * * Se agregan fotos en documentación.
-* * Pendiente circuito esquematico para primer prototipo en placa.
 
 * V1.5
 * * Se agregan los pinout faltantes de leds.
@@ -44,7 +43,7 @@ por baja tension que genera el modulo SIM800.
 * * Se cambia GPIO37 de button1 por GPIO36, el 37 generaba problemas.
 * * Se agregan tareas para apagar leds1,2 y 3.
 * * Pendiente corregir BUG detectado: al presionar un boton para enviar un mensaje, envia 1 mensaje SMS pero se reciben 2 o 3 de lora (PASA EN EL GW DE LABORATORIO).
-* * Pendiente actualizar esquematico.
+* * Se actualiza esquematico y se crea PCB para prototipo.
 * * Pendiente configurar tiempos de encendido y apagado de leds.
 
 * V1.6
