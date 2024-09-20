@@ -66,8 +66,8 @@ void buttonTask2() {
     #endif
 
     encenderLED(led2);
-    t_apagarLED2.enable();
-    t_apagarLED2.delay(delay_apagarLED2);       //se ejecuta la tarea apagarLED con un delay de X segundos
+    //t_apagarLED2.enable();
+    //t_apagarLED2.delay(delay_apagarLED2);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton2 = false;           // Reinicia el estado del pulsador
     t6.disable();
@@ -83,8 +83,8 @@ void buttonTask3() {
     #endif
 
     encenderLED(led3);
-    t_apagarLED2.enable();
-    t_apagarLED3.delay(delay_apagarLED3);       //se ejecuta la tarea apagarLED con un delay de X segundos
+    //t_apagarLED3.enable();
+    //t_apagarLED3.delay(delay_apagarLED3);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton3 = false;           // Reinicia el estado del pulsador
     t7.disable();
