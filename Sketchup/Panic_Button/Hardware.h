@@ -1,30 +1,30 @@
 //estructura para guardar variables del nodo
+#define MAX_RANDOM_LARGO       50        //50 segundos
+#define MAX_REINTENTOS         6         //es la cantidad  maxima de reintentos que hace con un intervalo de tiempo pequeño, luego espera un tiempo mas largo y vuelve a intentar. Min 6 para que use todos los SF  
+#define MAX_PAUSAS_LARGAS      3         //Maximo de pausas largas que se realizan cuando los reintentos cortos fallan, superado este numero se espera un dia completo
+#define LONG_TIME_TO_WAIT      180       //3 minutos
+#define MIN_RANDOM             10        //10 segundos
+#define MAX_RANDOM             40        //40 segundos
+#define UN_DIA                 84600     //24hs = 86400 segundos
+
 struct str {
   uint8_t pdr_ok = 0;                       // =1 cuando la prueba de red dio ok, sino =0
-
   //variables de tiempo
   int32_t t_wait                = 0;        //tiempo de espera
-  uint8_t MAX_RANDOM_LARGO      = 50;       //50 segundos  
   uint8_t pausa_larga           = 0;        //=1 esperar tiempo largo
   uint8_t cont_pausas_largas    = 0;        //cuenta las pausas largas que se realizan cuando los reintentos cortos fallan
-
   uint8_t cont_reintento_corto  = 0;        //usado para contar los intentos uplink de las funciones pdr, sync e ident
-  uint8_t MAX_REINTENTOS        = 6;        //es la cantidad  maxima de reintentos que hace con un intervalo de tiempo pequeño, luego espera un tiempo mas largo y vuelve a intentar. Min 6 para que use todos los SF
-  uint8_t MAX_PAUSAS_LARGAS     = 3;        //Maximo de pausas largas que se realizan cuando los reintentos cortos fallan, superado este numero se espera un dia completo
-  uint8_t LONG_TIME_TO_WAIT     = 180;       //3 minutos
-
-  uint8_t MIN_RANDOM            = 10;        //10 segundos
-  uint8_t MAX_RANDOM            = 40;        //40 segundos
-  
-  uint16_t UN_DIA               = 84600;     //24hs = 86400 segundos
-
-
 };
 str nodo;
 
 
 //variables para adc en GPIO13
 int ADC_powerON_value = 0;            //voltage = ADC_powerON_value * (3.3 / 4095.0);     ADC_powerON_value = analogRead(ADC_powerON);
+
+//interrupciones:
+void IRAM_ATTR buttonInterrupt1();
+void IRAM_ATTR buttonInterrupt2();
+void IRAM_ATTR buttonInterrupt3();
 
 int16_t random_time(unsigned int MIN_,unsigned int MAX_);
 void pdr_function();

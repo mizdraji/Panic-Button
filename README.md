@@ -17,7 +17,7 @@
 * GPIO16 RX SIM800L
 * GPIO17 TX SIM800L
 *******************************
-* GPIO37 button1 - pulsador con resistencia pull-down.
+* GPIO36 button1 - pulsador con resistencia pull-down.
 * GPIO38 button2 - pulsador con resistencia pull-down.
 * GPIO39 button3 - pulsador con resistencia pull-down.
 * *****************************

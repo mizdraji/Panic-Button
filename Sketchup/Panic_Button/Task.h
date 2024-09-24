@@ -1,14 +1,14 @@
 #include "pinout.h"
 
 unsigned long previousMillis = 0;         // Variable para almacenar el tiempo anterior
-const unsigned long ledOnTime = 500;      // Tiempo de encendido en milisegundos (0.5 segundos)
-const unsigned long ledOffTime = 10000;   // Tiempo de apagado en milisegundos (5 segundos)
+#define ledOnTime   500      // Tiempo de encendido en milisegundos (0.5 segundos)
+#define ledOffTime  10000   // Tiempo de apagado en milisegundos (5 segundos)
 bool LED_state = LOW;                     // Estado actual del LED
 
-uint32_t delay_apagarLED = 5000;            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
-uint32_t delay_apagarLED1 = 5000;            //delay para apagar el led1 despues de cierto tiempo de que se envio un mensaje
-uint32_t delay_apagarLED2 = 5000;            //delay para apagar el led2 despues de cierto tiempo de que se envio un mensaje
-uint32_t delay_apagarLED3 = 5000;            //delay para apagar el led3 despues de cierto tiempo de que se envio un mensaje
+#define delay_apagarLED   5000            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
+#define delay_apagarLED1  5000            //delay para apagar el led1 despues de cierto tiempo de que se envio un mensaje
+#define delay_apagarLED2  5000            //delay para apagar el led2 despues de cierto tiempo de que se envio un mensaje
+#define delay_apagarLED3  5000            //delay para apagar el led3 despues de cierto tiempo de que se envio un mensaje
 
 //estados de los pulsadores
 volatile bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
@@ -34,6 +34,8 @@ void apagarLED();
 void apagarLED1();
 void apagarLED2();
 void apagarLED3();
+void trecibido();
+void tatendido();
 
 
 //Tareas:
@@ -42,9 +44,6 @@ void apagarLED3();
 
 //TASK0 - REVISAR LUEGO, NO SE PUEDE INTRODUCIR TAREAS DENTRO DE OTRAS FUNCIONES.
 //Task t_encenderLED(0, TASK_FOREVER, []() { encenderLED(led_recibido); }, &taskManager);  // Ejecuta inmediatamente
-
-//TASK1
-Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);   // Se ejecuta una vez durante    
 
 
 //TASK2:  blink de stand by, es un blink de baja frecuencia para indicar que el dispositivo esta funcionando.
@@ -63,10 +62,13 @@ Task t6(100, TASK_FOREVER, &buttonTask2, &interrupt);                  // Ejecut
 Task t7(100, TASK_FOREVER, &buttonTask3, &interrupt);                  // Ejecutar la tarea cada 100 ms
 
 //tareas para apagar leds:
+Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);   // Se ejecuta una vez durante 
 Task t_apagarLED1(5000, TASK_FOREVER, &apagarLED1, &taskManager);   // Se ejecuta una vez durante 
 Task t_apagarLED2(5000, TASK_FOREVER, &apagarLED2, &taskManager);   // Se ejecuta una vez durante 
 Task t_apagarLED3(5000, TASK_FOREVER, &apagarLED3, &taskManager);   // Se ejecuta una vez durante 
 
+Task t_recibido(1000, TASK_FOREVER, &trecibido, &taskManager);
+Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
 
 
 
