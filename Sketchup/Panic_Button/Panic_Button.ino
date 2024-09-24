@@ -1,12 +1,7 @@
 /*Detalle de versiones:
-* V1.7: 
-* Se cambian algunas variables por define para mejorar rendimiento, ya que estas no eran modificadas durante el programa.
-* Se agrega control de rebotes para los tres pulsadores.
-* Se corrige la falla que enviaba dos veces lora.
-* Se cambia secuencia de leds: al presionar boton led1/2/3 -> se recibe respuesta led_recibido -> se recibe respuesta atendido led_atendido -> luego de cierto tiempo se apagan todos los leds.
-* Pendiente, ver cuestion: que pasa con las tareas cuando se recibe lora y sms a la vez.
-* Pendiente configurar led encendido en GPIO23con ADC en GPIO13.
-* Pendiente mejorar Tasks en setup.
+* V1.8: 
+* Se crea config_task(); para organizar mejor el setup de task.
+* Se saca t5, t6 y t7 del loop para ser habilitados en las interrupciones
 */
 
 //librerias utilizadas
@@ -52,18 +47,7 @@ void setup() {                              //setup run in core1
   }
 
   //config Scheduler
-  Serial.println("Initialized scheduler");
-  taskManager.setHighPriorityScheduler(&interrupt);          //Configura Scheduler interrupt como alta prioridad
-  taskManager.enableAll(true);                               //this will recursively enable the higher priority tasks as well
-  t_apagarLED.disable();
-  t_apagarLED1.disable();
-  t_apagarLED2.disable();
-  t_apagarLED3.disable();
-  t5.disable();
-  t6.disable();
-  t7.disable();
-  t_recibido.disable();
-  t_atendido.disable();
+  config_task();
   
   //Se crea una tarea que se ejecutará en la función loop0(), con prioridad 1 y se ejecutará en el core0.
   xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
@@ -83,20 +67,20 @@ void setup() {                              //setup run in core1
 
 void loop() {                                           //loop run in core1
   // Verificar si el botón 1 fue presionado
-  if (statebutton1) {
-    Serial.println("Botón 1 presionado");
-    t5.enable();
-  }
-  // Verificar si el botón 2 fue presionado
-  if (statebutton2) {
-    Serial.println("Botón 2 presionado");
-    t6.enable();
-  }
-  // Verificar si el botón 3 fue presionado
-  if (statebutton3) {
-    Serial.println("Botón 3 presionado");
-    t7.enable();
-  }
+  // if (statebutton1) {
+  //   Serial.println("Botón 1 presionado");
+  //   t5.enable();
+  // }
+  // // Verificar si el botón 2 fue presionado
+  // if (statebutton2) {
+  //   Serial.println("Botón 2 presionado");
+  //   t6.enable();
+  // }
+  // // Verificar si el botón 3 fue presionado
+  // if (statebutton3) {
+  //   Serial.println("Botón 3 presionado");
+  //   t7.enable();
+  // }
 
   while(SIM800L.available()>0) {
     String mensaje_recibido = "";

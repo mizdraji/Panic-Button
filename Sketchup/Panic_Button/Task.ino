@@ -1,3 +1,20 @@
+//configuracion task para setup:
+void config_task(){
+  Serial.println("Initialized scheduler");
+  taskManager.setHighPriorityScheduler(&interrupt);          //Configura Scheduler interrupt como alta prioridad
+  taskManager.enableAll(true);                               //this will recursively enable the higher priority tasks as well
+  t_apagarLED.disable();
+  t_apagarLED1.disable();
+  t_apagarLED2.disable();
+  t_apagarLED3.disable();
+  t5.disable();
+  t6.disable();
+  t7.disable();
+  t_recibido.disable();
+  t_atendido.disable();
+}
+
+
 //Definimos nuestras tareas:
 
 //TASK1
