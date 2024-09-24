@@ -54,3 +54,6 @@ por baja tension que genera el modulo SIM800.
 * V1.8
 * * Se crea config_task(); para organizar mejor el setup de task.
 * * Se saca t5, t6 y t7 del loop para ser habilitados en las interrupciones.
+* * Se agrega Remitente2 mastermonitor
+* * Se actualiza los recibidos por lora
+

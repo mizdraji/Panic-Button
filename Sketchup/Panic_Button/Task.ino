@@ -58,7 +58,7 @@ void loraSend() {
 void buttonTask1() {
   //Serial.println("buttontask");
   if (statebutton1) {
-    Enviar_msj(numero.Remitente1, msj.policia);               //SMS
+    Enviar_msj(numero.Remitente2, msj.policia);               //SMS
     sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);         //LORA
     #if DEBUG
     Serial.println("Enviar mensaje1 y prender led1");
@@ -76,7 +76,7 @@ void buttonTask1() {
 //TASK6: interrupcion por pulsador button2
 void buttonTask2() {
   if (statebutton2) {
-    Enviar_msj(numero.Remitente1, msj.bomberos);          //SMS
+    Enviar_msj(numero.Remitente2, msj.bomberos);          //SMS
     sendPackage(bomberos_lora, strlen(bomberos_lora), no_espera_ACK,  1);      //LORA
     #if DEBUG
     Serial.println("Enviar mensaje2 y prender led2");
@@ -93,7 +93,7 @@ void buttonTask2() {
 //TASK7: interrupcion por pulsador button3
 void buttonTask3() {
   if (statebutton3) {
-    Enviar_msj(numero.Remitente1, msj.medica);            //SMS
+    Enviar_msj(numero.Remitente2, msj.medica);            //SMS
     sendPackage(medica_lora, strlen(medica_lora), no_espera_ACK,  1);      //LORA
     #if DEBUG
     Serial.println("Enviar mensaje3 y prender led3");

@@ -16,7 +16,7 @@
 //configuracion GSM numeros de remitentes
 struct remitente {
 String Remitente1 = "3794003039";    //NUMERO REMITENTE 1
-String Remitente2 = "";              //NUMERO REMITENTE 2
+String Remitente2 = "3795572356";              //NUMERO REMITENTE 2
 String Remitente3 = "";              //NUMERO REMITENTE 3
 };
 remitente numero;

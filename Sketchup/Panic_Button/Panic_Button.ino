@@ -2,6 +2,8 @@
 * V1.8: 
 * Se crea config_task(); para organizar mejor el setup de task.
 * Se saca t5, t6 y t7 del loop para ser habilitados en las interrupciones
+* Se agrega Remitente2 mastermonitor
+* Se actualiza los recibidos por lora
 */
 
 //librerias utilizadas
@@ -105,10 +107,10 @@ void loop0(void *parameter){                    //loop0 run in core0
   if(recvStatus) {
     Serial.print("====>> ");
     Serial.println(datoEntrante);
-    if(strcmp(datoEntrante,atendidorcv_lora) == 0) encenderLED(led_atendido);
+    if(strcmp(datoEntrante,atendidorcv_lora) == 0) t_atendido.enable();    //se ejecuta task de atendido
     if(strcmp(datoEntrante, policiarcv_lora) == 0 ||
        strcmp(datoEntrante,bomberosrcv_lora) == 0 ||
-       strcmp(datoEntrante,medicarcv_lora) == 0)  encenderLED(led_recibido);
+       strcmp(datoEntrante,medicarcv_lora) == 0)  t_recibido.enable();      //se ejecuta task de recibido
 
   }
   lora.update();                     //actualizacion lora
