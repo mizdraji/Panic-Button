@@ -56,4 +56,5 @@ por baja tension que genera el modulo SIM800.
 * * Se saca t5, t6 y t7 del loop para ser habilitados en las interrupciones.
 * * Se agrega Remitente2 mastermonitor
 * * Se actualiza los recibidos por lora
-
+* * Se agrega lectura ADC al taskManager. Boton powerON funcional.
+* * Se corrige divisor resistivo en lectura ADC, tanto en esquemático, placa prototipo y PCB.

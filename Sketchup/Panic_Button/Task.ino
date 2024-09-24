@@ -33,14 +33,14 @@ void blinkstb() {
     // Apagar el LED después de 0.5 segundos
     LED_state = LOW;                  // Cambiar estado del LED
     previousMillis = currentMillis;   // Actualizar tiempo anterior
-    digitalWrite(LED_BUILTIN, LED_state);  // Apagar el LED
+    digitalWrite(led_powerON, LED_state);  // Apagar el LED
     //Serial.println("blink blink");
     
   } else if (LED_state == LOW && (currentMillis - previousMillis >= ledOffTime)) {
     // Encender el LED después de 7 segundos
     LED_state = HIGH;                 // Cambiar estado del LED
     previousMillis = currentMillis;   // Actualizar tiempo anterior
-    digitalWrite(LED_BUILTIN, LED_state);  // Encender el LED
+    digitalWrite(led_powerON, LED_state);  // Encender el LED
   }
 }
 
@@ -154,4 +154,14 @@ void apagarLED3() {
   t_apagarLED3.disable();
 }
 
+//powerON
+void powerON () {
+  if(analogRead(ADC_powerON) > ADC_powerON_value) {         //USB CONECTADO
+  digitalWrite(led_powerON, HIGH);
+  t2.disable();
+  }  
+  else {                //USB DESCONECTADO
+  t2.enable();
+  } 
+  }
 
