@@ -19,15 +19,9 @@
 #include "configuracion.h"
 #include <SoftwareSerial.h>         //Libreria para definir tx y rx de sim800
 
-int32_t prevMillis = 0;
-#define interval 15000
-
 SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
-
 TaskHandle_t Task0;                         //Task0 para ejecutar en core0
-
-
 
 void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
@@ -64,8 +58,6 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
-
-  prevMillis = millis();
 }
 
 void loop() {                                           //loop run in core1
