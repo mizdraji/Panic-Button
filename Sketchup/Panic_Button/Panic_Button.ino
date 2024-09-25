@@ -1,12 +1,10 @@
 /*Detalle de versiones:
-* V1.7: 
-* Se cambian algunas variables por define para mejorar rendimiento, ya que estas no eran modificadas durante el programa.
-* Se agrega control de rebotes para los tres pulsadores.
-* Se corrige la falla que enviaba dos veces lora.
-* Se cambia secuencia de leds: al presionar boton led1/2/3 -> se recibe respuesta led_recibido -> se recibe respuesta atendido led_atendido -> luego de cierto tiempo se apagan todos los leds.
-* Pendiente, ver cuestion: que pasa con las tareas cuando se recibe lora y sms a la vez.
-* Pendiente configurar led encendido en GPIO23con ADC en GPIO13.
-* Pendiente mejorar Tasks en setup.
+* V1.8: 
+* Se crea config_task(); para organizar mejor el setup de task.
+* Se saca t5, t6 y t7 del loop para ser habilitados en las interrupciones
+* Se agrega Remitente2 mastermonitor
+* Se actualiza los recibidos por lora
+* Se agrega lectura ADC al taskManager. Boton powerON funcional.
 */
 
 //librerias utilizadas
@@ -21,15 +19,9 @@
 #include "configuracion.h"
 #include <SoftwareSerial.h>         //Libreria para definir tx y rx de sim800
 
-int32_t prevMillis = 0;
-#define interval 15000
-
 SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
-
 TaskHandle_t Task0;                         //Task0 para ejecutar en core0
-
-
 
 void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
@@ -52,18 +44,7 @@ void setup() {                              //setup run in core1
   }
 
   //config Scheduler
-  Serial.println("Initialized scheduler");
-  taskManager.setHighPriorityScheduler(&interrupt);          //Configura Scheduler interrupt como alta prioridad
-  taskManager.enableAll(true);                               //this will recursively enable the higher priority tasks as well
-  t_apagarLED.disable();
-  t_apagarLED1.disable();
-  t_apagarLED2.disable();
-  t_apagarLED3.disable();
-  t5.disable();
-  t6.disable();
-  t7.disable();
-  t_recibido.disable();
-  t_atendido.disable();
+  config_task();
   
   //Se crea una tarea que se ejecutará en la función loop0(), con prioridad 1 y se ejecutará en el core0.
   xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
@@ -77,26 +58,24 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
-
-  prevMillis = millis();
 }
 
 void loop() {                                           //loop run in core1
   // Verificar si el botón 1 fue presionado
-  if (statebutton1) {
-    Serial.println("Botón 1 presionado");
-    t5.enable();
-  }
-  // Verificar si el botón 2 fue presionado
-  if (statebutton2) {
-    Serial.println("Botón 2 presionado");
-    t6.enable();
-  }
-  // Verificar si el botón 3 fue presionado
-  if (statebutton3) {
-    Serial.println("Botón 3 presionado");
-    t7.enable();
-  }
+  // if (statebutton1) {
+  //   Serial.println("Botón 1 presionado");
+  //   t5.enable();
+  // }
+  // // Verificar si el botón 2 fue presionado
+  // if (statebutton2) {
+  //   Serial.println("Botón 2 presionado");
+  //   t6.enable();
+  // }
+  // // Verificar si el botón 3 fue presionado
+  // if (statebutton3) {
+  //   Serial.println("Botón 3 presionado");
+  //   t7.enable();
+  // }
 
   while(SIM800L.available()>0) {
     String mensaje_recibido = "";
@@ -121,10 +100,10 @@ void loop0(void *parameter){                    //loop0 run in core0
   if(recvStatus) {
     Serial.print("====>> ");
     Serial.println(datoEntrante);
-    if(strcmp(datoEntrante,atendidorcv_lora) == 0) encenderLED(led_atendido);
+    if(strcmp(datoEntrante,atendidorcv_lora) == 0) t_atendido.enable();    //se ejecuta task de atendido
     if(strcmp(datoEntrante, policiarcv_lora) == 0 ||
        strcmp(datoEntrante,bomberosrcv_lora) == 0 ||
-       strcmp(datoEntrante,medicarcv_lora) == 0)  encenderLED(led_recibido);
+       strcmp(datoEntrante,medicarcv_lora) == 0)  t_recibido.enable();      //se ejecuta task de recibido
 
   }
   lora.update();                     //actualizacion lora

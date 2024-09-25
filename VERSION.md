@@ -50,3 +50,11 @@ por baja tension que genera el modulo SIM800.
 * * Se agrega control de rebotes para los tres pulsadores.
 * * Se corrige la falla que enviaba dos veces lora.
 * * Se cambia secuencia de leds: al presionar boton led1/2/3 -> se recibe respuesta led_recibido -> se recibe respuesta atendido led_atendido -> luego de cierto tiempo se apagan todos los leds.
+
+* V1.8
+* * Se crea config_task(); para organizar mejor el setup de task.
+* * Se saca t5, t6 y t7 del loop para ser habilitados en las interrupciones.
+* * Se agrega Remitente2 mastermonitor
+* * Se actualiza los recibidos por lora
+* * Se agrega lectura ADC al taskManager. Boton powerON funcional.
+* * Se corrige divisor resistivo en lectura ADC, tanto en esquemático, placa prototipo y PCB.

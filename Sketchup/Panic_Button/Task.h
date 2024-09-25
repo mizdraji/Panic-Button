@@ -17,6 +17,11 @@ volatile bool statebutton3 = false;         //monitorea el estado del button1 en
 
 bool statusLED = false;
 
+//variables para adc en GPIO13
+#define ADC_powerON_value      2800     //voltage = ADC_powerON_value * (3.3 / 4095.0);     ADC_powerON_value = analogRead(ADC_powerON);
+//debe ser mayor a 2.25V para estar conectado a usb
+//ADC_powerON_value = 2.25 * 4095 / 3.3 = 2800
+
 //Scheduler: Este objeto es el programador encargado de la ejecución de las tareas, el cual se tendrá que ejecutar en cada loop
 //Creamos el Scheduler que se encargará de gestionar las tareas
 Scheduler taskManager;
@@ -36,6 +41,7 @@ void apagarLED2();
 void apagarLED3();
 void trecibido();
 void tatendido();
+void powerON();
 
 
 //Tareas:
@@ -70,5 +76,6 @@ Task t_apagarLED3(5000, TASK_FOREVER, &apagarLED3, &taskManager);   // Se ejecut
 Task t_recibido(1000, TASK_FOREVER, &trecibido, &taskManager);
 Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
 
+Task ADCpower(10000, TASK_FOREVER, &powerON, &taskManager);       //se ejecuta cada 10 segundos para verificar si esta cargando con usb
 
 

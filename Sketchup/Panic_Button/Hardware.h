@@ -17,10 +17,6 @@ struct str {
 };
 str nodo;
 
-
-//variables para adc en GPIO13
-int ADC_powerON_value = 0;            //voltage = ADC_powerON_value * (3.3 / 4095.0);     ADC_powerON_value = analogRead(ADC_powerON);
-
 //interrupciones:
 void IRAM_ATTR buttonInterrupt1();
 void IRAM_ATTR buttonInterrupt2();

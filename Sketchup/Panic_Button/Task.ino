@@ -1,3 +1,20 @@
+//configuracion task para setup:
+void config_task(){
+  Serial.println("Initialized scheduler");
+  taskManager.setHighPriorityScheduler(&interrupt);          //Configura Scheduler interrupt como alta prioridad
+  taskManager.enableAll(true);                               //this will recursively enable the higher priority tasks as well
+  t_apagarLED.disable();
+  t_apagarLED1.disable();
+  t_apagarLED2.disable();
+  t_apagarLED3.disable();
+  t5.disable();
+  t6.disable();
+  t7.disable();
+  t_recibido.disable();
+  t_atendido.disable();
+}
+
+
 //Definimos nuestras tareas:
 
 //TASK1
@@ -16,14 +33,14 @@ void blinkstb() {
     // Apagar el LED después de 0.5 segundos
     LED_state = LOW;                  // Cambiar estado del LED
     previousMillis = currentMillis;   // Actualizar tiempo anterior
-    digitalWrite(LED_BUILTIN, LED_state);  // Apagar el LED
+    digitalWrite(led_powerON, LED_state);  // Apagar el LED
     //Serial.println("blink blink");
     
   } else if (LED_state == LOW && (currentMillis - previousMillis >= ledOffTime)) {
     // Encender el LED después de 7 segundos
     LED_state = HIGH;                 // Cambiar estado del LED
     previousMillis = currentMillis;   // Actualizar tiempo anterior
-    digitalWrite(LED_BUILTIN, LED_state);  // Encender el LED
+    digitalWrite(led_powerON, LED_state);  // Encender el LED
   }
 }
 
@@ -41,7 +58,7 @@ void loraSend() {
 void buttonTask1() {
   //Serial.println("buttontask");
   if (statebutton1) {
-    Enviar_msj(numero.Remitente1, msj.policia);               //SMS
+    Enviar_msj(numero.Remitente2, msj.policia);               //SMS
     sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);         //LORA
     #if DEBUG
     Serial.println("Enviar mensaje1 y prender led1");
@@ -59,7 +76,7 @@ void buttonTask1() {
 //TASK6: interrupcion por pulsador button2
 void buttonTask2() {
   if (statebutton2) {
-    Enviar_msj(numero.Remitente1, msj.bomberos);          //SMS
+    Enviar_msj(numero.Remitente2, msj.bomberos);          //SMS
     sendPackage(bomberos_lora, strlen(bomberos_lora), no_espera_ACK,  1);      //LORA
     #if DEBUG
     Serial.println("Enviar mensaje2 y prender led2");
@@ -76,7 +93,7 @@ void buttonTask2() {
 //TASK7: interrupcion por pulsador button3
 void buttonTask3() {
   if (statebutton3) {
-    Enviar_msj(numero.Remitente1, msj.medica);            //SMS
+    Enviar_msj(numero.Remitente2, msj.medica);            //SMS
     sendPackage(medica_lora, strlen(medica_lora), no_espera_ACK,  1);      //LORA
     #if DEBUG
     Serial.println("Enviar mensaje3 y prender led3");
@@ -137,4 +154,14 @@ void apagarLED3() {
   t_apagarLED3.disable();
 }
 
+//powerON
+void powerON () {
+  if(analogRead(ADC_powerON) > ADC_powerON_value) {         //USB CONECTADO
+  digitalWrite(led_powerON, HIGH);
+  t2.disable();
+  }  
+  else {                //USB DESCONECTADO
+  t2.enable();
+  } 
+  }
 
