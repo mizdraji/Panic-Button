@@ -14,6 +14,7 @@
 #include "Hardware.h"
 #include "configuracion.h"
 #include <SoftwareSerial.h>         //Libreria para definir tx y rx de sim800
+#include "Memoria.h"
 
 SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
@@ -33,7 +34,7 @@ void setup() {                              //setup run in core1
   Serial.println("RFM95 detected");
   if (initLoraTec()) {
     Serial.println("-->LoraTec OK");
-    Serial.print("-->devID: TLV2_DPEC_");
+    Serial.print("-->devID: PB");
     Serial.println(devID);                  //Activacion Manual, devID predefinido
     char uncero[1]={0};
     sendPackage(uncero, 1, no_espera_ACK,  1);

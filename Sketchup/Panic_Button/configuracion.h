@@ -1,5 +1,6 @@
 //Version
-#define VERSION "V1.9"
+#define VERSION          "V1.9"
+#define VERSION_HARDWARE "V1.0"
 
 //Serial
 #define SERIAL_SPEED  115200
@@ -12,6 +13,7 @@
 #define DEFAULT_SF SF7BW125               // Set Data Rate
 #define DEBUG 0 
 #define dbspk 1                           //lora send pakage
+#define dbmem 0                           //mensajes de memoria
 
 //configuracion GSM numeros de remitentes
 struct remitente {
