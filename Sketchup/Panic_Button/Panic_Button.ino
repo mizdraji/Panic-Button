@@ -1,6 +1,8 @@
 /*Detalle de versiones:
 * V1.9: 
-
+* Se crea unas pruebas de string.
+* Se empieza a ver la estructura de la memoria EEPROM. Se crea Memoria.h y Memoria.ino.
+* Se define la estructura de la memoria en Direcciones de memoria - PB.xlsx
 */
 
 //librerias utilizadas
@@ -24,7 +26,15 @@ void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
   Serial.begin(SERIAL_SPEED);
   config_pines();
-  delay(5000);                              //falta crear variable para initial random time
+  
+  /*    A FUTURO SE USARA PARA RESETEAR MEMORIA CON TAMPER, pin_analogX a definir en un futuro
+    if (analogRead(pin_analogX)<20) {
+    clearEEPROM();
+  }
+  */
+  delay(5000);                              //falta crear variable para initial random time: delay(initial_random_time()); //delay random
+
+  initEEPROM();                             //inicializa la EEPROM
 
   //config lora
   if (!lora.init()) {
