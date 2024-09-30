@@ -58,3 +58,4 @@ por baja tension que genera el modulo SIM800.
 * * Se actualiza los recibidos por lora
 * * Se agrega lectura ADC al taskManager. Boton powerON funcional.
 * * Se corrige divisor resistivo en lectura ADC, tanto en esquemático, placa prototipo y PCB.
+* * Se mejora funcion Enviar_mensaje y ReceiveMode.
