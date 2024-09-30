@@ -1,11 +1,8 @@
 /*Detalle de versiones:
-* V1.8: 
-* Se crea config_task(); para organizar mejor el setup de task.
-* Se saca t5, t6 y t7 del loop para ser habilitados en las interrupciones
-* Se agrega Remitente2 mastermonitor
-* Se actualiza los recibidos por lora
-* Se agrega lectura ADC al taskManager. Boton powerON funcional.
-* Se mejora funcion Enviar_mensaje y ReceiveMode.
+* V1.9: 
+* Se crea unas pruebas de string.
+* Se empieza a ver la estructura de la memoria EEPROM. Se crea Memoria.h y Memoria.ino.
+* Se define la estructura de la memoria en Direcciones de memoria - PB.xlsx
 */
 
 //librerias utilizadas
@@ -19,6 +16,7 @@
 #include "Hardware.h"
 #include "configuracion.h"
 #include <SoftwareSerial.h>         //Libreria para definir tx y rx de sim800
+#include "Memoria.h"
 
 SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
@@ -28,7 +26,15 @@ void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
   Serial.begin(SERIAL_SPEED);
   config_pines();
-  delay(5000);                              //falta crear variable para initial random time
+  
+  /*    A FUTURO SE USARA PARA RESETEAR MEMORIA CON TAMPER, pin_analogX a definir en un futuro
+    if (analogRead(pin_analogX)<20) {
+    clearEEPROM();
+  }
+  */
+  delay(5000);                              //falta crear variable para initial random time: delay(initial_random_time()); //delay random
+
+  initEEPROM();                             //inicializa la EEPROM
 
   //config lora
   if (!lora.init()) {
@@ -38,7 +44,7 @@ void setup() {                              //setup run in core1
   Serial.println("RFM95 detected");
   if (initLoraTec()) {
     Serial.println("-->LoraTec OK");
-    Serial.print("-->devID: TLV2_DPEC_");
+    Serial.print("-->devID: PB");
     Serial.println(devID);                  //Activacion Manual, devID predefinido
     char uncero[1]={0};
     sendPackage(uncero, 1, no_espera_ACK,  1);

@@ -5,7 +5,7 @@ void config_pines( void )
   pinMode(button1, INPUT);            //boton de policia      - GPIO 37
   pinMode(button2, INPUT);            //boton de bomberos     - GPIO 38
   pinMode(button3, INPUT);            //boton de ambulancia   - GPIO 39
-  pinMode(ADC_powerON, INPUT);
+  pinMode(ADC_powerON, INPUT);        //conversor ADC para lectura de 5V USB
   pinMode(led1, OUTPUT);              //LED1 confirm policia  - GPIO 15
   pinMode(led2, OUTPUT);              //LED2 confirm bomberos - GPIO 2
   pinMode(led3, OUTPUT);              //LED3 confirm medica   - GPIO 4
