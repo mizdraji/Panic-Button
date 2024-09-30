@@ -25,10 +25,6 @@ void Enviar_msj(String numero, String msj) {
   SIM800L.print(config_numero);
   delay(10);
 
-  //SIM800L.println("AT+CMGF=1\r"); // Configuring TEXT mode
-  //delay(10);
-  //Serialcom();
-
   //Enviar contenido del SMS
   SIM800L.print(msj);
   delay(10);
