@@ -20,10 +20,6 @@ void Enviar_msj(String numero, String msj) {
   //Se establece el formato de SMS en ASCII
   String config_numero = "AT+CMGS=\"+549" + numero + "\"\r\n";
   Serial.println(config_numero);
-
-  //configurar modulo como modo SMS
-  SIM800L.write("AT+CMGF=1\r\n");
-  delay(10);
   
   //Enviar comando para un nuevos SMS al numero establecido
   SIM800L.print(config_numero);
@@ -53,29 +49,18 @@ void Serialcom() {
 //Set the SIM800L Receive mode  
 void ReceiveMode() {       
   SIM800L.println("AT"); //If everything is Okay it will show "OK" on the serial monitor
-  delay(500);
+  delay(200);
   Serialcom();
   SIM800L.println("AT+CMGF=1"); // Configuring TEXT mode
-  delay(500);
+  delay(200);
+  Serialcom();
+  SIM800L.println("AT+CSCS=\"GSM\"");
+  delay(200);
   Serialcom();
   SIM800L.println("AT+CNMI=2,2,0,0,0"); //Configure the SIM800L on how to manage the Received SMS... Check the SIM800L AT commands manual
-  delay(500);
+  delay(200);
   Serialcom();
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 //Prueba de Red: Es el primer paquete LoRa. Envia un cero para establecer la conexion con la red LoRaWAN.
 void pdr_function() {

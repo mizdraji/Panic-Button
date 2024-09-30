@@ -5,6 +5,7 @@
 * Se agrega Remitente2 mastermonitor
 * Se actualiza los recibidos por lora
 * Se agrega lectura ADC al taskManager. Boton powerON funcional.
+* Se mejora funcion Enviar_mensaje y ReceiveMode.
 */
 
 //librerias utilizadas
@@ -61,22 +62,6 @@ void setup() {                              //setup run in core1
 }
 
 void loop() {                                           //loop run in core1
-  // Verificar si el botón 1 fue presionado
-  // if (statebutton1) {
-  //   Serial.println("Botón 1 presionado");
-  //   t5.enable();
-  // }
-  // // Verificar si el botón 2 fue presionado
-  // if (statebutton2) {
-  //   Serial.println("Botón 2 presionado");
-  //   t6.enable();
-  // }
-  // // Verificar si el botón 3 fue presionado
-  // if (statebutton3) {
-  //   Serial.println("Botón 3 presionado");
-  //   t7.enable();
-  // }
-
   while(SIM800L.available()>0) {
     String mensaje_recibido = "";
     mensaje_recibido = SIM800L.readString(); 
