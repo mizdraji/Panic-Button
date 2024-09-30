@@ -20,14 +20,14 @@ void Enviar_msj(String numero, String msj) {
   //Se establece el formato de SMS en ASCII
   String config_numero = "AT+CMGS=\"+549" + numero + "\"\r\n";
   Serial.println(config_numero);
-
-  //configurar modulo como modo SMS
-  SIM800L.write("AT+CMGF=1\r\n");
-  delay(10);
   
   //Enviar comando para un nuevos SMS al numero establecido
   SIM800L.print(config_numero);
   delay(10);
+
+  //SIM800L.println("AT+CMGF=1\r"); // Configuring TEXT mode
+  //delay(10);
+  //Serialcom();
 
   //Enviar contenido del SMS
   SIM800L.print(msj);
@@ -52,14 +52,17 @@ void Serialcom() {
 
 //Set the SIM800L Receive mode  
 void ReceiveMode() {       
-  SIM800L.println("AT"); //If everything is Okay it will show "OK" on the serial monitor
-  delay(500);
+  SIM800L.print("AT\r"); //If everything is Okay it will show "OK" on the serial monitor
+  delay(200);
   Serialcom();
-  SIM800L.println("AT+CMGF=1"); // Configuring TEXT mode
-  delay(500);
+  SIM800L.print("AT+CMGF=1\r"); // Configuring TEXT mode
+  delay(200);
   Serialcom();
-  SIM800L.println("AT+CNMI=2,2,0,0,0"); //Configure the SIM800L on how to manage the Received SMS... Check the SIM800L AT commands manual
-  delay(500);
+  SIM800L.print("AT+CSCS=\"GSM\"\r");
+  delay(200);
+  Serialcom();
+  SIM800L.print("AT+CNMI=2,2,0,0,0\r"); //Configure the SIM800L on how to manage the Received SMS... Check the SIM800L AT commands manual
+  delay(200);
   Serialcom();
 }
 
