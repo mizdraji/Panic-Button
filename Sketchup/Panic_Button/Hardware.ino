@@ -25,6 +25,10 @@ void Enviar_msj(String numero, String msj) {
   SIM800L.print(config_numero);
   delay(10);
 
+  //SIM800L.println("AT+CMGF=1\r"); // Configuring TEXT mode
+  //delay(10);
+  //Serialcom();
+
   //Enviar contenido del SMS
   SIM800L.print(msj);
   delay(10);
@@ -48,16 +52,16 @@ void Serialcom() {
 
 //Set the SIM800L Receive mode  
 void ReceiveMode() {       
-  SIM800L.println("AT"); //If everything is Okay it will show "OK" on the serial monitor
+  SIM800L.print("AT\r"); //If everything is Okay it will show "OK" on the serial monitor
   delay(200);
   Serialcom();
-  SIM800L.println("AT+CMGF=1"); // Configuring TEXT mode
+  SIM800L.print("AT+CMGF=1\r"); // Configuring TEXT mode
   delay(200);
   Serialcom();
-  SIM800L.println("AT+CSCS=\"GSM\"");
+  SIM800L.print("AT+CSCS=\"GSM\"\r");
   delay(200);
   Serialcom();
-  SIM800L.println("AT+CNMI=2,2,0,0,0"); //Configure the SIM800L on how to manage the Received SMS... Check the SIM800L AT commands manual
+  SIM800L.print("AT+CNMI=2,2,0,0,0\r"); //Configure the SIM800L on how to manage the Received SMS... Check the SIM800L AT commands manual
   delay(200);
   Serialcom();
 }
