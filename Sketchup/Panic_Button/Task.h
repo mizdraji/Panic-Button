@@ -11,11 +11,11 @@ bool LED_state = LOW;                     // Estado actual del LED
 #define delay_apagarLED3  5000            //delay para apagar el led3 despues de cierto tiempo de que se envio un mensaje
 
 //estados de los pulsadores
-volatile bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
-volatile bool statebutton2 = false;         //monitorea el estado del button1 en pin 38
-volatile bool statebutton3 = false;         //monitorea el estado del button1 en pin 39
-bool               bloqueo = false;         //Variable para monitorear bloqueo de pulsadores.
-#define tiempo_bloqueo 5000                 //3 segundos tiempo bloqueo.
+bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
+bool statebutton2 = false;         //monitorea el estado del button1 en pin 38
+bool statebutton3 = false;         //monitorea el estado del button1 en pin 39
+bool      bloqueo = false;         //Variable para monitorear bloqueo de pulsadores.
+#define tiempo_bloqueo 10000       //10 segundos tiempo bloqueo de pulsadores
 
 bool statusLED = false;
 

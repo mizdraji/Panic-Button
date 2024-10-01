@@ -1,0 +1,13 @@
+Guru Meditation Error: Core  1 panic'ed (IllegalInstruction). Exception was unhandled.
+Memory dump at 0x4008b7a0: 1188f004 8080aa1b 514c8c54
+Core  1 register dump:
+PC      : 0x4008b7a7  PS      : 0x00060c33  A0      : 0x80083e42  A1      : 0x3ffb2130  
+A2      : 0x00000001  A3      : 0x3ffb0320  A4      : 0x00000020  A5      : 0x00000001  
+A6      : 0x3ffc1d28  A7      : 0x3ffc2a48  A8      : 0x000007e0  A9      : 0x00000007  
+A10     : 0x00000005  A11     : 0x00000001  A12     : 0x00000000  A13     : 0x00000020  
+A14     : 0x00000001  A15     : 0x3ffc2210  SAR     : 0x0000001b  EXCCAUSE: 0x00000000  
+EXCVADDR: 0x00000000  LBEG    : 0x4008b798  LEND    : 0x4008b7a6  LCOUNT  : 0x00000001  
+
+
+Backtrace: 0x4008b7a4:0x3ffb2130 0x40083e3f:0x3ffb2150 0x4008b5f5:0x3ffb2170 0x4008a12d:0x3ffb2190 0x400887e4:0x3ffb21c0 0x40088881:0x3ffb21e0 0x400d19cc:0x3ffb2200 0x400d19a2:0x3ffb2220 0x400d2096:0x3ffb2240 0x400d6ded:0x3ffb2290
+

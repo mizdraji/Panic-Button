@@ -1,6 +1,8 @@
 /*Detalle de versiones:
 * V1.8.1: 
-* Bloqueo de pulsadores por 5 segundos para evitar que presionen muchas veces en poco tiempo.
+* Bloqueo de pulsadores por 10 segundos para evitar que presionen muchas veces en poco tiempo. Se crea tarea lock para bloquear que llama luego a la funcion unlock para desbloquear.
+* Se agrega funcion config_inicial en el setup para definir el estado de los leds cuando arranca el dispositivo.
+* Se cambian tipos de variables para los statebutton, se saca volatile bool y se deja solamente bool.
 */
 
 //librerias utilizadas
@@ -23,6 +25,7 @@ void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
   Serial.begin(SERIAL_SPEED);
   config_pines();
+  config_inicial();
   delay(5000);                              //falta crear variable para initial random time
 
   //config lora
