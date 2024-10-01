@@ -1,5 +1,5 @@
 //configuracion de pines para el setup
-void config_pines( void )
+void config_pines()
 {
   //configure pines
   pinMode(button1, INPUT);            //boton de policia      - GPIO 37
@@ -13,6 +13,17 @@ void config_pines( void )
   pinMode(led_recibido, OUTPUT);      //LED amarillo
   pinMode(led_atendido, OUTPUT);      //LED naranja
   //pinMode(LED_BUILTIN, OUTPUT);       //LED integrado         - GPIO 25
+}
+
+//estado incial de los leds
+void config_inicial()
+{
+  digitalWrite(led1, LOW);
+  digitalWrite(led2, LOW);
+  digitalWrite(led3, LOW);
+  digitalWrite(led_powerON, LOW);
+  digitalWrite(led_recibido, LOW);
+  digitalWrite(led_atendido, LOW);
 }
 
 //Función para enviar mensaje SMS

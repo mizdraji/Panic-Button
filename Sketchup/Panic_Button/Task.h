@@ -11,9 +11,11 @@ bool LED_state = LOW;                     // Estado actual del LED
 #define delay_apagarLED3  5000            //delay para apagar el led3 despues de cierto tiempo de que se envio un mensaje
 
 //estados de los pulsadores
-volatile bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
-volatile bool statebutton2 = false;         //monitorea el estado del button1 en pin 38
-volatile bool statebutton3 = false;         //monitorea el estado del button1 en pin 39
+bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
+bool statebutton2 = false;         //monitorea el estado del button1 en pin 38
+bool statebutton3 = false;         //monitorea el estado del button1 en pin 39
+bool      bloqueo = false;         //Variable para monitorear bloqueo de pulsadores.
+#define tiempo_bloqueo 10000       //10 segundos tiempo bloqueo de pulsadores
 
 bool statusLED = false;
 
@@ -42,6 +44,7 @@ void apagarLED3();
 void trecibido();
 void tatendido();
 void powerON();
+void unlock();
 
 
 //Tareas:
@@ -60,18 +63,17 @@ Task t2(500, TASK_FOREVER, &blinkstb, &taskManager);
 
 //TASK4: Envia mensaje sms.
 
-//TASK5: buttontask1
-Task t5(100, TASK_FOREVER, &buttonTask1, &interrupt);                  // Ejecutar la tarea cada 100 ms
-//TASK6: buttontask2
-Task t6(100, TASK_FOREVER, &buttonTask2, &interrupt);                  // Ejecutar la tarea cada 100 ms
-//TASK7: buttontask3
-Task t7(100, TASK_FOREVER, &buttonTask3, &interrupt);                  // Ejecutar la tarea cada 100 ms
+
+Task t5(100, TASK_FOREVER, &buttonTask1, &interrupt);                //TASK5: buttontask1                
+Task t6(100, TASK_FOREVER, &buttonTask2, &interrupt);                //TASK6: buttontask2          
+Task t7(100, TASK_FOREVER, &buttonTask3, &interrupt);                //TASK7: buttontask3     
+Task lock(3000, TASK_FOREVER, &unlock, &interrupt);                  //   
 
 //tareas para apagar leds:
-Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);   // Se ejecuta una vez durante 
-Task t_apagarLED1(5000, TASK_FOREVER, &apagarLED1, &taskManager);   // Se ejecuta una vez durante 
-Task t_apagarLED2(5000, TASK_FOREVER, &apagarLED2, &taskManager);   // Se ejecuta una vez durante 
-Task t_apagarLED3(5000, TASK_FOREVER, &apagarLED3, &taskManager);   // Se ejecuta una vez durante 
+Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);     //TASK apagar todos los leds
+Task t_apagarLED1(5000, TASK_FOREVER, &apagarLED1, &taskManager);   //TASK apaga led1
+Task t_apagarLED2(5000, TASK_FOREVER, &apagarLED2, &taskManager);   //TASK apaga led2
+Task t_apagarLED3(5000, TASK_FOREVER, &apagarLED3, &taskManager);   //TASK apaga led3
 
 Task t_recibido(1000, TASK_FOREVER, &trecibido, &taskManager);
 Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);

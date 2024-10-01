@@ -1,13 +1,8 @@
 /*Detalle de versiones:
-* V1.8: 
-* Se crea config_task(); para organizar mejor el setup de task.
-* Se saca t5, t6 y t7 del loop para ser habilitados en las interrupciones
-* Se agrega Remitente2 mastermonitor
-* Se actualiza los recibidos por lora
-* Se agrega lectura ADC al taskManager. Boton powerON funcional.
-* Se mejora funcion Enviar_mensaje y ReceiveMode.
-* Se mejora buttontask1, 2 y 3.
-* Se saca la parte de lora del loop0 y se la pasa al loop principal para probar estabilidad.
+* V1.8.1: 
+* Bloqueo de pulsadores por 10 segundos para evitar que presionen muchas veces en poco tiempo. Se crea tarea lock para bloquear que llama luego a la funcion unlock para desbloquear.
+* Se agrega funcion config_inicial en el setup para definir el estado de los leds cuando arranca el dispositivo.
+* Se cambian tipos de variables para los statebutton, se saca volatile bool y se deja solamente bool.
 */
 
 //librerias utilizadas
@@ -30,6 +25,7 @@ void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
   Serial.begin(SERIAL_SPEED);
   config_pines();
+  config_inicial();
   delay(5000);                              //falta crear variable para initial random time
 
   //config lora
@@ -40,7 +36,7 @@ void setup() {                              //setup run in core1
   Serial.println("RFM95 detected");
   if (initLoraTec()) {
     Serial.println("-->LoraTec OK");
-    Serial.print("-->devID: TLV2_DPEC_");
+    Serial.print("-->devID: PB");
     Serial.println(devID);                  //Activacion Manual, devID predefinido
     char uncero[1]={0};
     sendPackage(uncero, 1, no_espera_ACK,  1);
