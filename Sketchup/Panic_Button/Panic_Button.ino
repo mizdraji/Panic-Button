@@ -6,6 +6,8 @@
 * Se actualiza los recibidos por lora
 * Se agrega lectura ADC al taskManager. Boton powerON funcional.
 * Se mejora funcion Enviar_mensaje y ReceiveMode.
+* Se mejora buttontask1, 2 y 3.
+* Se saca la parte de lora del loop0 y se la pasa al loop principal para probar estabilidad.
 */
 
 //librerias utilizadas
@@ -22,7 +24,7 @@
 
 SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
-TaskHandle_t Task0;                         //Task0 para ejecutar en core0
+//TaskHandle_t Task0;                         //Task0 para ejecutar en core0
 
 void setup() {                              //setup run in core1
   SIM800L.begin(SERIAL_SIM);
@@ -48,7 +50,7 @@ void setup() {                              //setup run in core1
   config_task();
   
   //Se crea una tarea que se ejecutará en la función loop0(), con prioridad 1 y se ejecutará en el core0.
-  xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
+  //xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
 
   //configurar modulo GSM como modo SMS
   Serial.println("iniciando .........");
@@ -76,11 +78,6 @@ void loop() {                                           //loop run in core1
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
   interrupt.execute();
 
-}
-
-
-void loop0(void *parameter){                    //loop0 run in core0
-  while(1){
   recvStatus = lora.readData(datoEntrante);
   if(recvStatus) {
     Serial.print("====>> ");
@@ -92,12 +89,29 @@ void loop0(void *parameter){                    //loop0 run in core0
 
   }
   lora.update();                     //actualizacion lora
-  vTaskDelay(10);                     //delay para fallas de wtd
-  
-  }
 
-  //vTaskDelay(10);                     //delay para fallas de wtd
 }
+
+
+// void loop0(void *parameter){                    //loop0 run in core0
+//   while(1){
+//   recvStatus = lora.readData(datoEntrante);
+//   if(recvStatus) {
+//     Serial.print("====>> ");
+//     Serial.println(datoEntrante);
+//     if(strcmp(datoEntrante,atendidorcv_lora) == 0) t_atendido.enable();    //se ejecuta task de atendido
+//     if(strcmp(datoEntrante, policiarcv_lora) == 0 ||
+//        strcmp(datoEntrante,bomberosrcv_lora) == 0 ||
+//        strcmp(datoEntrante,medicarcv_lora) == 0)  t_recibido.enable();      //se ejecuta task de recibido
+
+//   }
+//   lora.update();                     //actualizacion lora
+//   vTaskDelay(10);                     //delay para fallas de wtd
+  
+//   }
+
+//   //vTaskDelay(10);                     //delay para fallas de wtd
+// }
 
 
 

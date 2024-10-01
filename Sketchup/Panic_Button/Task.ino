@@ -56,56 +56,46 @@ void loraSend() {
 
 //TASK5: interrupcion por pulsador button1
 void buttonTask1() {
-  //Serial.println("buttontask");
-  if (statebutton1) {
-    Enviar_msj(numero.Remitente2, msj.policia);               //SMS
+    Enviar_msj(numero.Remitente1, msj.policia);               //SMS
+    
     sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);         //LORA
     #if DEBUG
     Serial.println("Enviar mensaje1 y prender led1");
     #endif
 
     encenderLED(led1);
-    //t_apagarLED1.enable();
-    //t_apagarLED1.delay(delay_apagarLED1);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton1 = false;             // Reinicia el estado del pulsador
     t5.disable();
-  }
 }
 
 //TASK6: interrupcion por pulsador button2
 void buttonTask2() {
-  if (statebutton2) {
-    Enviar_msj(numero.Remitente2, msj.bomberos);          //SMS
+    Enviar_msj(numero.Remitente1, msj.bomberos);          //SMS
+    
     sendPackage(bomberos_lora, strlen(bomberos_lora), no_espera_ACK,  1);      //LORA
     #if DEBUG
     Serial.println("Enviar mensaje2 y prender led2");
     #endif
 
     encenderLED(led2);
-    //t_apagarLED2.enable();
-    //t_apagarLED2.delay(delay_apagarLED2);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton2 = false;           // Reinicia el estado del pulsador
     t6.disable();
-  }
 }
 //TASK7: interrupcion por pulsador button3
 void buttonTask3() {
-  if (statebutton3) {
-    Enviar_msj(numero.Remitente2, msj.medica);            //SMS
+    Enviar_msj(numero.Remitente1, msj.medica);            //SMS
+    
     sendPackage(medica_lora, strlen(medica_lora), no_espera_ACK,  1);      //LORA
     #if DEBUG
     Serial.println("Enviar mensaje3 y prender led3");
     #endif
 
     encenderLED(led3);
-    //t_apagarLED3.enable();
-    //t_apagarLED3.delay(delay_apagarLED3);       //se ejecuta la tarea apagarLED con un delay de X segundos
     
     statebutton3 = false;           // Reinicia el estado del pulsador
     t7.disable();
-  }
 }
 
 void trecibido() {
