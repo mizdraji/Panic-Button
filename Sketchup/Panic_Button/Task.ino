@@ -56,6 +56,7 @@ void loraSend() {
 
 //TASK5: interrupcion por pulsador button1
 void buttonTask1() {
+  if(!bloqueo) {
     Enviar_msj(numero.Remitente1, msj.policia);               //SMS
     
     sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);         //LORA
@@ -67,10 +68,16 @@ void buttonTask1() {
     
     statebutton1 = false;             // Reinicia el estado del pulsador
     t5.disable();
+
+    bloqueo = true;
+    lock.enable();
+    lock.delay(tiempo_bloqueo);       //se ejecuta la tarea lock despues de tiempo_bloqueo (3 segundos).
+  }
 }
 
 //TASK6: interrupcion por pulsador button2
 void buttonTask2() {
+  if(!bloqueo) {
     Enviar_msj(numero.Remitente1, msj.bomberos);          //SMS
     
     sendPackage(bomberos_lora, strlen(bomberos_lora), no_espera_ACK,  1);      //LORA
@@ -82,9 +89,15 @@ void buttonTask2() {
     
     statebutton2 = false;           // Reinicia el estado del pulsador
     t6.disable();
+
+    bloqueo = true;
+    lock.enable();
+    lock.delay(tiempo_bloqueo);       //se ejecuta la tarea lock despues de tiempo_bloqueo (3 segundos).
+  }
 }
 //TASK7: interrupcion por pulsador button3
 void buttonTask3() {
+  if(!bloqueo) {
     Enviar_msj(numero.Remitente1, msj.medica);            //SMS
     
     sendPackage(medica_lora, strlen(medica_lora), no_espera_ACK,  1);      //LORA
@@ -96,6 +109,19 @@ void buttonTask3() {
     
     statebutton3 = false;           // Reinicia el estado del pulsador
     t7.disable();
+
+    bloqueo = true;
+    lock.enable();
+    lock.delay(tiempo_bloqueo);       //se ejecuta la tarea lock despues de tiempo_bloqueo (3 segundos).
+  }
+}
+
+void unlock(){
+  bloqueo = false;
+  lock.disable();
+  t5.disable();
+  t6.disable();
+  t7.disable();
 }
 
 void trecibido() {
