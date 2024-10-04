@@ -62,6 +62,9 @@ void loop() {                                           //loop run in core1
     String mensaje_recibido = "";
     mensaje_recibido = SIM800L.readString(); 
 
+    //if(mensaje_recibido.indexOf("OK") != -1)  {Serial.println("se recibio OK");}                //comparo si recibo OK en el string de mensaje_recibido
+    //if(mensaje_recibido.indexOf("ERROR") != -1)  {Serial.println("se recibio ERROR");}
+
     Serial.print(mensaje_recibido);
     if (mensaje_recibido.indexOf(msj.rcv_atendido) != -1) t_atendido.enable();    //se ejecuta task de atendido
     if (mensaje_recibido.indexOf(msj.rcv_policia) != -1 ||

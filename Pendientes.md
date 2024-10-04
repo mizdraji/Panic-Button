@@ -6,3 +6,4 @@
 ese OK para prender leds de mensajes enviados, y parpadear leds cuando es ERROR.
 * * Sensar tension de baterias para enviar mensaje.
 * * Terminar la parte de almacenamiento en memoria EEPROM que se empezo en la versión 1.9.
+* * Armar guia de usuario. Folleto explicativo del modo de uso.
