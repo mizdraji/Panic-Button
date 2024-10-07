@@ -1,6 +1,7 @@
 /*Detalle de versiones:
 * V1.8.2: 
-
+* Se agregan nuevos mensajes recibidos: "informadorcv" y "cerradorcv". cerradorcv sin función aun.
+* Ahora rcv_informado apaga todos los leds luego de 15 segundos de recibir el mensaje. A futuro se aumentara este tiempo.
 */
 
 //librerias utilizadas
@@ -70,7 +71,14 @@ void loop() {                                           //loop run in core1
     if (mensaje_recibido.indexOf(msj.rcv_policia) != -1 ||
         mensaje_recibido.indexOf(msj.rcv_bomberos) != -1 ||
         mensaje_recibido.indexOf(msj.rcv_medica) != -1) t_recibido.enable();      //se ejecuta task de recibido
+
+    if (mensaje_recibido.indexOf(msj.rcv_informado) != -1) {
+      t_apagarLED.enable();                                                       //se ejecuta task de informado
+      t_apagarLED.delay(delay_apagarLED);                                         //se ejecuta la tarea apagarLED con un delay de 15 segundos);
+    }
+    //if (mensaje_recibido.indexOf(msj.rcv_cerrado) != -1) task.enable();    //se ejecuta task de cerrado
 }
+    
 
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
   interrupt.execute();

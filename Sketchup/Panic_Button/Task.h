@@ -5,7 +5,7 @@ unsigned long previousMillis = 0;         // Variable para almacenar el tiempo a
 #define ledOffTime  10000   // Tiempo de apagado en milisegundos (5 segundos)
 bool LED_state = LOW;                     // Estado actual del LED
 
-#define delay_apagarLED   5000            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
+#define delay_apagarLED   15000            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
 #define delay_apagarLED1  5000            //delay para apagar el led1 despues de cierto tiempo de que se envio un mensaje
 #define delay_apagarLED2  5000            //delay para apagar el led2 despues de cierto tiempo de que se envio un mensaje
 #define delay_apagarLED3  5000            //delay para apagar el led3 despues de cierto tiempo de que se envio un mensaje
@@ -14,7 +14,7 @@ bool LED_state = LOW;                     // Estado actual del LED
 bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
 bool statebutton2 = false;         //monitorea el estado del button1 en pin 38
 bool statebutton3 = false;         //monitorea el estado del button1 en pin 39
-bool      bloqueo = false;         //Variable para monitorear bloqueo de pulsadores.
+bool bloqueo      = false;         //Variable para monitorear bloqueo de pulsadores.
 #define tiempo_bloqueo 10000       //10 segundos tiempo bloqueo de pulsadores
 
 bool statusLED = false;

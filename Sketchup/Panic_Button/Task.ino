@@ -125,16 +125,14 @@ void unlock(){
 }
 
 void trecibido() {
-  //Serial.println("trecibido");
   encenderLED(led_recibido);
   t_recibido.disable();
 }
 
 void tatendido() {
-  //Serial.println("tatendido");
   encenderLED(led_atendido);
-  t_apagarLED.enable();
-  t_apagarLED.delay(delay_apagarLED);       //se ejecuta la tarea apagarLED con un delay de X segundos
+  //t_apagarLED.enable();
+  //t_apagarLED.delay(delay_apagarLED);       //se ejecuta la tarea apagarLED con un delay de X segundos
   t_atendido.disable();
 }
 
@@ -142,13 +140,10 @@ void tatendido() {
 //LED ON
 void encenderLED(uint8_t LED) {
   digitalWrite(LED, HIGH);  // Encender el LED
-  //t_apagarLED.enable();           // Habilitar la tarea para apagar el LED después de 5 segundos
-  //t_apagarLED.delay(delay_apagarLED);       //se ejecuta la tarea apagarLED con un delay de 50 segundos
 }
 
 //LED OFF
 void apagarLED() {            //apaga todos los leds
-  //Serial.println("apagar todos los leds");
   digitalWrite(led1, LOW);  // Apagar el LED
   digitalWrite(led2, LOW);  // Apagar el LED
   digitalWrite(led3, LOW);  // Apagar el LED
