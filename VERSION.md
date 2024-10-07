@@ -64,3 +64,6 @@ por baja tension que genera el modulo SIM800.
 * * Bloqueo de pulsadores por 10 segundos para evitar que presionen muchas veces en poco tiempo. Se crea tarea lock para bloquear que llama luego a la funcion unlock para desbloquear.
 * * Se agrega funcion config_inicial en el setup para definir el estado de los leds cuando arranca el dispositivo.
 * * Se cambian tipos de variables para los statebutton, se saca volatile bool y se deja solamente bool.
+
+* V1.8.2
+* *

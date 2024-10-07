@@ -62,7 +62,7 @@ void ReceiveMode() {
   SIM800L.print("AT\r"); //If everything is Okay it will show "OK" on the serial monitor
   delay(200);
   Serialcom();
-  SIM800L.print("AT+CMGF=1\r"); // Configuring TEXT mode
+  SIM800L.write("AT+CMGF=1\r"); // Configuring TEXT mode
   delay(200);
   Serialcom();
   SIM800L.print("AT+CSCS=\"GSM\"\r");

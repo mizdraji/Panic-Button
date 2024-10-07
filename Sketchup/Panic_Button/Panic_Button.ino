@@ -1,8 +1,6 @@
 /*Detalle de versiones:
-* V1.8.1: 
-* Bloqueo de pulsadores por 10 segundos para evitar que presionen muchas veces en poco tiempo. Se crea tarea lock para bloquear que llama luego a la funcion unlock para desbloquear.
-* Se agrega funcion config_inicial en el setup para definir el estado de los leds cuando arranca el dispositivo.
-* Se cambian tipos de variables para los statebutton, se saca volatile bool y se deja solamente bool.
+* V1.8.2: 
+
 */
 
 //librerias utilizadas
@@ -63,6 +61,9 @@ void loop() {                                           //loop run in core1
   while(SIM800L.available()>0) {
     String mensaje_recibido = "";
     mensaje_recibido = SIM800L.readString(); 
+
+    //if(mensaje_recibido.indexOf("OK") != -1)  {Serial.println("se recibio OK");}                //comparo si recibo OK en el string de mensaje_recibido
+    //if(mensaje_recibido.indexOf("ERROR") != -1)  {Serial.println("se recibio ERROR");}
 
     Serial.print(mensaje_recibido);
     if (mensaje_recibido.indexOf(msj.rcv_atendido) != -1) t_atendido.enable();    //se ejecuta task de atendido
