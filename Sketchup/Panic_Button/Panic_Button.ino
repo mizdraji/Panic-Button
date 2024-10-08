@@ -1,8 +1,6 @@
 /*Detalle de versiones:
-* V1.9: 
-* Se crea unas pruebas de string.
-* Se empieza a ver la estructura de la memoria EEPROM. Se crea Memoria.h y Memoria.ino.
-* Se define la estructura de la memoria en Direcciones de memoria - PB.xlsx
+* V1.9.1: 
+
 */
 
 //librerias utilizadas

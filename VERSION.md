@@ -70,4 +70,9 @@ por baja tension que genera el modulo SIM800.
 * * Ahora rcv_informado apaga todos los leds luego de 15 segundos de recibir el mensaje. A futuro se aumentara este tiempo.
 
 * V1.9
+* * Se crea unas pruebas de string.
+* * Se empieza a ver la estructura de la memoria EEPROM. Se crea Memoria.h y Memoria.ino.
+* * Se define la estructura de la memoria en Direcciones de memoria - PB.xlsx
+
+* V1.9.1
 * *
