@@ -1,6 +1,7 @@
 /*Detalle de versiones:
 * V1.9.2: 
-* Se crea funcion writeResetCountToEEPROM
+* Se crea función writeResetCountToEEPROM.
+* Se agrega activación manual/automática en ABPCredentials.h
 
 */
 
