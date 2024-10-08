@@ -1,5 +1,9 @@
 /*Detalle de versiones:
 * V1.9.1: 
+* Se agregan en Memoria.h las direcciones de memoria.
+* Se crea funcion ClearEEPROM para limpiar memoria.
+* Se crea funcion init_interrupt para habilitar las interrupciones.
+* Se crea funcion stop_interrupt para parar las interrupciones durante la escritura de memoria.
 
 */
 
@@ -60,9 +64,7 @@ void setup() {                              //setup run in core1
   Enviar_msj(numero.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
 
   //config interrupt
-  attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
-  attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
-  attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
+  init_interrupt();
 }
 
 void loop() {                                           //loop run in core1

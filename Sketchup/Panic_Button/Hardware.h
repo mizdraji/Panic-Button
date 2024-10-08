@@ -7,6 +7,8 @@
 #define MAX_RANDOM             40        //40 segundos
 #define UN_DIA                 84600     //24hs = 86400 segundos
 
+bool inhibir_tamper = false;             //tamper que se deberá puentear para limpiar memoria
+
 struct str {
   uint8_t pdr_ok = 0;                       // =1 cuando la prueba de red dio ok, sino =0
   //variables de tiempo
@@ -22,6 +24,8 @@ void IRAM_ATTR buttonInterrupt1();
 void IRAM_ATTR buttonInterrupt2();
 void IRAM_ATTR buttonInterrupt3();
 
+void stop_interrupt();                      //funcion para detener interrupciones
+void init_interrupt();                      //funcion para inicializar interrupciones
 int16_t random_time(unsigned int MIN_,unsigned int MAX_);
 void pdr_function();
-void config_pines( void );
+void config_pines();

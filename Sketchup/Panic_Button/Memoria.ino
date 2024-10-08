@@ -42,3 +42,30 @@ void initEEPROM() {
   readPLFromEEPROM(0,payloadGuardada); //leer la payload que está en el primer slot para armar el paquete START
   loadPayloadST(payloadGuardada,CMt_corte); //carga la payload START
 }
+
+void clearEEPROM() {
+  Serial.println("Limpiando memoria EEPROM");
+  // apagar el led integrado
+  digitalWrite(LED_BUILTIN, HIGH);
+  stop_interrupt();
+  EEPROM.begin(EEPROM_SIZE);
+  // write a 0 to all bytes of the EEPROM
+  for (int i = 0; i < EEPROM_SIZE; i++) {
+    EEPROM.write(i, 0);
+  }
+  // encender y apagar el led integrado 2 veces
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(1000);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(1000);
+  digitalWrite(LED_BUILTIN, LOW);
+  delay(1000);
+  digitalWrite(LED_BUILTIN, HIGH);
+  delay(1000);
+  digitalWrite(LED_BUILTIN, LOW);
+  EEPROM.end();
+  init_interrupt();
+  cambio_bloque_PL=1;
+}
+
+

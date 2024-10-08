@@ -154,6 +154,23 @@ void IRAM_ATTR buttonInterrupt3() {
   last_interrupt_time = interrupt_time;
 }
 
+void stop_interrupt() {
+  if (inhibir_tamper) {
+  detachInterrupt(digitalPinToInterrupt(button1));
+  detachInterrupt(digitalPinToInterrupt(button2));
+  detachInterrupt(digitalPinToInterrupt(button3));
+  if(dbmem) Serial.println("Interrupciones detenidas");
+  }
+}
+void init_interrupt() {
+  if (!inhibir_tamper) {
+  attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
+  attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
+  attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
+  if(dbmem) Serial.println("Interrupciones activadas");
+  }
+}
+
 int16_t random_time(unsigned int MIN_,unsigned int MAX_) {
   //calcula un nuevo tiempo
   return random(MIN_, MAX_);
