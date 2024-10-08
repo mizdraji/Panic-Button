@@ -18,6 +18,7 @@ int pos_mem[SLOTS_CANTIDAD_MAX]={0};    //Array donde se guardan las posiciones 
 //const int pos_devID=pos_bit_act+1;	//2726 devID (4 + 1 bytes) 
 #define pos_devID 1         //devID (5 bytes)
 //const int pos_devAddr=pos_devID+5;	//2731	(8+1 bytes)
+#define pos_devAddr 55      // 8 +1 bytes
 #define pos_D1 6            //Destinatario1  (10 bytes)
 #define pos_D2 16           //Destinatario2  (10 bytes)
 #define pos_D3 26           //Destinatario3  (10 bytes)
@@ -42,5 +43,7 @@ byte slot_para_enviar=0; //Numero de bloque de memoria (0-15) donde se almacena 
 
 
 void initEEPROM();
+void updateEEPROM(int addr, byte dato_in);
 void clearEEPROM();
 void writeResetCountToEEPROM(byte reset_count_);
+byte readCredFromEEPROM();

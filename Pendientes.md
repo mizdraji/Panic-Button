@@ -10,3 +10,4 @@ ese OK para prender leds de mensajes enviados, y parpadear leds cuando es ERROR.
 * * Cambiar leds de 5mm por leds de 3mm.
 * * Configurar reset EEPROM con tamper en setup a travez de pin_analogX
 * * Crear variable para initial random time en setup, para que inicie con un tiempo aleatorio.
+* * Organizar posiciones de memoria EEPROM

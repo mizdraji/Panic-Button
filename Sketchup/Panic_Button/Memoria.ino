@@ -68,9 +68,40 @@ void clearEEPROM() {
   cambio_bloque_PL=1;
 }
 
+//Esta funcion compara el byte en la posición de memoria con el que se va a escribir, si no es igual lo sobreescribe.
+void updateEEPROM(int addr, byte dato_in) {
+  byte dato_leido = EEPROM.read(addr);
+  if (dato_leido!=dato_in) {
+    EEPROM.write(addr, dato_in);
+  }
+}
+
 void writeResetCountToEEPROM(byte reset_count_) {
   stop_interrupt();
   updateEEPROM(pos_reset_count,reset_count_);
   EEPROM.commit();
   init_interrupt();
+}
+
+//Esta funcion lee el bloque de credenciales, devuelve el bit de activacion
+byte readCredFromEEPROM() {
+  byte bit_act_=EEPROM.read(pos_bit_act);
+  if (bit_act_==0x01) {
+    nodo.is_activated=1;
+    byte length_=EEPROM.read(pos_devID);
+    char devID_out_[4]={0};
+    for (int i = 0; i < length_-1; i++)  {
+      devID_out_[i]=EEPROM.read(pos_devID + 1 + i);
+    }
+    devID_AA = (unsigned long)devID_out_[0] << 24 | (unsigned long)devID_out_[1] << 16 | (unsigned long)devID_out_[2] << 8 | devID_out_[3];
+    Serial.print("devID leido: "); Serial.println(devID_AA);
+    length_=EEPROM.read(pos_devAddr);
+    //char devAddr_out_[8]={0};
+    for (int i = 0; i < length_-1; i++)  {
+      devAddr_AA[i]=EEPROM.read(pos_devAddr + 1 + i);
+    }
+    Serial.print("devAddr leido: "); Serial.println(devAddr_AA);
+    //for (int i = 0; i < 8; ++i) Serial.print(devAddr[i]); Serial.println(" ");
+  }
+  return bit_act_;
 }

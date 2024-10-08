@@ -81,4 +81,7 @@ por baja tension que genera el modulo SIM800.
 * * Se crea funcion stop_interrupt para parar las interrupciones durante la escritura de memoria.
 
 * V1.9.2
-* *
+* * Se crea función writeResetCountToEEPROM.
+* * Se agrega activación manual/automática en ABPCredentials.h
+* * Se crea función readCredFromEEPROM, devuelve el bit de activación.
+* * Se crea la función updateEEPROM. Compara el valor de la memoria con el que se va a escribir, si no es igual lo sobreescribe.

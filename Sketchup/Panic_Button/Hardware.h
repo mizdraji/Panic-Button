@@ -16,6 +16,8 @@ struct str {
   uint8_t pausa_larga           = 0;        //=1 esperar tiempo largo
   uint8_t cont_pausas_largas    = 0;        //cuenta las pausas largas que se realizan cuando los reintentos cortos fallan
   uint8_t cont_reintento_corto  = 0;        //usado para contar los intentos uplink de las funciones pdr, sync e ident
+
+  uint8_t is_activated          = 0;        //si esta en 1, el nodo esta activado.
 };
 str nodo;
 

@@ -1,5 +1,8 @@
 //ABP Credentials para comunicación LoRa
 
+unsigned int devID_AA = 0;   //devID para Activacion Automatica
+char devAddr_AA[9] = "0118e299"; //devAddr para Activacion Automatica
+
 //Activación
 #define activacion_manual 1 // 1: manual, 0: automático
 
