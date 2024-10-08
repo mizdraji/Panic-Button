@@ -30,6 +30,8 @@ struct mensajes {
   String rcv_bomberos     = "bomberosrcv";          //bomberos recibido confirmacion
   String rcv_medica       = "medicarcv";            //medica recibido confirmacion
   String rcv_atendido     = "atendidorcv";          //Respuesta de operario, alerta atendida
+  String rcv_informado    = "informadorcv";         //Informadorcv cuando se da aviso a la policía
+  String rcv_cerrado      = "cerradorcv";           // es cuando se da por finalizada la alerta, pero puede pasar mucho tiempo
 };
 mensajes msj;
 
