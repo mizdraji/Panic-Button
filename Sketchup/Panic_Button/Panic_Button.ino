@@ -1,9 +1,6 @@
 /*Detalle de versiones:
-* V1.9.1: 
-* Se agregan en Memoria.h las direcciones de memoria.
-* Se crea funcion ClearEEPROM para limpiar memoria.
-* Se crea funcion init_interrupt para habilitar las interrupciones.
-* Se crea funcion stop_interrupt para parar las interrupciones durante la escritura de memoria.
+* V1.9.2: 
+
 
 */
 

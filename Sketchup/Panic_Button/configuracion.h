@@ -1,5 +1,5 @@
 //Version
-#define VERSION          "V1.9.1"
+#define VERSION          "V1.9.2"
 #define VERSION_HARDWARE "V1.0"
 
 //Serial
