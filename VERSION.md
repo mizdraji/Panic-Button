@@ -85,3 +85,4 @@ por baja tension que genera el modulo SIM800.
 * * Se agrega activación manual/automática en ABPCredentials.h
 * * Se crea función readCredFromEEPROM, devuelve el bit de activación.
 * * Se crea la función updateEEPROM. Compara el valor de la memoria con el que se va a escribir, si no es igual lo sobreescribe.
+* * Se agregan las funciones readCMtFromEEPROM y overWriteEEPROM.
