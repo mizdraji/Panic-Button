@@ -43,3 +43,4 @@ byte slot_para_enviar=0; //Numero de bloque de memoria (0-15) donde se almacena 
 
 void initEEPROM();
 void clearEEPROM();
+void writeResetCountToEEPROM(byte reset_count_);

@@ -1,6 +1,6 @@
 /*Detalle de versiones:
 * V1.9.2: 
-
+* Se crea funcion writeResetCountToEEPROM
 
 */
 

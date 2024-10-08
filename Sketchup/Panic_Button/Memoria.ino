@@ -68,4 +68,9 @@ void clearEEPROM() {
   cambio_bloque_PL=1;
 }
 
-
+void writeResetCountToEEPROM(byte reset_count_) {
+  stop_interrupt();
+  updateEEPROM(pos_reset_count,reset_count_);
+  EEPROM.commit();
+  init_interrupt();
+}
