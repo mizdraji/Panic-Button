@@ -1,17 +1,17 @@
 //  Manejo de memoria EEPROM (Flash)
 
 void initEEPROM() {
-  // int pos_mem_[SLOTS_CANTIDAD_MAX]={0};
-  // int pos_=0;
-  // for (int i = 0; i < SLOTS_CANTIDAD_MAX; ++i) {
-  //   pos_mem_[i]=pos_;
-  // }
+  int pos_mem_[SLOTS_CANTIDAD_MAX]={0};
+  int pos_=0;
+  for (int i = 0; i < SLOTS_CANTIDAD_MAX; ++i) {
+     pos_mem_[i]=pos_;
+   }
   //Init EEPROM
   if (dbmem) Serial.println("* * * iniciando EEPROM * * *");
   EEPROM.begin(EEPROM_SIZE);
 
   byte reset_count=EEPROM.read(pos_reset_count);
-  if (dbmem) Serial.print("leer reset_count: ");Serial.println(reset_count);
+  if (dbmem) { Serial.print("leer reset_count: ");Serial.println(reset_count); }
   if (reset_count==255) { //Si reset_count es "FF" limpiar memoria y resetear
     clearEEPROM();
     Serial.print("Reiniciando... ");
@@ -31,16 +31,15 @@ void initEEPROM() {
     nodo.is_activated=1;
   }
   else nodo.is_activated=0;
-  if (dbmem) Serial.print("nodo activado: ");Serial.println(nodo.is_activated);
+  if (dbmem) { Serial.print("nodo activado: ");Serial.println(nodo.is_activated); }
 
-  slot_actual=leerPLGuardadas();
   dir_actual=pos_mem_[slot_actual];
-  checkDir();
-  dir_CMt_actual=leerCMtGuardados();
-  if (dbmem) Serial.printf("Almacenar en direcciones dir_actual: %d dir_CMt_actual: %d \n",dir_actual,dir_CMt_actual);
-  char payloadGuardada[PL_CONT_MONO_SIZE] = {0};
-  readPLFromEEPROM(0,payloadGuardada); //leer la payload que está en el primer slot para armar el paquete START
-  loadPayloadST(payloadGuardada,CMt_corte); //carga la payload START
+
+  //dir_CMt_actual=leerCMtGuardados();
+  //if (dbmem) Serial.printf("Almacenar en direcciones dir_actual: %d dir_CMt_actual: %d \n",dir_actual,dir_CMt_actual);
+  //char payloadGuardada[PL_CONT_MONO_SIZE] = {0};
+  //readPLFromEEPROM(0,payloadGuardada); //leer la payload que está en el primer slot para armar el paquete START
+  //loadPayloadST(payloadGuardada,CMt_corte); //carga la payload START
 }
 
 void clearEEPROM() {
@@ -104,4 +103,22 @@ byte readCredFromEEPROM() {
     //for (int i = 0; i < 8; ++i) Serial.print(devAddr[i]); Serial.println(" ");
   }
   return bit_act_;
+}
+
+//Esta funcion lee el bloque CMt escrito en la posición de memoria addrOffset y lo guarda en el array data_out_. 
+void readCMtFromEEPROM(int addrOffset, char * data_out_) {
+  byte length_=EEPROM.read(addrOffset);
+  for (int i = 0; i < length_; i++)  {
+    data_out_[i]=EEPROM.read(addrOffset + 1 + i);
+  }
+}
+
+//Esta funcion sobreescribe los datos en addr, no agrega bytes adicionales.
+void overWriteEEPROM(int addr, char data_in_[], byte length_) {
+  stop_interrupt();
+  for (int i = 0; i < length_; i++)  {
+    updateEEPROM(addr + i, data_in_[i]);
+  }
+  EEPROM.commit();
+  init_interrupt();
 }
