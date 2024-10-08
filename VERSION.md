@@ -75,4 +75,7 @@ por baja tension que genera el modulo SIM800.
 * * Se define la estructura de la memoria en Direcciones de memoria - PB.xlsx
 
 * V1.9.1
-* *
+* * Se agregan en Memoria.h las direcciones de memoria.
+* * Se crea funcion ClearEEPROM para limpiar memoria.
+* * Se crea funcion init_interrupt para habilitar las interrupciones.
+* * Se crea funcion stop_interrupt para parar las interrupciones durante la escritura de memoria.
