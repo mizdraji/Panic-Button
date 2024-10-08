@@ -1,7 +1,8 @@
 /*Detalle de versiones:
-* V1.8.2: 
-* Se agregan nuevos mensajes recibidos: "informadorcv" y "cerradorcv". cerradorcv sin función aun.
-* Ahora rcv_informado apaga todos los leds luego de 15 segundos de recibir el mensaje. A futuro se aumentara este tiempo.
+* V1.9: 
+* Se crea unas pruebas de string.
+* Se empieza a ver la estructura de la memoria EEPROM. Se crea Memoria.h y Memoria.ino.
+* Se define la estructura de la memoria en Direcciones de memoria - PB.xlsx
 */
 
 //librerias utilizadas
@@ -15,6 +16,7 @@
 #include "Hardware.h"
 #include "configuracion.h"
 #include <SoftwareSerial.h>         //Libreria para definir tx y rx de sim800
+#include "Memoria.h"
 
 SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
@@ -25,7 +27,14 @@ void setup() {                              //setup run in core1
   Serial.begin(SERIAL_SPEED);
   config_pines();
   config_inicial();
-  delay(5000);                              //falta crear variable para initial random time
+  delay(5000);                              //falta crear variable para initial random time: delay(initial_random_time()); //delay random
+  
+  /*    A FUTURO SE USARA PARA RESETEAR MEMORIA CON TAMPER, pin_analogX a definir en un futuro
+    if (analogRead(pin_analogX)<20) {
+    clearEEPROM();
+  }
+  */                   
+  initEEPROM();                             //inicializa la EEPROM
 
   //config lora
   if (!lora.init()) {
