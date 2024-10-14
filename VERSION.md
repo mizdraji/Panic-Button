@@ -69,3 +69,6 @@ por baja tension que genera el modulo SIM800.
 * * Se agregan nuevos mensajes recibidos: "informadorcv" y "cerradorcv". cerradorcv sin función aun.
 * * Ahora rcv_informado apaga todos los leds luego de 15 segundos de recibir el mensaje. A futuro se aumentara este tiempo.
 * * Se reduce a 3 segundos el tiempo del blinkstb.
+
+* V1.8.3
+* *
