@@ -23,5 +23,6 @@ void IRAM_ATTR buttonInterrupt2();
 void IRAM_ATTR buttonInterrupt3();
 
 int16_t random_time(unsigned int MIN_,unsigned int MAX_);
+uint32_t idempotencia_random();
 void pdr_function();
 void config_pines( void );

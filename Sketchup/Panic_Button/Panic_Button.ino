@@ -1,6 +1,7 @@
 /*Detalle de versiones:
 * V1.8.3: 
-
+* Se crea función idempotencia_random para generar un numero aleatorio de 8 digitos para ser usado de idempotencia en los mensajes.
+* Ahora el mensaje saliente es: "mensaje, idempotencia". Ejemplo: "policia, 61283763" ; "Lpolicia, 61283763" (para lora).
 */
 
 //librerias utilizadas

@@ -19,6 +19,8 @@ bool bloqueo      = false;         //Variable para monitorear bloqueo de pulsado
 
 bool statusLED = false;
 
+String idempotencia;
+
 //variables para adc en GPIO13
 #define ADC_powerON_value      2800     //voltage = ADC_powerON_value * (3.3 / 4095.0);     ADC_powerON_value = analogRead(ADC_powerON);
 //debe ser mayor a 2.25V para estar conectado a usb
