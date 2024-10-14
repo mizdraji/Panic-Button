@@ -1,8 +1,8 @@
 #include "pinout.h"
 
 unsigned long previousMillis = 0;         // Variable para almacenar el tiempo anterior
-#define ledOnTime   500      // Tiempo de encendido en milisegundos (0.5 segundos)
-#define ledOffTime  10000   // Tiempo de apagado en milisegundos (5 segundos)
+#define ledOnTime   300      // Tiempo de encendido en milisegundos (0.5 segundos)
+#define ledOffTime  3000   // Tiempo de apagado en milisegundos (3 segundos)
 bool LED_state = LOW;                     // Estado actual del LED
 
 #define delay_apagarLED   15000            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
