@@ -28,16 +28,14 @@ void led_blink() {
 //TASK2:  blink de stand by, es un blink de baja frecuencia para indicar que el dispositivo esta funcionando.
 void blinkstb() {                       
   unsigned long currentMillis = millis();
-
   if (LED_state == HIGH && (currentMillis - previousMillis >= ledOnTime)) {
-    // Apagar el LED después de 0.5 segundos
+    // Apagar el LED después de 0.3 segundos
     LED_state = LOW;                  // Cambiar estado del LED
     previousMillis = currentMillis;   // Actualizar tiempo anterior
     digitalWrite(led_powerON, LED_state);  // Apagar el LED
-    //Serial.println("blink blink");
-    
-  } else if (LED_state == LOW && (currentMillis - previousMillis >= ledOffTime)) {
-    // Encender el LED después de 7 segundos
+  } 
+  else if (LED_state == LOW && (currentMillis - previousMillis >= ledOffTime)) {
+    // Encender el LED después de 3 segundos
     LED_state = HIGH;                 // Cambiar estado del LED
     previousMillis = currentMillis;   // Actualizar tiempo anterior
     digitalWrite(led_powerON, LED_state);  // Encender el LED

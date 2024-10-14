@@ -41,6 +41,8 @@
 * String "bomberosrcv"          //bomberos recibido confirmacion - enviado de servidor de forma automática.
 * String "medicarcv"            //medica recibido confirmacion - enviado de servidor de forma automática.
 * String "atendidorcv"          //Respuesta de operario, alerta atendida - enviado por operario de forma manual.
+* String "informadorcv"         //informadorcv cuando se da aviso a la policia. Activa un temporizador para apagar todos los leds.
+* String "cerradorcv"           //Es cuando se da por finalizada la alerta, pero puede pasar mucho tiempo. Todavia sin funcionalidad en el módulo.
 *******************************
 ## MENSAJES ENVIADOS LORA
 * char "Lpolicia"	- Base64: THBvbGljaWE=	//mensaje1 para enviar por lora.
