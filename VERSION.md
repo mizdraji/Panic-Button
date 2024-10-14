@@ -71,4 +71,4 @@ por baja tension que genera el modulo SIM800.
 * * Se reduce a 3 segundos el tiempo del blinkstb.
 
 * V1.8.3
-* *
+* * Se crea prueba para generar numeros aleatorios para usarlo de idempotencia.
