@@ -21,13 +21,13 @@ void loop() {
 // Función para generar un número aleatorio basado en el timestamp y mantener su longitud
 uint32_t generate_fixed_length_random() {
     // Obtener el timestamp actual en microsegundos
-    int64_t timestamp = esp_timer_get_time();
+    uint32_t timestamp = esp_timer_get_time();
 
     // Sembrar el generador de números aleatorios con el timestamp (opcional, para mayor variabilidad)
     srand((unsigned int)(timestamp));
 
     // Generar un número aleatorio
-    uint64_t random_number = rand()  % 90000000 + 10000000;
+    uint32_t random_number = rand()  % 90000000 + 10000000;
 
     return random_number;
 }
