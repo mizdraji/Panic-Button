@@ -4,9 +4,6 @@
 
 String mensaje_enviar = "";
 
-int64_t timestamp = 0;
-int64_t timestamp2 = 0;
-
 void setup() {
   Serial.begin(115200);
   delay(5000);
