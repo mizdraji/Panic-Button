@@ -21,7 +21,7 @@ void config_inicial()
   digitalWrite(led1, LOW);
   digitalWrite(led2, LOW);
   digitalWrite(led3, LOW);
-  digitalWrite(led_powerON, LOW);
+  digitalWrite(led_powerON, HIGH);
   digitalWrite(led_recibido, LOW);
   digitalWrite(led_atendido, LOW);
 }
