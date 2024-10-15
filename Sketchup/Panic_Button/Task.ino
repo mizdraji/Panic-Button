@@ -178,8 +178,6 @@ void powerON () {
   digitalWrite(led_powerON, HIGH);
   t2.disable();
   }  
-  else {                //USB DESCONECTADO
-  t2.enable();
-  } 
-  }
+  else t2.enable();                                         //USB DESCONECTADO
+}
 
