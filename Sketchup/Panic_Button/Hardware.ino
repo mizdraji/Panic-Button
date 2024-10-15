@@ -21,7 +21,7 @@ void config_inicial()
   digitalWrite(led1, LOW);
   digitalWrite(led2, LOW);
   digitalWrite(led3, LOW);
-  digitalWrite(led_powerON, LOW);
+  digitalWrite(led_powerON, HIGH);
   digitalWrite(led_recibido, LOW);
   digitalWrite(led_atendido, LOW);
 }
@@ -154,7 +154,15 @@ void IRAM_ATTR buttonInterrupt3() {
   last_interrupt_time = interrupt_time;
 }
 
+//Genera un numero aleatorio de 8 digitos para usar de idempotencia
+uint32_t idempotencia_random() {
+    int32_t timestamp = esp_timer_get_time();                   // Obtener el timestamp actual en microsegundos
+    srand((unsigned int)(timestamp));                           //Sembrar el generador de números aleatorios con el timestamp (opcional, para mayor variabilidad)
+    uint32_t random_number = rand()  % 90000000 + 10000000;     // Generar un número aleatorio
+    return random_number;
+}
+
+//Genera un numero aleatorio entre MIN y MAX
 int16_t random_time(unsigned int MIN_,unsigned int MAX_) {
-  //calcula un nuevo tiempo
-  return random(MIN_, MAX_);
+  return random(MIN_, MAX_);          //calcula un nuevo tiempo
 }

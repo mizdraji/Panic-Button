@@ -1,8 +1,8 @@
 #include "pinout.h"
 
 unsigned long previousMillis = 0;         // Variable para almacenar el tiempo anterior
-#define ledOnTime   300      // Tiempo de encendido en milisegundos (0.5 segundos)
-#define ledOffTime  3000   // Tiempo de apagado en milisegundos (3 segundos)
+#define ledOnTime   200      // Tiempo de encendido en milisegundos (0.2 segundos)
+#define ledOffTime  2000   // Tiempo de apagado en milisegundos (2 segundos)
 bool LED_state = LOW;                     // Estado actual del LED
 
 #define delay_apagarLED   15000            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
@@ -18,6 +18,8 @@ bool bloqueo      = false;         //Variable para monitorear bloqueo de pulsado
 #define tiempo_bloqueo 10000       //10 segundos tiempo bloqueo de pulsadores
 
 bool statusLED = false;
+
+String idempotencia;
 
 //variables para adc en GPIO13
 #define ADC_powerON_value      2800     //voltage = ADC_powerON_value * (3.3 / 4095.0);     ADC_powerON_value = analogRead(ADC_powerON);

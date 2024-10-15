@@ -1,8 +1,9 @@
 /*Detalle de versiones:
-* V1.8.2: 
-* Se agregan nuevos mensajes recibidos: "informadorcv" y "cerradorcv". cerradorcv sin función aun.
-* Ahora rcv_informado apaga todos los leds luego de 15 segundos de recibir el mensaje. A futuro se aumentara este tiempo.
-* Se reduce a 3 segundos el tiempo del blinkstb.
+* V1.8.3: 
+* Se crea función idempotencia_random para generar un numero aleatorio de 8 digitos para ser usado de idempotencia en los mensajes.
+* Ahora el mensaje saliente es: "mensaje, idempotencia". Ejemplo: "policia, 61283763" ; "Lpolicia, 61283763" (para lora).
+* Mensajes de entrada son similares a los salientes: "mensaje, idempotencia". Ejemplo: "policiarcv, 61283763" ; "Lpoliciarcv, 61283763" (para lora).
+* Update led_powerON = HIGH (al iniciar), ledOnTime = 200, ledOffTime = 2000. 
 */
 
 //librerias utilizadas
