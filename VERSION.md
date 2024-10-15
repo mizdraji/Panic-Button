@@ -75,3 +75,6 @@ por baja tension que genera el modulo SIM800.
 * * Ahora el mensaje saliente es: "mensaje, idempotencia". Ejemplo: "policia, 61283763" ; "Lpolicia, 61283763" (para lora).
 * * Mensajes de entrada son similares a los salientes: "mensaje, idempotencia". Ejemplo: "policiarcv, 61283763" ; "Lpoliciarcv, 61283763" (para lora).
 * * Update led_powerON = HIGH (al iniciar), ledOnTime = 200, ledOffTime = 2000. 
+
+* V1.8.4
+* *
