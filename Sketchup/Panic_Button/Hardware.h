@@ -8,7 +8,7 @@
 #define UN_DIA                 84600     //24hs = 86400 segundos
 
 struct str {
-  uint8_t pdr_ok = 0;                       // =1 cuando la prueba de red dio ok, sino =0
+  uint8_t pdr_ok                = 0;        // =1 cuando la prueba de red dio ok, sino =0
   //variables de tiempo
   int32_t t_wait                = 0;        //tiempo de espera
   uint8_t pausa_larga           = 0;        //=1 esperar tiempo largo
@@ -24,5 +24,7 @@ void IRAM_ATTR buttonInterrupt3();
 
 int16_t random_time(unsigned int MIN_,unsigned int MAX_);
 uint32_t idempotencia_random();
+uint32_t extraer_numero(String mensaje_completo);
+uint32_t extraer_numero(char mensaje_completo[]);
 void pdr_function();
 void config_pines();

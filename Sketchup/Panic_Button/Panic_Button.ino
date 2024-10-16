@@ -1,5 +1,8 @@
 /*Detalle de versiones:
 * V1.8.4: 
+* Se crean dos funciones extraer_numero en Hardware.ino, para obtener el número de idempotencia recibido. Una función es para mensajes lora del tipo char[] y la otra para SMS.
+* Se agrega if (SIM800L.available()) antes de while(SIM800L.available()>0) para hacer el código más seguro y eficiente. Permite asegurar de que solo se leerá los datos cuando realmente haya datos disponibles.
+* Se agrega lock.disable() dentro de config_task para que los botones ya esten habilitados al presionarse por primera vez.
 
 */
 
@@ -35,9 +38,9 @@ void setup() {                              //setup run in core1
   if (initLoraTec()) {
     Serial.println("-->LoraTec OK");
     Serial.print("-->devID: PB");
-    Serial.println(devID);                  //Activacion Manual, devID predefinido
+    Serial.println(devID);                          //Activacion Manual, devID predefinido
     char uncero[1]={0};
-    sendPackage(uncero, 1, no_espera_ACK,  1);
+    sendPackage(uncero, 1, no_espera_ACK,  1);      //envia un cero a travez de lora al iniciar para establecer la conexión
   }
 
   //config Scheduler
@@ -58,24 +61,29 @@ void setup() {                              //setup run in core1
 }
 
 void loop() {                                           //loop run in core1
+if(SIM800L.available()) {
   while(SIM800L.available()>0) {
-    String mensaje_recibido = "";
-    mensaje_recibido = SIM800L.readString(); 
-
+    String mensaje_recibido = SIM800L.readString();
+    uint32_t numrcv = extraer_numero(mensaje_recibido); 
+    Serial.print(mensaje_recibido);
+    
     //if(mensaje_recibido.indexOf("OK") != -1)  {Serial.println("se recibio OK");}                //comparo si recibo OK en el string de mensaje_recibido
     //if(mensaje_recibido.indexOf("ERROR") != -1)  {Serial.println("se recibio ERROR");}
 
-    Serial.print(mensaje_recibido);
     if (mensaje_recibido.indexOf(msj.rcv_atendido) != -1) t_atendido.enable();    //se ejecuta task de atendido
-    if (mensaje_recibido.indexOf(msj.rcv_policia) != -1 ||
-        mensaje_recibido.indexOf(msj.rcv_bomberos) != -1 ||
-        mensaje_recibido.indexOf(msj.rcv_medica) != -1) t_recibido.enable();      //se ejecuta task de recibido
+    if ((mensaje_recibido.indexOf(msj.rcv_policia) != -1) ||
+        (mensaje_recibido.indexOf(msj.rcv_bomberos) != -1) ||
+        (mensaje_recibido.indexOf(msj.rcv_medica) != -1)) {
+          if(numrcv != 0) {Serial.print("numrcv: ");Serial.println(numrcv);}
+          t_recibido.enable();      //se ejecuta task de recibido
+        }
 
     if (mensaje_recibido.indexOf(msj.rcv_informado) != -1) {
       t_apagarLED.enable();                                                       //se ejecuta task de informado
       t_apagarLED.delay(delay_apagarLED);                                         //se ejecuta la tarea apagarLED con un delay de 15 segundos);
     }
     //if (mensaje_recibido.indexOf(msj.rcv_cerrado) != -1) task.enable();    //se ejecuta task de cerrado
+}
 }
     
 

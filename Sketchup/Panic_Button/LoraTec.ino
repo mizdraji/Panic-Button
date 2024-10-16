@@ -2,20 +2,20 @@
 #define MAX_RETRY_SAME_SF 2
 
 const unsigned char SFvector[4] = { SF7BW125, SF8BW125, SF9BW125, SF10BW125 }; //toma solamente hasta los primeros 4 SF
-uint8_t SF_actual = 0;            //para saber cual se esta usando
-uint8_t SF_is_set = 0;            //para saber si esta seteado el SF
-uint8_t SF_index = 0;             //para movernos dentro del vector
+uint8_t SF_actual    = 0;            //para saber cual se esta usando
+uint8_t SF_is_set    = 0;            //para saber si esta seteado el SF
+uint8_t SF_index     = 0;             //para movernos dentro del vector
 uint8_t cont_same_SF = 0;         //para probar mas d euna vez cada SF
 
 //variables para timeout
 #define tick_time 100 //base de tiempo para el delay
-#define timeout 80 //timeout * tick_time = tiempo de time out = 8 segundos
+#define timeout   80 //timeout * tick_time = tiempo de time out = 8 segundos
 
 #if tipo_modulo == 0
 //RFM95W + ESP12 (Macro version)
 const sRFM_pins RFM_pins = {
-  .CS = 15,
-  .RST = 0,
+  .CS   = 15,
+  .RST  = 0,
   .DIO0 = 5,
   .DIO1 = 5,
   .DIO2 = 5,

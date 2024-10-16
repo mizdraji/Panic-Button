@@ -12,6 +12,7 @@ void config_task(){
   t7.disable();
   t_recibido.disable();
   t_atendido.disable();
+  lock.disable();
 }
 
 
