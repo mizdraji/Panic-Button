@@ -114,13 +114,12 @@ void pdr_function() {
     }
     else if (nodo.t_wait > 0) { //tiempo de espera 
       nodo.t_wait--; //vamos decrementando el t_wait
-      
     }
   }
 }
 
 //FUNCIONES DE INTERRUPCIONES CON ANTIREBOTE:
-//interrupcion pulsador1
+//interrupción pulsador1
 void IRAM_ATTR buttonInterrupt1() {           
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
@@ -131,7 +130,7 @@ void IRAM_ATTR buttonInterrupt1() {
   }
   last_interrupt_time = interrupt_time;
 }
-//interrupcion pulsador2
+//interrupción pulsador2
 void IRAM_ATTR buttonInterrupt2() {           
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
@@ -142,7 +141,7 @@ void IRAM_ATTR buttonInterrupt2() {
   }
   last_interrupt_time = interrupt_time;
 }
-//interrupcion pulsador3
+//interrupción pulsador3
 void IRAM_ATTR buttonInterrupt3() {           
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
@@ -154,7 +153,7 @@ void IRAM_ATTR buttonInterrupt3() {
   last_interrupt_time = interrupt_time;
 }
 
-//Genera un numero aleatorio de 8 digitos para usar de idempotencia
+//Genera un número aleatorio de 8 digitos para usar de idempotencia
 uint32_t idempotencia_random() {
     int32_t timestamp = esp_timer_get_time();                   // Obtener el timestamp actual en microsegundos
     srand((unsigned int)(timestamp));                           //Sembrar el generador de números aleatorios con el timestamp (opcional, para mayor variabilidad)
@@ -162,7 +161,30 @@ uint32_t idempotencia_random() {
     return random_number;
 }
 
-//Genera un numero aleatorio entre MIN y MAX
+//funcion para extraer el número de un mensaje del tipo char[]: "mensaje, numero"
+uint32_t extraer_numero(char mensaje_completo[]) {
+    char *coma_pos = strchr(mensaje_completo, ',');                   // Encontrar la posición de la coma en el mensaje    
+    // Verificar si la coma fue encontrada
+    if (coma_pos != NULL) {
+        char *parte_numerica = coma_pos + 2;                          // Saltar la coma y el espacio para obtener la parte numérica
+        uint32_t numero = strtol(parte_numerica, NULL, 10);           // Convertir la parte numérica en un uint32_t usando strtol
+        return numero;
+    }
+    return 0;  // Si no se encontró la coma, devolver 0
+}
+//funcion para extraer el número de un mensaje del tipo String: "mensaje, numero", extrae el número despues de la ULTIMA COMA.
+uint32_t extraer_numero(String mensaje_completo) {
+    int posicion_ultima_coma = mensaje_completo.lastIndexOf(',');     // Buscar la última coma en el mensaje
+
+    if (posicion_ultima_coma != -1) {                                  // Verificar si se encontró la coma
+        // Extraer la parte numérica después de la última coma y espacio
+        String numero = mensaje_completo.substring(posicion_ultima_coma + 2);  // +2 para saltar la coma y el espacio
+        return numero.toInt();  // Convertir a uint32_t y retornar
+    }
+    return 0;     // Si no se encontró la coma, devolver 0
+}
+
+//Genera un número aleatorio entre MIN y MAX
 int16_t random_time(unsigned int MIN_,unsigned int MAX_) {
   return random(MIN_, MAX_);          //calcula un nuevo tiempo
 }

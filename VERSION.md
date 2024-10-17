@@ -75,3 +75,11 @@ por baja tension que genera el modulo SIM800.
 * * Ahora el mensaje saliente es: "mensaje, idempotencia". Ejemplo: "policia, 61283763" ; "Lpolicia, 61283763" (para lora).
 * * Mensajes de entrada son similares a los salientes: "mensaje, idempotencia". Ejemplo: "policiarcv, 61283763" ; "Lpoliciarcv, 61283763" (para lora).
 * * Update led_powerON = HIGH (al iniciar), ledOnTime = 200, ledOffTime = 2000. 
+
+* V1.8.4
+* * Se crean dos funciones extraer_numero en Hardware.ino, para obtener el número de idempotencia recibido. Una función es para mensajes lora del tipo char[] y la otra para SMS.
+* * Se agrega if (SIM800L.available()) antes de while(SIM800L.available()>0) para hacer el código más seguro y eficiente. Permite asegurar de que solo se leerá los datos cuando realmente haya datos disponibles.
+* * Se agrega lock.disable() dentro de config_task para que los botones ya esten habilitados al presionarse por primera vez.
+* * Se agrega bandera checknum para comparar si el número idempotencia es el mismo que el recibido.
+* * Se agrega condición de mensaje recibido: numrcv == numsnt y checknum == false, tanto en lora como para SMS.
+* * Se usa función strncmp en vez de strcmp en datoEntrada para buscar la palabra clave dentro del mensaje recibido.

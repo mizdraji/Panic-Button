@@ -1,9 +1,12 @@
 /*Detalle de versiones:
-* V1.8.3: 
-* Se crea función idempotencia_random para generar un numero aleatorio de 8 digitos para ser usado de idempotencia en los mensajes.
-* Ahora el mensaje saliente es: "mensaje, idempotencia". Ejemplo: "policia, 61283763" ; "Lpolicia, 61283763" (para lora).
-* Mensajes de entrada son similares a los salientes: "mensaje, idempotencia". Ejemplo: "policiarcv, 61283763" ; "Lpoliciarcv, 61283763" (para lora).
-* Update led_powerON = HIGH (al iniciar), ledOnTime = 200, ledOffTime = 2000. 
+* V1.8.4: 
+* Se crean dos funciones extraer_numero en Hardware.ino, para obtener el número de idempotencia recibido. Una función es para mensajes lora del tipo char[] y la otra para SMS.
+* Se agrega if (SIM800L.available()) antes de while(SIM800L.available()>0) para hacer el código más seguro y eficiente. Permite asegurar de que solo se leerá los datos cuando realmente haya datos disponibles.
+* Se agrega lock.disable() dentro de config_task para que los botones ya esten habilitados al presionarse por primera vez.
+* Se agrega bandera checknum para comparar si el numero idempotencia es el mismo que el recibido.
+* Se agrega condición de mensaje recibido: numrcv == numsnt y checknum == false, tanto en lora como para SMS.
+* Se usa función strncmp en vez de strcmp en datoEntrada para buscar la palabra clave dentro del mensaje recibido.
+
 */
 
 //librerias utilizadas
@@ -38,9 +41,9 @@ void setup() {                              //setup run in core1
   if (initLoraTec()) {
     Serial.println("-->LoraTec OK");
     Serial.print("-->devID: PB");
-    Serial.println(devID);                  //Activacion Manual, devID predefinido
+    Serial.println(devID);                          //Activacion Manual, devID predefinido
     char uncero[1]={0};
-    sendPackage(uncero, 1, no_espera_ACK,  1);
+    sendPackage(uncero, 1, no_espera_ACK,  1);      //envia un cero a travez de lora al iniciar para establecer la conexión
   }
 
   //config Scheduler
@@ -61,24 +64,28 @@ void setup() {                              //setup run in core1
 }
 
 void loop() {                                           //loop run in core1
+if(SIM800L.available()) {
   while(SIM800L.available()>0) {
-    String mensaje_recibido = "";
-    mensaje_recibido = SIM800L.readString(); 
-
+    String mensaje_recibido = SIM800L.readString();
+    uint32_t numrcv = extraer_numero(mensaje_recibido); 
+    Serial.print(mensaje_recibido);
+    
     //if(mensaje_recibido.indexOf("OK") != -1)  {Serial.println("se recibio OK");}                //comparo si recibo OK en el string de mensaje_recibido
     //if(mensaje_recibido.indexOf("ERROR") != -1)  {Serial.println("se recibio ERROR");}
 
-    Serial.print(mensaje_recibido);
     if (mensaje_recibido.indexOf(msj.rcv_atendido) != -1) t_atendido.enable();    //se ejecuta task de atendido
-    if (mensaje_recibido.indexOf(msj.rcv_policia) != -1 ||
-        mensaje_recibido.indexOf(msj.rcv_bomberos) != -1 ||
-        mensaje_recibido.indexOf(msj.rcv_medica) != -1) t_recibido.enable();      //se ejecuta task de recibido
+    if ((mensaje_recibido.indexOf(msj.rcv_policia) != -1 || mensaje_recibido.indexOf(msj.rcv_bomberos) != -1 || mensaje_recibido.indexOf(msj.rcv_medica) != -1) && numrcv == numsnt && checknum == false) {
+        checknum = true;
+        Serial.println("Recibi primero SMS");
+        t_recibido.enable();      //se ejecuta task de recibido
+    }
 
     if (mensaje_recibido.indexOf(msj.rcv_informado) != -1) {
       t_apagarLED.enable();                                                       //se ejecuta task de informado
       t_apagarLED.delay(delay_apagarLED);                                         //se ejecuta la tarea apagarLED con un delay de 15 segundos);
     }
     //if (mensaje_recibido.indexOf(msj.rcv_cerrado) != -1) task.enable();    //se ejecuta task de cerrado
+}
 }
     
 
@@ -89,10 +96,17 @@ void loop() {                                           //loop run in core1
   if(recvStatus) {
     Serial.print("====>> ");
     Serial.println(datoEntrante);
-    if(strcmp(datoEntrante,atendidorcv_lora) == 0) t_atendido.enable();    //se ejecuta task de atendido
-    if(strcmp(datoEntrante, policiarcv_lora) == 0 ||
-       strcmp(datoEntrante,bomberosrcv_lora) == 0 ||
-       strcmp(datoEntrante,medicarcv_lora) == 0)  t_recibido.enable();      //se ejecuta task de recibido
+    uint32_t numrcv = extraer_numero(datoEntrante);
+    if(strncmp(datoEntrante,  atendidorcv_lora, strlen(atendidorcv_lora)) == 0) t_atendido.enable();        //se ejecuta task de atendido
+    if((strncmp(datoEntrante, policiarcv_lora,  strlen(policiarcv_lora))  == 0  ||                          //busca policiarcv_lora en los primeros lugares de datoEntrante, 
+        strncmp(datoEntrante, bomberosrcv_lora, strlen(bomberosrcv_lora)) == 0  ||                          //si encuentra la palabra buscada devuelve un 0.
+        strncmp(datoEntrante, medicarcv_lora,   strlen(medicarcv_lora))   == 0) && 
+        numrcv == numsnt && checknum == false ) {
+
+       checknum = true;
+       Serial.println("Recibi primero LORA");
+       t_recibido.enable();                                                 //se ejecuta task de recibido
+    }
 
   }
   lora.update();                     //actualizacion lora

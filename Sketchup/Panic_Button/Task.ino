@@ -12,6 +12,7 @@ void config_task(){
   t7.disable();
   t_recibido.disable();
   t_atendido.disable();
+  lock.disable();
 }
 
 
@@ -56,12 +57,14 @@ void loraSend() {
 void buttonTask1() {
   if(!bloqueo) {
     idempotencia = idempotencia_random();
+    numsnt = idempotencia.toInt();
+    checknum = false;
     String mensaje_saliente = msj.policia + ", " + idempotencia;
     //Enviar_msj(numero.Remitente2, msj.policia);          //SMS
     Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
     
     char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", policia_lora, idempotencia.c_str());                 //Concatena "policia" y "idempotencia" con una coma
+    sprintf(mensaje_saliente_lora, "%s, %s", policia_lora, idempotencia.c_str());                 //Concatena "policia" e "idempotencia" con una coma
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
     //sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);                         //LORA
 
@@ -80,12 +83,14 @@ void buttonTask1() {
 void buttonTask2() {
   if(!bloqueo) {
     idempotencia = idempotencia_random();
+    numsnt = idempotencia.toInt();
+    checknum = false;
     String mensaje_saliente = msj.bomberos + ", " + idempotencia;
     //Enviar_msj(numero.Remitente2, msj.bomberos);          //SMS
     Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
     
     char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", bomberos_lora, idempotencia.c_str());                 //Concatena "policia" y "idempotencia" con una coma
+    sprintf(mensaje_saliente_lora, "%s, %s", bomberos_lora, idempotencia.c_str());                 //Concatena "bomberos" e "idempotencia" con una coma
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
     //sendPackage(bomberos_lora, strlen(bomberos_lora), no_espera_ACK,  1);                       //LORA
 
@@ -103,12 +108,14 @@ void buttonTask2() {
 void buttonTask3() {
   if(!bloqueo) {
     idempotencia = idempotencia_random();
+    numsnt = idempotencia.toInt();
+    checknum = false;
     String mensaje_saliente = msj.medica + ", " + idempotencia;
     //Enviar_msj(numero.Remitente2, msj.medica);            //SMS
     Enviar_msj(numero.Remitente2, mensaje_saliente);        //SMS
 
     char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", medica_lora, idempotencia.c_str());                 //Concatena "policia" y "idempotencia" con una coma
+    sprintf(mensaje_saliente_lora, "%s, %s", medica_lora, idempotencia.c_str());                 //Concatena "media" e "idempotencia" con una coma
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
     //sendPackage(medica_lora, strlen(medica_lora), no_espera_ACK,  1);      //LORA
 
@@ -178,8 +185,6 @@ void powerON () {
   digitalWrite(led_powerON, HIGH);
   t2.disable();
   }  
-  else {                //USB DESCONECTADO
-  t2.enable();
-  } 
-  }
+  else t2.enable();                                         //USB DESCONECTADO
+}
 
