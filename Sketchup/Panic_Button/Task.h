@@ -20,6 +20,9 @@ bool bloqueo      = false;         //Variable para monitorear bloqueo de pulsado
 bool statusLED = false;
 
 String idempotencia;
+uint32_t numsnt = 0;      //number sent, numero de idempotencia enviado en uint32_t
+bool checknum = false;    //bandera para chekear si numsnt = numrcv
+//uint32_t numrcv = 0;
 
 //variables para adc en GPIO13
 #define ADC_powerON_value      2800     //voltage = ADC_powerON_value * (3.3 / 4095.0);     ADC_powerON_value = analogRead(ADC_powerON);
