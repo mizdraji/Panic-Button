@@ -30,7 +30,7 @@ struct mensajes {
   String rcv_bomberos     = "bomberosrcv";          //bomberos recibido confirmacion
   String rcv_medica       = "medicarcv";            //medica recibido confirmacion
   String rcv_atendido     = "atendidorcv";          //Respuesta de operario, alerta atendida
-  String rcv_informado    = "informadorcv";         //Informadorcv cuando se da aviso a la policía
+  String rcv_informado    = "informadorcv";         //Informadorcv cuando se da aviso a la autoridad correspondiente.
   String rcv_cerrado      = "cerradorcv";           // es cuando se da por finalizada la alerta, pero puede pasar mucho tiempo
 };
 mensajes msj;
@@ -43,4 +43,5 @@ mensajes msj;
   char bomberosrcv_lora[] = "Lbomberosrcv";   //bomberos recibido por lora confirmacion - enviado de servidor de forma automática.
   char medicarcv_lora[]   = "Lmedicarcv";     //medica recibido por lora confirmacion - enviado de servidor de forma automática.
   char atendidorcv_lora[] = "Latendidorcv";   //Respuesta por lora de operario, alerta atendida - enviado por operario de forma manual.
+  char informadorcv_lora[]= "Linformadorcv";  //Respuesta por lora de operario Informadorcv cuando se da aviso a la autoridad correspondiente
   

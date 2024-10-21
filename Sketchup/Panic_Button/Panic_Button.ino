@@ -6,6 +6,7 @@
 * Se agrega bandera checknum para comparar si el numero idempotencia es el mismo que el recibido.
 * Se agrega condición de mensaje recibido: numrcv == numsnt y checknum == false, tanto en lora como para SMS.
 * Se usa función strncmp en vez de strcmp en datoEntrada para buscar la palabra clave dentro del mensaje recibido.
+* Se agrega informadorcv_lora y procesamiento de este mensaje.
 
 */
 
@@ -97,7 +98,7 @@ if(SIM800L.available()) {
     Serial.print("====>> ");
     Serial.println(datoEntrante);
     uint32_t numrcv = extraer_numero(datoEntrante);
-    if(strncmp(datoEntrante,  atendidorcv_lora, strlen(atendidorcv_lora)) == 0) t_atendido.enable();        //se ejecuta task de atendido
+    if(strncmp(datoEntrante,  atendidorcv_lora, strlen(atendidorcv_lora)) == 0) {Serial.println("atendidorcv");t_atendido.enable();}        //se ejecuta task de atendido
     if((strncmp(datoEntrante, policiarcv_lora,  strlen(policiarcv_lora))  == 0  ||                          //busca policiarcv_lora en los primeros lugares de datoEntrante, 
         strncmp(datoEntrante, bomberosrcv_lora, strlen(bomberosrcv_lora)) == 0  ||                          //si encuentra la palabra buscada devuelve un 0.
         strncmp(datoEntrante, medicarcv_lora,   strlen(medicarcv_lora))   == 0) && 
@@ -106,6 +107,10 @@ if(SIM800L.available()) {
        checknum = true;
        Serial.println("Recibi primero LORA");
        t_recibido.enable();                                                 //se ejecuta task de recibido
+    }
+    if(strncmp(datoEntrante, informadorcv_lora, strlen(informadorcv_lora)) == 0) {
+      t_apagarLED.enable();                                                       //se ejecuta task de informado
+      t_apagarLED.delay(delay_apagarLED);   
     }
 
   }

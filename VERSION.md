@@ -83,3 +83,4 @@ por baja tension que genera el modulo SIM800.
 * * Se agrega bandera checknum para comparar si el número idempotencia es el mismo que el recibido.
 * * Se agrega condición de mensaje recibido: numrcv == numsnt y checknum == false, tanto en lora como para SMS.
 * * Se usa función strncmp en vez de strcmp en datoEntrada para buscar la palabra clave dentro del mensaje recibido.
+* * Se agrega informadorcv_lora y procesamiento de este mensaje.
