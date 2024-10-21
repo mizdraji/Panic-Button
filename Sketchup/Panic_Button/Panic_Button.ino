@@ -40,8 +40,6 @@ void setup() {                              //setup run in core1
     sendPackage(uncero, 1, no_espera_ACK,  1);      //envia un cero a travez de lora al iniciar para establecer la conexión
   }
 
-  //config Scheduler
-  config_task();
   
   //Se crea una tarea que se ejecutará en la función loop0(), con prioridad 1 y se ejecutará en el core0.
   //xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
@@ -50,6 +48,9 @@ void setup() {                              //setup run in core1
   Serial.println("iniciando .........");
   ReceiveMode();
   Enviar_msj(numero.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
+
+  //config Scheduler
+  config_task();
 
   //config interrupt
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente

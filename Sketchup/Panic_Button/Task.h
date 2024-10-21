@@ -4,6 +4,7 @@ unsigned long previousMillis = 0;         // Variable para almacenar el tiempo a
 #define ledOnTime   200      // Tiempo de encendido en milisegundos (0.2 segundos)
 #define ledOffTime  2000   // Tiempo de apagado en milisegundos (2 segundos)
 bool LED_state = LOW;                     // Estado actual del LED
+bool LED_state2 = LOW;
 
 #define delay_apagarLED   15000            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
 #define delay_apagarLED1  5000            //delay para apagar el led1 despues de cierto tiempo de que se envio un mensaje
