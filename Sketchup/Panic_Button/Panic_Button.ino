@@ -1,6 +1,6 @@
 /*Detalle de versiones:
 * V1.8.5: 
-
+* Se agrega secuencia de luces cuando se recibe informadorcv, con la tarea Tinformadorcv_Led.
 */
 
 //librerias utilizadas
@@ -75,8 +75,9 @@ if(SIM800L.available()) {
     }
 
     if (mensaje_recibido.indexOf(msj.rcv_informado) != -1) {
-      t_apagarLED.enable();                                                       //se ejecuta task de informado
-      t_apagarLED.delay(delay_apagarLED);                                         //se ejecuta la tarea apagarLED con un delay de 15 segundos);
+      //t_apagarLED.enable();                                                       //se ejecuta task de informado
+      //t_apagarLED.delay(delay_apagarLED);                                         //se ejecuta la tarea apagarLED con un delay de 15 segundos);
+      Tinformadorcv_Led.enable();
     }
     //if (mensaje_recibido.indexOf(msj.rcv_cerrado) != -1) task.enable();    //se ejecuta task de cerrado
 }
@@ -102,8 +103,9 @@ if(SIM800L.available()) {
        t_recibido.enable();                                                 //se ejecuta task de recibido
     }
     if(strncmp(datoEntrante, informadorcv_lora, strlen(informadorcv_lora)) == 0) {
-      t_apagarLED.enable();                                                       //se ejecuta task de informado
-      t_apagarLED.delay(delay_apagarLED);   
+      //t_apagarLED.enable();                                                       //se ejecuta task de informado
+      //t_apagarLED.delay(delay_apagarLED);
+      Tinformadorcv_Led.enable(); 
     }
 
   }

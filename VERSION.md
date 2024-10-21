@@ -86,4 +86,4 @@ por baja tension que genera el modulo SIM800.
 * * Se agrega informadorcv_lora y procesamiento de este mensaje.
 
 * V1.8.5
-* *
+* * Se agrega secuencia de luces cuando se recibe informadorcv, con la tarea Tinformadorcv_Led.
