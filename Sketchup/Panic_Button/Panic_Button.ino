@@ -1,6 +1,9 @@
 /*Detalle de versiones:
 * V1.8.5: 
 * Se agrega secuencia de luces cuando se recibe informadorcv, con la tarea Tinformadorcv_Led.
+* Se modifican algunos delays en el setup.
+* Se agrega la condicion numrcv == numsnt en atendido e informado.
+* Se agrega ESP.restart() cuando se recibe el mensaje ERROR, debido a que a veces inicia mal el SIM800 y debe resetearse el micro para establecer la correcta comunicación.
 */
 
 //librerias utilizadas
@@ -24,7 +27,7 @@ void setup() {                              //setup run in core1
   Serial.begin(SERIAL_SPEED);
   config_pines();
   config_inicial();
-  delay(5000);                              //falta crear variable para initial random time
+  delay(3000);                              //falta crear variable para initial random time
 
   //config lora
   if (!lora.init()) {
@@ -38,6 +41,7 @@ void setup() {                              //setup run in core1
     Serial.println(devID);                          //Activacion Manual, devID predefinido
     char uncero[1]={0};
     sendPackage(uncero, 1, no_espera_ACK,  1);      //envia un cero a travez de lora al iniciar para establecer la conexión
+    delay(1000); 
   }
 
   
@@ -45,12 +49,13 @@ void setup() {                              //setup run in core1
   //xTaskCreatePinnedToCore(loop0, "Task0", 10000, NULL, 1, &Task0, 0);  
 
   //configurar modulo GSM como modo SMS
-  Serial.println("iniciando .........");
+  //Serial.println("iniciando .........");
   ReceiveMode();
   Enviar_msj(numero.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
 
   //config Scheduler
   config_task();
+  delay(1000);
 
   //config interrupt
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
@@ -66,16 +71,21 @@ if(SIM800L.available()) {
     Serial.print(mensaje_recibido);
     
     //if(mensaje_recibido.indexOf("OK") != -1)  {Serial.println("se recibio OK");}                //comparo si recibo OK en el string de mensaje_recibido
-    //if(mensaje_recibido.indexOf("ERROR") != -1)  {Serial.println("se recibio ERROR");}
+    if(mensaje_recibido.indexOf("ERROR") != -1)  {
+      //Serial.println("se recibio ERROR");
+      ESP.restart();
+      }
 
-    if (mensaje_recibido.indexOf(msj.rcv_atendido) != -1) t_atendido.enable();    //se ejecuta task de atendido
-    if ((mensaje_recibido.indexOf(msj.rcv_policia) != -1 || mensaje_recibido.indexOf(msj.rcv_bomberos) != -1 || mensaje_recibido.indexOf(msj.rcv_medica) != -1) && numrcv == numsnt && checknum == false) {
+    if (mensaje_recibido.indexOf(msj.rcv_atendido)  != -1 && numrcv == numsnt) t_atendido.enable();    //se ejecuta task de atendido
+    if ((mensaje_recibido.indexOf(msj.rcv_policia)  != -1 || 
+         mensaje_recibido.indexOf(msj.rcv_bomberos) != -1 || 
+         mensaje_recibido.indexOf(msj.rcv_medica)   != -1) && numrcv == numsnt && checknum == false) {
         checknum = true;
-        Serial.println("Recibi primero SMS");
+        //Serial.println("Recibi primero SMS");
         t_recibido.enable();      //se ejecuta task de recibido
     }
 
-    if (mensaje_recibido.indexOf(msj.rcv_informado) != -1) {
+    if (mensaje_recibido.indexOf(msj.rcv_informado) != -1 && numrcv == numsnt) {
       //t_apagarLED.enable();                                                       //se ejecuta task de informado
       //t_apagarLED.delay(delay_apagarLED);                                         //se ejecuta la tarea apagarLED con un delay de 15 segundos);
       Tinformadorcv_Led.enable();
@@ -93,17 +103,19 @@ if(SIM800L.available()) {
     Serial.print("====>> ");
     Serial.println(datoEntrante);
     uint32_t numrcv = extraer_numero(datoEntrante);
-    if(strncmp(datoEntrante,  atendidorcv_lora, strlen(atendidorcv_lora)) == 0) {Serial.println("atendidorcv");t_atendido.enable();}        //se ejecuta task de atendido
+    if(strncmp(datoEntrante,  atendidorcv_lora, strlen(atendidorcv_lora)) == 0 && 
+        numrcv == numsnt) t_atendido.enable();                                                              //se ejecuta task de atendido
     if((strncmp(datoEntrante, policiarcv_lora,  strlen(policiarcv_lora))  == 0  ||                          //busca policiarcv_lora en los primeros lugares de datoEntrante, 
         strncmp(datoEntrante, bomberosrcv_lora, strlen(bomberosrcv_lora)) == 0  ||                          //si encuentra la palabra buscada devuelve un 0.
         strncmp(datoEntrante, medicarcv_lora,   strlen(medicarcv_lora))   == 0) && 
         numrcv == numsnt && checknum == false ) {
 
        checknum = true;
-       Serial.println("Recibi primero LORA");
+       //Serial.println("Recibi primero LORA");
        t_recibido.enable();                                                 //se ejecuta task de recibido
     }
-    if(strncmp(datoEntrante, informadorcv_lora, strlen(informadorcv_lora)) == 0) {
+    if(strncmp(datoEntrante, informadorcv_lora, strlen(informadorcv_lora)) == 0 && 
+        numrcv == numsnt) {
       //t_apagarLED.enable();                                                       //se ejecuta task de informado
       //t_apagarLED.delay(delay_apagarLED);
       Tinformadorcv_Led.enable(); 

@@ -65,6 +65,9 @@ void ReceiveMode() {
   SIM800L.write("AT+CMGF=1\r"); // Configuring TEXT mode
   delay(200);
   Serialcom();
+  // SIM800L.write("AT+CMGD=1,4\r"); // Limpia memoria de mensajes
+  // delay(200);
+  // Serialcom();
   SIM800L.print("AT+CSCS=\"GSM\"\r");
   delay(200);
   Serialcom();
