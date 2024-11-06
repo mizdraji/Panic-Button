@@ -13,6 +13,7 @@ void config_task(){
   t_recibido.disable();
   t_atendido.disable();
   lock.disable();
+  Tinformadorcv_Led.disable();
 }
 
 
@@ -188,3 +189,40 @@ void powerON () {
   else t2.enable();                                         //USB DESCONECTADO
 }
 
+
+void informado_led() {
+    unsigned long currentMillis = millis();
+  if (LED_state2 == HIGH && (currentMillis - previousMillis >= 500)) {
+    // Apagar el LED después de 0.3 segundos
+    LED_state2 = LOW;                  // Cambiar estado del LED
+    previousMillis = currentMillis;   // Actualizar tiempo anterior
+    digitalWrite(led_powerON, LED_state2);  // Apagar el LED
+    digitalWrite(led1, LED_state2); 
+    digitalWrite(led2, LED_state2); 
+    digitalWrite(led3, LED_state2);
+    digitalWrite(led_recibido, LED_state2);
+    digitalWrite(led_atendido, LED_state2);   
+  } 
+  else if (LED_state2 == LOW && (currentMillis - previousMillis >= 500)) {
+    // Encender el LED después de 3 segundos
+    LED_state2 = HIGH;                 // Cambiar estado del LED
+    previousMillis = currentMillis;   // Actualizar tiempo anterior
+    digitalWrite(led_powerON, LED_state2);  // Encender el LED
+    digitalWrite(led1, LED_state2); 
+    digitalWrite(led2, LED_state2); 
+    digitalWrite(led3, LED_state2);
+    digitalWrite(led_recibido, LED_state2); 
+    digitalWrite(led_atendido, LED_state2);
+    counterInformado ++;  
+  }
+  if (counterInformado > timesCounterInformado) {
+    digitalWrite(led_powerON, LOW);  // Encender el LED
+    digitalWrite(led1, LOW); 
+    digitalWrite(led2, LOW); 
+    digitalWrite(led3, LOW);
+    digitalWrite(led_recibido, LOW); 
+    digitalWrite(led_atendido, LOW); 
+    Tinformadorcv_Led.disable();
+    counterInformado = 0;
+  }
+}

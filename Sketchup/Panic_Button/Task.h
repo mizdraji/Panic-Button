@@ -4,6 +4,7 @@ unsigned long previousMillis = 0;         // Variable para almacenar el tiempo a
 #define ledOnTime   200      // Tiempo de encendido en milisegundos (0.2 segundos)
 #define ledOffTime  2000   // Tiempo de apagado en milisegundos (2 segundos)
 bool LED_state = LOW;                     // Estado actual del LED
+bool LED_state2 = LOW;
 
 #define delay_apagarLED   15000            //delay para apagar el led despues que se encendio por recibir un mensaje de confirmacion
 #define delay_apagarLED1  5000            //delay para apagar el led1 despues de cierto tiempo de que se envio un mensaje
@@ -15,7 +16,9 @@ bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
 bool statebutton2 = false;         //monitorea el estado del button1 en pin 38
 bool statebutton3 = false;         //monitorea el estado del button1 en pin 39
 bool bloqueo      = false;         //Variable para monitorear bloqueo de pulsadores.
-#define tiempo_bloqueo 10000       //10 segundos tiempo bloqueo de pulsadores
+#define tiempo_bloqueo 10000       //10 segundos tiempo bloqueo de pulsadores.
+uint counterInformado = 0;         //Contador para apagar secuencia de leds cuando se recibe informadorcv.
+#define timesCounterInformado 20   //se cuenta 20 veces el counterInformado, 2 = 1 seg, 20 = 10 seg.
 
 bool statusLED = false;
 
@@ -50,6 +53,7 @@ void trecibido();
 void tatendido();
 void powerON();
 void unlock();
+void informado_led();
 
 
 //Tareas:
@@ -84,5 +88,7 @@ Task t_recibido(1000, TASK_FOREVER, &trecibido, &taskManager);
 Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
 
 Task ADCpower(10000, TASK_FOREVER, &powerON, &taskManager);       //se ejecuta cada 10 segundos para verificar si esta cargando con usb
+
+Task Tinformadorcv_Led(500, TASK_FOREVER, &informado_led, &taskManager);    //Tarea para secuencia led cuando se recibe informadorcv
 
 

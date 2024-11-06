@@ -84,3 +84,9 @@ por baja tension que genera el modulo SIM800.
 * * Se agrega condición de mensaje recibido: numrcv == numsnt y checknum == false, tanto en lora como para SMS.
 * * Se usa función strncmp en vez de strcmp en datoEntrada para buscar la palabra clave dentro del mensaje recibido.
 * * Se agrega informadorcv_lora y procesamiento de este mensaje.
+
+* V1.8.5
+* * Se agrega secuencia de luces cuando se recibe informadorcv, con la tarea Tinformadorcv_Led.
+* * Se modifican algunos delays en el setup.
+* * Se agrega la condicion numrcv == numsnt en atendido e informado.
+* * Se agrega ESP.restart() cuando se recibe el mensaje ERROR, debido a que a veces inicia mal el SIM800 y debe resetearse el micro para establecer la correcta comunicación.
