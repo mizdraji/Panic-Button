@@ -1,6 +1,6 @@
 #include <lorawan.h>
 
-#define tipo_modulo 0 
+#define tipo_modulo 1
 
 #if tipo_modulo == 0
 //RFM95W + ESP12 (Macro version)
@@ -60,7 +60,7 @@ void setup() {
   lora.setNwkSKey(nwkSKey);
   lora.setAppSKey(appSKey);
   lora.setDevAddr(devAddr);
-Serial.println("aca se va a enviar un cero");
+  Serial.println("aca se va a enviar un cero");
   lora.sendUplink(uncero, strlen(uncero), 0, 1);
 
   // Configurar interrupción en el pin DIO0
