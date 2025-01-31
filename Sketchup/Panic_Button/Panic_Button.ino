@@ -1,9 +1,6 @@
 /*Detalle de versiones:
-* V1.8.5: 
-* Se agrega secuencia de luces cuando se recibe informadorcv, con la tarea Tinformadorcv_Led.
-* Se modifican algunos delays en el setup.
-* Se agrega la condicion numrcv == numsnt en atendido e informado.
-* Se agrega ESP.restart() cuando se recibe el mensaje ERROR, debido a que a veces inicia mal el SIM800 y debe resetearse el micro para establecer la correcta comunicación.
+* V1.8.6: 
+* Se agrega lora como interrupcion, queda pendiente solucionar falla que se recibe multiples mensajes por lora interrupt.
 */
 
 //librerias utilizadas
@@ -61,6 +58,7 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
+  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive,  RISING);            //habilita interrupciones para mensajes recibidos lora
 }
 
 void loop() {                                           //loop run in core1
@@ -98,8 +96,10 @@ if(SIM800L.available()) {
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
   interrupt.execute();
 
-  recvStatus = lora.readData(datoEntrante);
+  //recvStatus = lora.readData(datoEntrante);
   if(recvStatus) {
+    recvStatus = false;     //reset de bandera para recibir nuevos mensajes
+    lora.readData(datoEntrante);
     Serial.print("====>> ");
     Serial.println(datoEntrante);
     uint32_t numrcv = extraer_numero(datoEntrante);
