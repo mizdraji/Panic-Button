@@ -58,7 +58,7 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
-  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive,  CHANGE);            //habilita interrupciones para mensajes recibidos lora
+  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive,  CHANGE);            //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
 }
 
 void loop() {                                           //loop run in core1
