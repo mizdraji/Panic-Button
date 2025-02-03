@@ -1,6 +1,6 @@
 /*Detalle de versiones:
 * V1.8.6: 
-* Se agrega lora como interrupcion.
+* Se agrega lora como interrupcion, para priorizar mensajes recibidos.
 */
 
 //librerias utilizadas

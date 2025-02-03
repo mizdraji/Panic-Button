@@ -90,3 +90,6 @@ por baja tension que genera el modulo SIM800.
 * * Se modifican algunos delays en el setup.
 * * Se agrega la condicion numrcv == numsnt en atendido e informado.
 * * Se agrega ESP.restart() cuando se recibe el mensaje ERROR, debido a que a veces inicia mal el SIM800 y debe resetearse el micro para establecer la correcta comunicación.
+
+* V1.8.6
+* * Se agrega lora como interrupcion, para priorizar mensajes recibidos.
