@@ -12,7 +12,7 @@ void config_pines()
   pinMode(led_powerON, OUTPUT);       //LED blanco
   pinMode(led_recibido, OUTPUT);      //LED amarillo
   pinMode(led_atendido, OUTPUT);      //LED naranja
-  pinMode(digitalPinToInterrupt(RFM_pins.DIO0), INPUT);       //PIN INTERRUPCION LORA
+  pinMode(RFM_pins.DIO0, INPUT);       //PIN INTERRUPCION LORA
   //pinMode(LED_BUILTIN, OUTPUT);       //LED integrado         - GPIO 25
 }
 
@@ -159,7 +159,7 @@ void IRAM_ATTR buttonInterrupt3() {
 
 // Función de interrupción para mensajes recibidos lora
 void IRAM_ATTR onReceive() {
-  recvStatus = true; // Cambia bandera cuando hay un paquete recibido
+  recvStatus = lora.readData(datoEntrante); // Cambia bandera cuando hay un paquete recibido
 }
 
 //Genera un número aleatorio de 8 digitos para usar de idempotencia

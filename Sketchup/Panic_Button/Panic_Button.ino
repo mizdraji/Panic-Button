@@ -1,6 +1,6 @@
 /*Detalle de versiones:
 * V1.8.6: 
-* Se agrega lora como interrupcion, queda pendiente solucionar falla que se recibe multiples mensajes por lora interrupt.
+* Se agrega lora como interrupcion.
 */
 
 //librerias utilizadas
@@ -58,7 +58,7 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
-  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive,  RISING);            //habilita interrupciones para mensajes recibidos lora
+  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive,  CHANGE);            //habilita interrupciones para mensajes recibidos lora
 }
 
 void loop() {                                           //loop run in core1
@@ -92,14 +92,10 @@ if(SIM800L.available()) {
 }
 }
     
-
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
   interrupt.execute();
 
-  //recvStatus = lora.readData(datoEntrante);
   if(recvStatus) {
-    recvStatus = false;     //reset de bandera para recibir nuevos mensajes
-    lora.readData(datoEntrante);
     Serial.print("====>> ");
     Serial.println(datoEntrante);
     uint32_t numrcv = extraer_numero(datoEntrante);
@@ -126,7 +122,7 @@ if(SIM800L.available()) {
 
 }
 
-
+//void para core0, se dejo de utilizar porque generaba multiples reseteos.
 // void loop0(void *parameter){                    //loop0 run in core0
 //   while(1){
 //   recvStatus = lora.readData(datoEntrante);
