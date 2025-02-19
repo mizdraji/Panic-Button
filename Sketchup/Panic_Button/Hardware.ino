@@ -2,9 +2,9 @@
 void config_pines()
 {
   //configure pines
-  pinMode(button1, INPUT);            //boton de policia      - GPIO 37
-  pinMode(button2, INPUT);            //boton de bomberos     - GPIO 38
-  pinMode(button3, INPUT);            //boton de ambulancia   - GPIO 39
+  pinMode(button1, INPUT_PULLUP);            //boton de policia      - GPIO 37
+  pinMode(button2, INPUT_PULLUP);            //boton de bomberos     - GPIO 38
+  pinMode(button3, INPUT_PULLUP);            //boton de ambulancia   - GPIO 39
   pinMode(ADC_powerON, INPUT);
   pinMode(led1, OUTPUT);              //LED1 confirm policia  - GPIO 15
   pinMode(led2, OUTPUT);              //LED2 confirm bomberos - GPIO 2
@@ -12,6 +12,7 @@ void config_pines()
   pinMode(led_powerON, OUTPUT);       //LED blanco
   pinMode(led_recibido, OUTPUT);      //LED amarillo
   pinMode(led_atendido, OUTPUT);      //LED naranja
+  pinMode(RFM_pins.DIO0, INPUT);       //PIN INTERRUPCION LORA
   //pinMode(LED_BUILTIN, OUTPUT);       //LED integrado         - GPIO 25
 }
 
@@ -154,6 +155,11 @@ void IRAM_ATTR buttonInterrupt3() {
     t7.enable();
   }
   last_interrupt_time = interrupt_time;
+}
+
+// Función de interrupción para mensajes recibidos lora
+void IRAM_ATTR onReceive() {
+  recvStatus = lora.readData(datoEntrante); // Cambia bandera cuando hay un paquete recibido
 }
 
 //Genera un número aleatorio de 8 digitos para usar de idempotencia

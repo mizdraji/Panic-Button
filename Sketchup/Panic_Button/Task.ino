@@ -142,6 +142,7 @@ void unlock(){
 void trecibido() {
   encenderLED(led_recibido);
   t_recibido.disable();
+  timer = 0;
 }
 
 void tatendido() {
@@ -149,6 +150,7 @@ void tatendido() {
   //t_apagarLED.enable();
   //t_apagarLED.delay(delay_apagarLED);       //se ejecuta la tarea apagarLED con un delay de X segundos
   t_atendido.disable();
+  timer = 0;
 }
 
 
@@ -214,6 +216,7 @@ void informado_led() {
     digitalWrite(led_recibido, LED_state2); 
     digitalWrite(led_atendido, LED_state2);
     counterInformado ++;  
+    timer = 0;
   }
   if (counterInformado > timesCounterInformado) {
     digitalWrite(led_powerON, LOW);  // Encender el LED
@@ -224,5 +227,15 @@ void informado_led() {
     digitalWrite(led_atendido, LOW); 
     Tinformadorcv_Led.disable();
     counterInformado = 0;
+  }
+}
+
+void Sleeping_init(){
+  timer ++;
+  Serial.print("timer: ");
+  Serial.println(timer);
+  if((digitalRead(button1) && digitalRead(button2) && digitalRead(button3)) == LOW && timer > tiempo){
+    Serial.println("Going to sleep now");
+    esp_deep_sleep_start();
   }
 }

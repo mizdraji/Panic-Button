@@ -44,4 +44,3 @@ mensajes msj;
   char medicarcv_lora[]   = "Lmedicarcv";     //medica recibido por lora confirmacion - enviado de servidor de forma automática.
   char atendidorcv_lora[] = "Latendidorcv";   //Respuesta por lora de operario, alerta atendida - enviado por operario de forma manual.
   char informadorcv_lora[]= "Linformadorcv";  //Respuesta por lora de operario Informadorcv cuando se da aviso a la autoridad correspondiente
-  
