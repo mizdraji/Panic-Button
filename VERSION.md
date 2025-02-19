@@ -93,3 +93,5 @@ por baja tension que genera el modulo SIM800.
 
 * V1.8.6
 * * Se agrega lora como interrupcion, para priorizar mensajes recibidos.
+* * Se agrega deep_sleep mode.
+* * Los botones despierta del deep_sleep y envia el mensaje correspondiente.

@@ -1,6 +1,8 @@
 /*Detalle de versiones:
 * V1.8.6: 
 * Se agrega lora como interrupcion, para priorizar mensajes recibidos.
+* Se agrega deep_sleep mode.
+* Los botones despierta del deep_sleep y envia el mensaje correspondiente.
 */
 
 //librerias utilizadas
@@ -48,7 +50,7 @@ void setup() {                              //setup run in core1
   //configurar modulo GSM como modo SMS
   //Serial.println("iniciando .........");
   ReceiveMode();
-  Enviar_msj(numero.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
+  //Enviar_msj(numero.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
 
   //config Scheduler
   config_task();
@@ -59,6 +61,30 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive,  CHANGE);            //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
+
+   uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36);
+  esp_sleep_enable_ext1_wakeup(mask, ESP_EXT1_WAKEUP_ANY_HIGH);
+  print_wakeup_pins();               // Imprimir qué pin causó el wakeup
+  delay(2000);
+
+  switch (print_wakeup_pins()) {
+    case 36:                      //button1 policia
+      Serial.println("Wakeup causado por el pin 36");
+      t5.enable();
+      break;
+    case 38:                      //button2 bomberos
+      Serial.println("Wakeup causado por el pin 38");
+      t6.enable();
+      break;
+    case 39:                      //button3 medica
+      Serial.println("Wakeup causado por el pin 39");
+      t7.enable();
+      break;
+    case 0:
+      Serial.println("Wakeup causado por el pin 0");
+      break;
+  }
+
 }
 
 void loop() {                                           //loop run in core1
@@ -71,7 +97,7 @@ if(SIM800L.available()) {
     //if(mensaje_recibido.indexOf("OK") != -1)  {Serial.println("se recibio OK");}                //comparo si recibo OK en el string de mensaje_recibido
     if(mensaje_recibido.indexOf("ERROR") != -1)  {
       //Serial.println("se recibio ERROR");
-      ESP.restart();
+      ESP.restart();                                                                              //Reset en caso de que falle el SIM800
       }
 
     if (mensaje_recibido.indexOf(msj.rcv_atendido)  != -1 && numrcv == numsnt) t_atendido.enable();    //se ejecuta task de atendido
@@ -120,6 +146,8 @@ if(SIM800L.available()) {
   }
   lora.update();                     //actualizacion lora
 
+  if (SIM800L.available() || recvStatus || (digitalRead(button1) || digitalRead(button2) || digitalRead(button3)) == HIGH) timer = 0;     //si se produce una interrupcion resetear contador timer para no entrar al modo sleep
+
 }
 
 //void para core0, se dejo de utilizar porque generaba multiples reseteos.
@@ -143,5 +171,18 @@ if(SIM800L.available()) {
 //   //vTaskDelay(10);                     //delay para fallas de wtd
 // }
 
-
-
+// Función para imprimir qué pin causó el wakeup
+uint8_t print_wakeup_pins() {
+  uint64_t wakeup_pin_mask = esp_sleep_get_ext1_wakeup_status();
+  if (wakeup_pin_mask != 0) {
+    for (int i = 0; i < GPIO_NUM_MAX; i++) {
+      if ((wakeup_pin_mask & (1ULL << i)) != 0) {
+        //Serial.printf("GPIO %d was the trigger\n", i);
+        return i;
+      }
+    }
+  } else {
+    //Serial.println("No GPIO triggered the wakeup");
+    return 0;
+  }
+}

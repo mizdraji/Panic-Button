@@ -2,9 +2,9 @@
 void config_pines()
 {
   //configure pines
-  pinMode(button1, INPUT);            //boton de policia      - GPIO 37
-  pinMode(button2, INPUT);            //boton de bomberos     - GPIO 38
-  pinMode(button3, INPUT);            //boton de ambulancia   - GPIO 39
+  pinMode(button1, INPUT_PULLUP);            //boton de policia      - GPIO 37
+  pinMode(button2, INPUT_PULLUP);            //boton de bomberos     - GPIO 38
+  pinMode(button3, INPUT_PULLUP);            //boton de ambulancia   - GPIO 39
   pinMode(ADC_powerON, INPUT);
   pinMode(led1, OUTPUT);              //LED1 confirm policia  - GPIO 15
   pinMode(led2, OUTPUT);              //LED2 confirm bomberos - GPIO 2
