@@ -194,6 +194,6 @@ uint32_t extraer_numero(String mensaje_completo) {
 }
 
 //Genera un número aleatorio entre MIN y MAX
-int16_t random_time(unsigned int MIN_,unsigned int MAX_) {
+uint16_t random_time(unsigned int MIN_,unsigned int MAX_) {
   return random(MIN_, MAX_);          //calcula un nuevo tiempo
 }
