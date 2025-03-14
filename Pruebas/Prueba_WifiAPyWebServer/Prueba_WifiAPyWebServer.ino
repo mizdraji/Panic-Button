@@ -19,12 +19,16 @@ const char* adminPass = "1234";
 ESP8266WebServer server(80);
 Preferences preferences;
 
+String numeroPolicia = "";
+String numeroBomberos = "";
+String numeroMedica = "";
+
 // Página HTML mejorada con estilos CSS
 const char htmlPage[] PROGMEM = R"rawliteral(
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Configuración ESP8266</title>
+    <title>Configuracion ESP8266</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; background-color: #f4f4f4; }
         .container { max-width: 400px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1); }
@@ -69,17 +73,34 @@ void handleSave() {
     if (!server.authenticate(adminUser, adminPass)) {
         return server.requestAuthentication();
     }
+
+    // Verifica si los datos no están vacíos antes de actualizar en la memoria
     preferences.begin("emergency", false);
-    preferences.putString("police", server.arg("police"));
-    preferences.putString("fire", server.arg("fire"));
-    preferences.putString("medical", server.arg("medical"));
+
+    // Si el valor no está vacío, guarda el nuevo valor
+    if (server.hasArg("police") && server.arg("police") != "") {
+        preferences.putString("policia", server.arg("police"));
+    }
+
+    if (server.hasArg("fire") && server.arg("fire") != "") {
+        preferences.putString("bomberos", server.arg("fire"));
+    }
+
+    if (server.hasArg("medical") && server.arg("medical") != "") {
+        preferences.putString("medica", server.arg("medical"));
+    }
+
     preferences.end();
-    server.send(200, "text/plain", "Datos guardados");
+
+    // Responde que los datos se guardaron
+    server.send(200, "text/plain", "Datos guardados correctamente.");
+    delay(3000);
+    ESP.reset();
 }
 
 void setup() {
     Serial.begin(115200);
-    if(WiFi.softAP(ssid, password, 13, false, 1)){
+    if(WiFi.softAP(ssid, password)){
       Serial.println("Punto de acceso iniciado");
       Serial.print("IP del ESP8266: ");
       Serial.println(WiFi.softAPIP());
@@ -89,6 +110,22 @@ void setup() {
     server.on("/save", HTTP_POST, handleSave);
     server.begin();
     Serial.println("Servidor Iniciado");
+
+
+     // Inicializa las preferencias (memoria flash)
+  preferences.begin("emergency", true);
+
+  // Lee las variables guardadas
+  numeroPolicia = preferences.getString("policia", "");  // Si no existe, se devuelve ""
+  numeroBomberos = preferences.getString("bomberos", "");  // Si no existe, se devuelve ""
+  numeroMedica = preferences.getString("medica", "");  // Si no existe, se devuelve ""
+
+  // Imprime los valores leídos
+  Serial.println("Número Policía: " + numeroPolicia);
+  Serial.println("Número Bomberos: " + numeroBomberos);
+  Serial.println("Número Medica: " + numeroMedica);
+
+  preferences.end();  // Finaliza el acceso a la memoria
 }
 
 void loop() {
