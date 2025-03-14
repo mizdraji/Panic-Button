@@ -95,3 +95,5 @@ por baja tension que genera el modulo SIM800.
 * * Se agrega lora como interrupcion, para priorizar mensajes recibidos.
 * * Se agrega deep_sleep mode.
 * * Los botones despierta del deep_sleep y envia el mensaje correspondiente.
+* * No entra en modo sleep cuando esta conectado por usb.
+* * Despierta del modo sleep conectando alimentación.

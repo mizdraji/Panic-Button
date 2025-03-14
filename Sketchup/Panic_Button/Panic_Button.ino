@@ -3,6 +3,8 @@
 * Se agrega lora como interrupcion, para priorizar mensajes recibidos.
 * Se agrega deep_sleep mode.
 * Los botones despierta del deep_sleep y envia el mensaje correspondiente.
+* No entra en modo sleep cuando esta conectado por usb.
+* Despierta del modo sleep conectando alimentación.
 */
 
 //librerias utilizadas
@@ -62,28 +64,10 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive,  CHANGE);            //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
 
-   uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36);
+   uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36) | (1ULL << GPIO_NUM_13);;
   esp_sleep_enable_ext1_wakeup(mask, ESP_EXT1_WAKEUP_ANY_HIGH);
   print_wakeup_pins();               // Imprimir qué pin causó el wakeup
   delay(2000);
-
-  switch (print_wakeup_pins()) {
-    case 36:                      //button1 policia
-      Serial.println("Wakeup causado por el pin 36");
-      t5.enable();
-      break;
-    case 38:                      //button2 bomberos
-      Serial.println("Wakeup causado por el pin 38");
-      t6.enable();
-      break;
-    case 39:                      //button3 medica
-      Serial.println("Wakeup causado por el pin 39");
-      t7.enable();
-      break;
-    case 0:
-      Serial.println("Wakeup causado por el pin 0");
-      break;
-  }
 
 }
 
@@ -172,17 +156,31 @@ if(SIM800L.available()) {
 // }
 
 // Función para imprimir qué pin causó el wakeup
-uint8_t print_wakeup_pins() {
+void print_wakeup_pins() {
   uint64_t wakeup_pin_mask = esp_sleep_get_ext1_wakeup_status();
-  if (wakeup_pin_mask != 0) {
+  if (wakeup_pin_mask == 0) {
+    Serial.println("No se detectó ningún pin de wakeup.");
+    return;
+  }
     for (int i = 0; i < GPIO_NUM_MAX; i++) {
       if ((wakeup_pin_mask & (1ULL << i)) != 0) {
-        //Serial.printf("GPIO %d was the trigger\n", i);
-        return i;
+        switch (i) {
+          case 36:                      //button1 policia
+            Serial.println("Wakeup causado por el pin 36");
+            t5.enable();
+            break;
+          case 38:                      //button2 bomberos
+            Serial.println("Wakeup causado por el pin 38");
+            t6.enable();
+            break;
+          case 39:                      //button3 medica
+            Serial.println("Wakeup causado por el pin 39");
+            t7.enable();
+            break;
+          case 13:
+            Serial.println("Wakeup causado por el pin 13");
+            break;
+        }
       }
     }
-  } else {
-    //Serial.println("No GPIO triggered the wakeup");
-    return 0;
-  }
 }
