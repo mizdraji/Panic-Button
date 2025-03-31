@@ -97,3 +97,7 @@ por baja tension que genera el modulo SIM800.
 * * Los botones despierta del deep_sleep y envia el mensaje correspondiente.
 * * No entra en modo sleep cuando esta conectado por usb.
 * * Despierta del modo sleep conectando alimentación.
+
+* V1.8.7
+* * Se agrega modo sleep para el sim800. 
+* * Se agregan las funciones dormirSIM800 y despertarSIM800.

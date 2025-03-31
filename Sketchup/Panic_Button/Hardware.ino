@@ -13,6 +13,7 @@ void config_pines()
   pinMode(led_recibido, OUTPUT);      //LED amarillo
   pinMode(led_atendido, OUTPUT);      //LED naranja
   pinMode(RFM_pins.DIO0, INPUT);       //PIN INTERRUPCION LORA
+  pinMode(DTR, OUTPUT);
   //pinMode(LED_BUILTIN, OUTPUT);       //LED integrado         - GPIO 25
 }
 
@@ -25,6 +26,7 @@ void config_inicial()
   digitalWrite(led_powerON, HIGH);
   digitalWrite(led_recibido, LOW);
   digitalWrite(led_atendido, LOW);
+  digitalWrite(DTR, LOW);
 }
 
 //Función para enviar mensaje SMS

@@ -1,10 +1,8 @@
 /*Detalle de versiones:
-* V1.8.6: 
-* Se agrega lora como interrupcion, para priorizar mensajes recibidos.
-* Se agrega deep_sleep mode.
-* Los botones despierta del deep_sleep y envia el mensaje correspondiente.
-* No entra en modo sleep cuando esta conectado por usb.
-* Despierta del modo sleep conectando alimentación.
+* V1.8.7:
+* Se agrega modo sleep para el sim800. 
+* Se agregan las funciones dormirSIM800 y despertarSIM800.
+
 */
 
 //librerias utilizadas
@@ -64,7 +62,7 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive,  CHANGE);            //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
 
-   uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36) | (1ULL << GPIO_NUM_13);;
+  uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36) | (1ULL << GPIO_NUM_13); //Comentar la ultima condición para hacer pruebas mientras esta conectado.
   esp_sleep_enable_ext1_wakeup(mask, ESP_EXT1_WAKEUP_ANY_HIGH);
   print_wakeup_pins();               // Imprimir qué pin causó el wakeup
   delay(2000);
@@ -162,6 +160,8 @@ void print_wakeup_pins() {
     Serial.println("No se detectó ningún pin de wakeup.");
     return;
   }
+  despertarSIM800L();
+  delay(100);
     for (int i = 0; i < GPIO_NUM_MAX; i++) {
       if ((wakeup_pin_mask & (1ULL << i)) != 0) {
         switch (i) {

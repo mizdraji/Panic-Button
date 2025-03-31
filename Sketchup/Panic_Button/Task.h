@@ -13,7 +13,7 @@ bool LED_state2 = LOW;
 
 //variables para deepsleep
 uint8_t timer = 0;        //contador de tiempo
-#define tiempo 60         //tiempo en el que quiero que duerma en segundos
+#define tiempo 30         //tiempo de espera para iniciar deepsleep
 
 //estados de los pulsadores
 bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
@@ -59,6 +59,8 @@ void powerON();
 void unlock();
 void informado_led();
 void Sleeping_init();
+void dormirSIM800();
+void despertarSIM800L();
 
 
 //Tareas:

@@ -237,6 +237,27 @@ void Sleeping_init(){
   Serial.println(timer);
   if((digitalRead(button1) && digitalRead(button2) && digitalRead(button3)) == LOW && timer > tiempo){
     Serial.println("Going to sleep now");
+    dormirSIM800();
+    delay(2000);
     esp_deep_sleep_start();
   }
+}
+
+
+void dormirSIM800() {
+  digitalWrite(DTR, HIGH);                //DTR HIGH -> DORMIR
+  Serial.println("sleep now");
+  //SIM800L.print("AT+CFUN=0\r\n");       // = 0 Minimum functionality - Este comando se usa para reducir aun mas el consumo
+  //delay(100);
+  SIM800L.print("AT+CSCLK=1\r\n");        //= 1 Dormir
+  delay(1000);
+}
+
+void despertarSIM800L() {
+  digitalWrite(DTR, LOW);               //DTR LOW -> DESPIERTA
+  //SIM800L.print("AT+CFUN=1\r\n");     // = 1 Full functionality (Default) - Este comando se usa para reducir aun mas el consumo
+  //delay(10000);
+  SIM800L.print("AT+CSCLK=0\r\n");      //= 0 Despierta
+  Serial.println("wake up");
+  delay(100);          // Esperar 100ms
 }
