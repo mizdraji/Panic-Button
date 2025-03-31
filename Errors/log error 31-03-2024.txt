@@ -1,0 +1,23 @@
+timer: 6
+
++CMT: "+5493795572356","","25/03/31,13:47:43-12"
+bomberosrcv, 94614735
+Guru Meditation Error: Core  1 panic'ed (IllegalInstruction). Exception was unhandled.
+Memory dump at 0x400d1bec: 20c00af2 0c034200 56744040
+Core  1 register dump:
+PC      : 0x400d1bf3  PS      : 0x00060630  A0      : 0x800d1c0d  A1      : 0x3ffb2200  
+A2      : 0xfffffeb7  A3      : 0x3ffc259c  A4      : 0x3ffc250c  A5      : 0x3ffc25e4  
+A6      : 0x00000000  A7      : 0xff000000  A8      : 0x00000000  A9      : 0x0000000f  
+A10     : 0x3ffb8368  A11     : 0x00000008  A12     : 0x001a381a  A13     : 0x3ffb8378  
+A14     : 0x000001fe  A15     : 0x00000000  SAR     : 0x00000000  EXCCAUSE: 0x00000000  
+EXCVADDR: 0x00000000  LBEG    : 0x4008eae8  LEND    : 0x4008eaf6  LCOUNT  : 0x00000001  
+
+
+Backtrace: 0x400d1bf0:0x3ffb2200 0x400d1c0a:0x3ffb2220 0x400d25b2:0x3ffb2240 0x400d7699:0x3ffb2290
+
+
+
+
+ELF file SHA256: 3aad648be5da5a80
+
+Rebooting...
