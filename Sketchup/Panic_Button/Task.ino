@@ -14,6 +14,7 @@ void config_task(){
   t_atendido.disable();
   lock.disable();
   Tinformadorcv_Led.disable();
+  SleepSIM.disable();
 }
 
 
@@ -60,7 +61,7 @@ void buttonTask1() {
     idempotencia = idempotencia_random();
     numsnt = idempotencia.toInt();
     checknum = false;
-    String mensaje_saliente = msj.policia + ", " + idempotencia;
+    String mensaje_saliente = policia + ", " + idempotencia;
     //Enviar_msj(numero.Remitente2, msj.policia);          //SMS
     Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
     
@@ -86,7 +87,7 @@ void buttonTask2() {
     idempotencia = idempotencia_random();
     numsnt = idempotencia.toInt();
     checknum = false;
-    String mensaje_saliente = msj.bomberos + ", " + idempotencia;
+    String mensaje_saliente = bomberos + ", " + idempotencia;
     //Enviar_msj(numero.Remitente2, msj.bomberos);          //SMS
     Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
     
@@ -111,7 +112,7 @@ void buttonTask3() {
     idempotencia = idempotencia_random();
     numsnt = idempotencia.toInt();
     checknum = false;
-    String mensaje_saliente = msj.medica + ", " + idempotencia;
+    String mensaje_saliente = medica + ", " + idempotencia;
     //Enviar_msj(numero.Remitente2, msj.medica);            //SMS
     Enviar_msj(numero.Remitente2, mensaje_saliente);        //SMS
 
@@ -187,7 +188,7 @@ void powerON () {
   if(analogRead(ADC_powerON) > ADC_powerON_value) {         //USB CONECTADO
   digitalWrite(led_powerON, HIGH);
   t2.disable();
-  timer = 0;
+  //timer = 0;
   }  
   else t2.enable();                                         //USB DESCONECTADO
 }
@@ -235,11 +236,15 @@ void Sleeping_init(){
   timer ++;
   Serial.print("timer: ");
   Serial.println(timer);
-  if((digitalRead(button1) && digitalRead(button2) && digitalRead(button3)) == LOW && timer > tiempo){
+  if((digitalRead(button1) && digitalRead(button2) && digitalRead(button3)) == LOW && (timer > tiempo) && (slp == false)) {
+    
+    slp = true;
     Serial.println("Going to sleep now");
-    dormirSIM800();
-    delay(2000);
-    esp_deep_sleep_start();
+    SleepSIM.enable();
+    SleepSIM.delay(2000);
+    //dormirSIM800();
+    //delay(2000);
+    
   }
 }
 
@@ -250,7 +255,10 @@ void dormirSIM800() {
   //SIM800L.print("AT+CFUN=0\r\n");       // = 0 Minimum functionality - Este comando se usa para reducir aun mas el consumo
   //delay(100);
   SIM800L.print("AT+CSCLK=1\r\n");        //= 1 Dormir
-  delay(1000);
+  
+  SleepSIM.disable();
+  esp_deep_sleep_start();
+  
 }
 
 void despertarSIM800L() {

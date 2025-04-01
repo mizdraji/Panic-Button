@@ -22,7 +22,7 @@ String Remitente3 = "";              //NUMERO REMITENTE 3
 remitente numero;
 
 //mensajes para enviar y recibir por sms
-struct mensajes {
+//struct mensajes {
   String policia          = "policia";              //mensaje1 para enviar
   String bomberos         = "bomberos";             //mensaje2 para enviar
   String medica           = "medica";               //mensaje3 para enviar
@@ -32,8 +32,8 @@ struct mensajes {
   String rcv_atendido     = "atendidorcv";          //Respuesta de operario, alerta atendida
   String rcv_informado    = "informadorcv";         //Informadorcv cuando se da aviso a la autoridad correspondiente.
   String rcv_cerrado      = "cerradorcv";           // es cuando se da por finalizada la alerta, pero puede pasar mucho tiempo
-};
-mensajes msj;
+//};
+//mensajes msj;
 
 //mensajes para enviar y recibir por lora
   char policia_lora[]     = "Lpolicia";       //mensaje1 para enviar por lora.

@@ -62,11 +62,11 @@ void setup() {                              //setup run in core1
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive,  CHANGE);            //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
 
-  uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36) | (1ULL << GPIO_NUM_13); //Comentar la ultima condición para hacer pruebas mientras esta conectado.
+  uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36);// | (1ULL << GPIO_NUM_13); //Comentar la ultima condición para hacer pruebas mientras esta conectado.
   esp_sleep_enable_ext1_wakeup(mask, ESP_EXT1_WAKEUP_ANY_HIGH);
   print_wakeup_pins();               // Imprimir qué pin causó el wakeup
   delay(2000);
-
+  slp = false;
 }
 
 void loop() {                                           //loop run in core1
@@ -82,16 +82,16 @@ if(SIM800L.available()) {
       ESP.restart();                                                                              //Reset en caso de que falle el SIM800
       }
 
-    if (mensaje_recibido.indexOf(msj.rcv_atendido)  != -1 && numrcv == numsnt) t_atendido.enable();    //se ejecuta task de atendido
-    if ((mensaje_recibido.indexOf(msj.rcv_policia)  != -1 || 
-         mensaje_recibido.indexOf(msj.rcv_bomberos) != -1 || 
-         mensaje_recibido.indexOf(msj.rcv_medica)   != -1) && numrcv == numsnt && checknum == false) {
+    if (mensaje_recibido.indexOf(rcv_atendido)  != -1 && numrcv == numsnt) t_atendido.enable();    //se ejecuta task de atendido
+    if ((mensaje_recibido.indexOf(rcv_policia)  != -1 || 
+         mensaje_recibido.indexOf(rcv_bomberos) != -1 || 
+         mensaje_recibido.indexOf(rcv_medica)   != -1) && numrcv == numsnt && checknum == false) {
         checknum = true;
         //Serial.println("Recibi primero SMS");
         t_recibido.enable();      //se ejecuta task de recibido
     }
 
-    if (mensaje_recibido.indexOf(msj.rcv_informado) != -1 && numrcv == numsnt) {
+    if (mensaje_recibido.indexOf(rcv_informado) != -1 && numrcv == numsnt) {
       //t_apagarLED.enable();                                                       //se ejecuta task de informado
       //t_apagarLED.delay(delay_apagarLED);                                         //se ejecuta la tarea apagarLED con un delay de 15 segundos);
       Tinformadorcv_Led.enable();
@@ -124,7 +124,7 @@ if(SIM800L.available()) {
       //t_apagarLED.delay(delay_apagarLED);
       Tinformadorcv_Led.enable(); 
     }
-
+  //recvStatus=0;
   }
   lora.update();                     //actualizacion lora
 

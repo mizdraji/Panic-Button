@@ -80,9 +80,9 @@ Task t2(500, TASK_FOREVER, &blinkstb, &taskManager);
 //TASK4: Envia mensaje sms.
 
 
-Task t5(100, TASK_FOREVER, &buttonTask1, &interrupt);                //TASK5: buttontask1                
-Task t6(100, TASK_FOREVER, &buttonTask2, &interrupt);                //TASK6: buttontask2          
-Task t7(100, TASK_FOREVER, &buttonTask3, &interrupt);                //TASK7: buttontask3     
+Task t5(500, TASK_FOREVER, &buttonTask1, &interrupt);                //TASK5: buttontask1                
+Task t6(500, TASK_FOREVER, &buttonTask2, &interrupt);                //TASK6: buttontask2          
+Task t7(500, TASK_FOREVER, &buttonTask3, &interrupt);                //TASK7: buttontask3     
 Task lock(3000, TASK_FOREVER, &unlock, &interrupt);                  //   
 
 //tareas para apagar leds:
@@ -94,8 +94,10 @@ Task t_apagarLED3(5000, TASK_FOREVER, &apagarLED3, &taskManager);   //TASK apaga
 Task t_recibido(1000, TASK_FOREVER, &trecibido, &taskManager);
 Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
 
-Task ADCpower(10000, TASK_FOREVER, &powerON, &taskManager);                  //se ejecuta cada 10 segundos para verificar si esta cargando con usb
+Task ADCpower(15000, TASK_FOREVER, &powerON, &taskManager);                  //se ejecuta cada 10 segundos para verificar si esta cargando con usb
 
 Task Tinformadorcv_Led(500, TASK_FOREVER, &informado_led, &taskManager);    //Tarea para secuencia led cuando se recibe informadorcv
 
-Task Sleep(1000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
+Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
+Task SleepSIM(1000, TASK_FOREVER, &dormirSIM800, &taskManager);
+bool slp = false;
