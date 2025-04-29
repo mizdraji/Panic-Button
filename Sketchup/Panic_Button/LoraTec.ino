@@ -145,7 +145,6 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
       if (rta) {
         if (dbspk) {
           Serial.println("-->ack ok");
-          //if (nodo.modo_wifi) telnet.println("-->ack ok\r");
         }
         SF_is_set = 1;
         //Elster_start();
@@ -154,7 +153,6 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
       else {
         if (dbspk) {
           Serial.println("-->NO ACK, time out");
-          //if (nodo.modo_wifi) telnet.println("-->NO ACK, time out\r");
         }
         SF_is_set = 0;
         //Elster_start();

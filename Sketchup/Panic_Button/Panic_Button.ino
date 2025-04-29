@@ -38,9 +38,12 @@ void setup() {
     Serial.println("-->LoraTec OK");
     Serial.print("-->devID: PB");
     Serial.println(devID);                          //Activacion Manual, devID predefinido
-    char uncero[1] = {0};
-    sendPackage(uncero, 1, espera_ACK,  1);      //envia un cero a travez de lora al iniciar para establecer la conexión
+    //char uncero[1] = {0};
+    //sendPackage(uncero, 1, espera_ACK,  1);      //envia un cero a travez de lora al iniciar para establecer la conexión
+    while(nodo.pdr_ok == 0) pdr_function();
   }
+  
+  
 
   //configurar modulo GSM como modo SMS
   //Serial.println("iniciando .........");
@@ -50,7 +53,7 @@ void setup() {
   //config Scheduler
   config_task();
   delay(1000);
-  lora.update();                     //actualización lora, mantener en la primer linea del loop.
+  //lora.update();                     //actualización lora, mantener en la primer linea del loop.
   memset(datoEntrante, 0, sizeof(datoEntrante));
 
   //config interrupt

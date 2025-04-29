@@ -83,12 +83,12 @@ void ReceiveMode() {
 void pdr_function() {
   if (nodo.pdr_ok == 0) {
     if (nodo.t_wait == 0) {
-      char uncero[1]={0};
+      char uncero[1] = {0};
       if (sendPackage(uncero, 1, espera_ACK, 0)) {        //si llega el ACK se pone en 1 y entra al if
         nodo.pdr_ok = 1;
         nodo.t_wait = random_time(0,MAX_RANDOM_LARGO);
         nodo.pausa_larga = 0;
-        nodo.cont_pausas_largas=0;
+        nodo.cont_pausas_largas = 0;
         nodo.cont_reintento_corto = 0;
         Serial.println("-->PRUEBA DE RED: OK");
       }
@@ -121,6 +121,7 @@ void pdr_function() {
     else if (nodo.t_wait > 0) { //tiempo de espera 
       nodo.t_wait--; //vamos decrementando el t_wait
     }
+    //lora.update();
   }
 }
 
