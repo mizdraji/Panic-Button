@@ -20,8 +20,8 @@ const sRFM_pins RFM_pins = {
   .CS = 18,
   .RST = 14,
   .DIO0 = 26,
-  .DIO1 = 33,
-  .DIO2 = 32,
+  .DIO1 = 34,
+  .DIO2 = 35,
   .DIO5 = -1,
 };
 #endif
@@ -32,7 +32,7 @@ const char *nwkSKey = "d8e5a8e01bddfaf48e059992119be745";
 const char *appSKey = "3f19e1ef0da5286e178c5b84fc9e23ae";
 
 char buffer_rx[255] = {0};
-char uncero[1] = {0};
+char uncero[1] = {1};
 volatile bool packetReceived = false; // Bandera para verificar datos
 
 
@@ -61,18 +61,15 @@ void setup() {
   lora.setAppSKey(appSKey);
   lora.setDevAddr(devAddr);
   Serial.println("aca se va a enviar un cero");
-  lora.sendUplink(uncero, strlen(uncero), 0, 1);
-
+  lora.sendUplink(uncero, strlen(uncero), 1, 1);
   // Configurar interrupción en el pin DIO0
   pinMode(digitalPinToInterrupt(RFM_pins.DIO0), INPUT);
   attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive, RISING);
 }
 
 void loop() {
-   int recvStatus;
-  //  for (int i = 0; i < 10001 ; i++){
-  //   if (i > 9999) attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive, RISING);
-  //  }
+   lora.update();
+   //int recvStatus;
   if (packetReceived) {
     packetReceived = false; // Resetea la bandera
 
@@ -86,7 +83,7 @@ void loop() {
 
 
   // Llamar a la FSM de LoRa para manejar la red
-  lora.update();
+ 
 
 
        // Leer el paquete recibido

@@ -5,7 +5,7 @@
 #define no_espera_ACK 2
 
 //dato entrante
-#define INPUTBUFF 255
+#define INPUTBUFF 50
 char datoEntrante[INPUTBUFF] = {0};
 char cmd_rcv;
 byte recvStatus = 0;                  //no usar bool para esta bandera ya que genera multiples interrupciones.

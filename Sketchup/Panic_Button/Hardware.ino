@@ -161,7 +161,9 @@ void IRAM_ATTR buttonInterrupt3() {
 
 // Función de interrupción para mensajes recibidos lora
 void IRAM_ATTR onReceive() {
-  recvStatus = lora.readData(datoEntrante); // Cambia bandera cuando hay un paquete recibido
+  //lora.update();
+  lorarcv = true;
+  //recvStatus = lora.readData(datoEntrante); // Cambia bandera cuando hay un paquete recibido
 }
 
 //Genera un número aleatorio de 8 digitos para usar de idempotencia

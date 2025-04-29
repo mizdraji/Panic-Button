@@ -101,3 +101,6 @@ por baja tension que genera el modulo SIM800.
 * V1.8.7
 * * Se agrega modo sleep para el sim800. 
 * * Se agregan las funciones dormirSIM800 y despertarSIM800.
+* * Se hacen modificaciones con respecto a como se administra la interrupción de lora.
+* * Se cambia de lugar el lora.update() porque habia un BUG que mostraba el mensaje anterior recibido debido a que el buffer no se actualizaba en el tiempo correcto.
+* * Se retira todo el código viejo que correspondia al uso de 2 cores.
