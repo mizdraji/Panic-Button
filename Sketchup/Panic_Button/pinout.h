@@ -13,8 +13,10 @@
 #define button2       38     //boton de bomberos
 #define button3       39     //boton de ambulancia
 
+#define io0           26      //GPIO26 HELTEC - DIO0 lora
+
 //pines para sim800
 #define TX            17     //GPIO17 HELTEC - pines para sim800 - Se conecta a RX de sim800
 #define RX            16     //GPIO16 HELTEC - pines para sim800 - Se conecta a TX de sim800
-#define DTR           21     //GPIO37 HELTEC - pines para sim800 - Se conecta a DTR de sim800 - Se usa para activar o desactivar el modo sleep.
+#define DTR           21     //GPIO21 HELTEC - pines para sim800 - Se conecta a DTR de sim800 - Se usa para activar o desactivar el modo sleep.
 //#define SIMRST 2           //GPIO2 HELTEC

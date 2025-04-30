@@ -29,8 +29,8 @@ const sRFM_pins RFM_pins = {
   .CS = 18,         //18
   .RST = 14,
   .DIO0 = 26,       //26
-  .DIO1 = 34,       //33
-  .DIO2 = 35,       //32
+  .DIO1 = 34,       //34
+  .DIO2 = 35,       //35
   .DIO5 = -1,
 };
 #endif

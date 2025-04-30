@@ -13,7 +13,7 @@ bool LED_state2 = LOW;
 
 //variables para deepsleep
 uint8_t timer = 0;        //contador de tiempo
-#define tiempo 60         //tiempo de espera para iniciar deepsleep
+#define tiempo 30         //tiempo de espera para iniciar deepsleep
 
 //estados de los pulsadores
 bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
@@ -86,10 +86,10 @@ Task t7(500, TASK_FOREVER, &buttonTask3, &interrupt);                //TASK7: bu
 Task lock(3000, TASK_FOREVER, &unlock, &interrupt);                  //   
 
 //tareas para apagar leds:
-Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);     //TASK apagar todos los leds
-Task t_apagarLED1(5000, TASK_FOREVER, &apagarLED1, &taskManager);   //TASK apaga led1
-Task t_apagarLED2(5000, TASK_FOREVER, &apagarLED2, &taskManager);   //TASK apaga led2
-Task t_apagarLED3(5000, TASK_FOREVER, &apagarLED3, &taskManager);   //TASK apaga led3
+Task t_apagarLED(5001, TASK_FOREVER, &apagarLED, &taskManager);     //TASK apagar todos los leds
+Task t_apagarLED1(5002, TASK_FOREVER, &apagarLED1, &taskManager);   //TASK apaga led1
+Task t_apagarLED2(5003, TASK_FOREVER, &apagarLED2, &taskManager);   //TASK apaga led2
+Task t_apagarLED3(5004, TASK_FOREVER, &apagarLED3, &taskManager);   //TASK apaga led3
 
 Task t_recibido(1000, TASK_FOREVER, &trecibido, &taskManager);
 Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
@@ -98,6 +98,6 @@ Task ADCpower(15000, TASK_FOREVER, &powerON, &taskManager);                  //s
 
 Task Tinformadorcv_Led(500, TASK_FOREVER, &informado_led, &taskManager);    //Tarea para secuencia led cuando se recibe informadorcv
 
-Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
+Task Sleep(1000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
 Task SleepSIM(1000, TASK_FOREVER, &dormirSIM800, &taskManager);
 bool slp = false;
