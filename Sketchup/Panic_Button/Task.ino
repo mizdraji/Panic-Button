@@ -217,6 +217,7 @@ void informado_led() {
     digitalWrite(led3, LED_state2);
     digitalWrite(led_recibido, LED_state2); 
     digitalWrite(led_atendido, LED_state2);
+    counterInformado ++; 
     timer = 0;
   }
   if (counterInformado > timesCounterInformado) {
