@@ -28,7 +28,7 @@ void config_inicial()
   digitalWrite(led_powerON, HIGH);
   digitalWrite(led_recibido, LOW);
   digitalWrite(led_atendido, LOW);
-  digitalWrite(DTR, LOW);
+  //digitalWrite(DTR, LOW);
 }
 
 //Función para enviar mensaje SMS
