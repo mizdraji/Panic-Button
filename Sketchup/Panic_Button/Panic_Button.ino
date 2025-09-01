@@ -61,7 +61,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
-  attachInterrupt(digitalPinToInterrupt(io0), onReceive, CHANGE);                       //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
+  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive, CHANGE);                       //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
 
   uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36);// | (1ULL << GPIO_NUM_13); //Comentar la ultima condición para hacer pruebas mientras esta conectado.
   esp_sleep_enable_ext1_wakeup(mask, ESP_EXT1_WAKEUP_ANY_HIGH);
@@ -109,11 +109,18 @@ void loop() {
   lora.update();                     //actualización lora
   if(lorarcv) {
     lorarcv = false;
+    lora.readData(datoEntrante);
+    Serial.print("====>> ");
+    Serial.println(datoEntrante);
+    
     timer = 0;
-    memset(datoEntrante, 0, sizeof(datoEntrante));
-    if(lora.readData(datoEntrante)) {
-      Serial.print("====>> ");
-      Serial.println(datoEntrante);
+    //memset(datoEntrante, 0, sizeof(datoEntrante));
+    //lora.readData(datoEntrante);
+    //Serial.println(datoEntrante);
+    
+    
+      //Serial.print("====>> ");
+      //Serial.println(datoEntrante);
       uint32_t numrcv = extraer_numero(datoEntrante);
       if(strncmp(datoEntrante,  atendidorcv_lora, strlen(atendidorcv_lora)) == 0 && 
         numrcv == numsnt) t_atendido.enable();                                                              //se ejecuta task de atendido
@@ -132,7 +139,8 @@ void loop() {
         //t_apagarLED.delay(delay_apagarLED);
         Tinformadorcv_Led.enable(); 
       }
-    }
+    //}
+    memset(datoEntrante, 0, sizeof(datoEntrante));
   }
 }
 
