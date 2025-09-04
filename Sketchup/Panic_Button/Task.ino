@@ -186,9 +186,9 @@ void apagarLED3() {
 //powerON
 void powerON () {
   if(analogRead(ADC_powerON) > ADC_powerON_value) {         //USB CONECTADO
-  digitalWrite(led_powerON, HIGH);
-  t2.disable();
-  timer = 0;                                              //Resetea el timer cuando el USB esta conectado para no entrar a modo sleep.
+    digitalWrite(led_powerON, HIGH);
+    t2.disable();
+    timer = 0;                                              //Resetea el timer cuando el USB esta conectado para no entrar a modo sleep.
   }  
   else t2.enable();                                         //USB DESCONECTADO
 }

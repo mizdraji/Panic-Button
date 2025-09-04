@@ -123,7 +123,6 @@ void pdr_function() {
     else if (nodo.t_wait > 0) { //tiempo de espera 
       nodo.t_wait--; //vamos decrementando el t_wait
     }
-    //lora.update();
   }
 }
 
@@ -132,48 +131,43 @@ void pdr_function() {
 void IRAM_ATTR buttonInterrupt1() {           
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
-  // If interrupts come faster than 200ms, assume it's a bounce and ignore
   if (interrupt_time - last_interrupt_time > 200) {
     statebutton1 = true;
-    t5.enable();
+    t5.enableIfNot();                           //Habilita la tarea solo si estaba desactivada previamente
   }
   last_interrupt_time = interrupt_time;
 }
+
 //interrupción pulsador2
 void IRAM_ATTR buttonInterrupt2() {           
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
-  // If interrupts come faster than 200ms, assume it's a bounce and ignore
   if (interrupt_time - last_interrupt_time > 200) {
     statebutton2 = true;
-    t6.enable();
+    t6.enableIfNot();                           //Habilita la tarea solo si estaba desactivada previamente
   }
   last_interrupt_time = interrupt_time;
 }
+
 //interrupción pulsador3
 void IRAM_ATTR buttonInterrupt3() {           
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
-  // If interrupts come faster than 200ms, assume it's a bounce and ignore
   if (interrupt_time - last_interrupt_time > 200) {
     statebutton3 = true;
-    t7.enable();
+    t7.enableIfNot();                             //Habilita la tarea solo si estaba desactivada previamente
   }
   last_interrupt_time = interrupt_time;
 }
 
 // Función de interrupción para mensajes recibidos lora
 void IRAM_ATTR onReceive() {
-  //lora.update();
-  Serial.println("onReceive");
-  
-  lorarcv = true;
-  //recvStatus = lora.readData(datoEntrante); // Cambia bandera cuando hay un paquete recibido
-  // if (recvStatus) {
-  // Serial.print("recvstatus: ");Serial.println(recvStatus);
-  // Serial.println(datoEntrante);
-  // }
-  
+  static unsigned long last_interrupt_time = 0;
+  unsigned long interrupt_time = millis();
+  if (interrupt_time - last_interrupt_time > 1000) {
+    recvStatus = lora.readData(datoEntrante); // Cambia bandera cuando hay un paquete recibido
+  }
+  last_interrupt_time = interrupt_time;
 }
 
 //Genera un número aleatorio de 8 digitos para usar de idempotencia
@@ -184,7 +178,7 @@ uint32_t idempotencia_random() {
     return random_number;
 }
 
-//funcion para extraer el número de un mensaje del tipo char[]: "mensaje, numero"
+//Función para extraer el número de un mensaje del tipo char[]: "mensaje, numero"
 uint32_t extraer_numero(char mensaje_completo[]) {
     char *coma_pos = strchr(mensaje_completo, ',');                   // Encontrar la posición de la coma en el mensaje    
     // Verificar si la coma fue encontrada
@@ -195,7 +189,8 @@ uint32_t extraer_numero(char mensaje_completo[]) {
     }
     return 0;  // Si no se encontró la coma, devolver 0
 }
-//funcion para extraer el número de un mensaje del tipo String: "mensaje, numero", extrae el número despues de la ULTIMA COMA.
+
+//Función para extraer el número de un mensaje del tipo String: "mensaje, numero", extrae el número despues de la ULTIMA COMA.
 uint32_t extraer_numero(String mensaje_completo) {
     int posicion_ultima_coma = mensaje_completo.lastIndexOf(',');     // Buscar la última coma en el mensaje
 

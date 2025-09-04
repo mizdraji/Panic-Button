@@ -94,10 +94,10 @@ Task t_apagarLED3(5004, TASK_FOREVER, &apagarLED3, &taskManager);   //TASK apaga
 Task t_recibido(1000, TASK_FOREVER, &trecibido, &taskManager);
 Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
 
-Task ADCpower(15000, TASK_FOREVER, &powerON, &taskManager);                  //se ejecuta cada 10 segundos para verificar si esta cargando con usb
+Task ADCpower(30000, TASK_FOREVER, &powerON, &taskManager);                  //se ejecuta cada 10 segundos para verificar si esta cargando con usb
 
 Task Tinformadorcv_Led(500, TASK_FOREVER, &informado_led, &taskManager);    //Tarea para secuencia led cuando se recibe informadorcv
 
-Task Sleep(1000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
+Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
 Task SleepSIM(1000, TASK_FOREVER, &dormirSIM800, &taskManager);
 bool slp = false;

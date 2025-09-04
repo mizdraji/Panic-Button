@@ -107,9 +107,9 @@ void loop() {
   if (SIM800L.available() || (digitalRead(button1) || digitalRead(button2) || digitalRead(button3)) == HIGH) timer = 0;     //si se produce una interrupcion resetear contador timer para no entrar al modo sleep
   
   lora.update();                     //actualización lora
-  if(lorarcv) {
-    lorarcv = false;
-    lora.readData(datoEntrante);
+  if(recvStatus) {
+    //lorarcv = false;
+    //lora.readData(datoEntrante);
     Serial.print("====>> ");
     Serial.println(datoEntrante);
     
@@ -142,6 +142,7 @@ void loop() {
     //}
     memset(datoEntrante, 0, sizeof(datoEntrante));
   }
+  recvStatus = 0;
 }
 
 // Función para imprimir qué pin causó el wakeup
