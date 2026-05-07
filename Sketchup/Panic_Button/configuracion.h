@@ -1,5 +1,5 @@
 //Version
-#define VERSION       "V1.8.7"
+#define VERSION       "V1.8.8"
 
 //Serial
 #define SERIAL_SPEED  115200
