@@ -11,6 +11,102 @@ uint8_t cont_same_SF = 0;         //para probar mas d euna vez cada SF
 #define tick_time 100 //base de tiempo para el delay
 #define timeout   80 //timeout * tick_time = tiempo de time out = 8 segundos
 
+bool ack_waiting_async = false;
+uint32_t ack_waiting_start_ms = 0;
+
+static void configureAndSendUplink(char *data_to_send, uint8_t len, bool canal_por_defecto) {
+  if (canal_por_defecto) {
+    lora.setChannel(DEFAULT_CHANNEL);
+  }
+  else lora.setChannel(MULTI);
+  
+  if (FORCE_FIXED_SF_TEST) {
+    uint8_t sf_fixed = FIXED_SF_INDEX;
+    if (sf_fixed > 3) sf_fixed = 3;
+    lora.setDataRate(SFvector[sf_fixed]);
+    SF_actual = sf_fixed;
+    SF_is_set = 1;
+    if (dbspk) {
+      Serial.print("-->SF FIJO TEST: "); Serial.println(sf_fixed);
+    }
+  }
+  else if (canal_por_defecto) {
+    lora.setDataRate(DEFAULT_SF);
+  }
+  else if (SF_is_set) {
+    if(SF_actual > 0){
+      uint8_t sf_ant = SF_actual - 1;
+      lora.setDataRate(SFvector[sf_ant]);
+      SF_actual = sf_ant;
+      if (dbspk) {
+        Serial.print("Reducir SF: "); Serial.println(SF_actual);
+      }
+    }
+    else {
+      lora.setDataRate(SFvector[SF_actual]);
+      if (dbspk) {
+        Serial.print("usar SF_actual: "); Serial.println(SF_actual);
+      }
+    }
+  }
+  else {              //no esta seteado el SF aun...
+    lora.setDataRate(SFvector[SF_index]);
+    SF_actual = SF_index;
+    if (dbspk) {
+      Serial.print("-->Test SF: "); Serial.println(SF_index);
+    }
+    cont_same_SF++;
+    if (cont_same_SF >= MAX_RETRY_SAME_SF) {
+      cont_same_SF = 0;
+      SF_index++;
+    }
+    if (SF_index > MAX_SF) {
+      SF_index = 0;
+    }
+  }
+  
+  if (canal_por_defecto) lora.sendUplink(data_to_send, len, 0, 1);
+  else lora.sendUplink(data_to_send, len, 1, 1);
+}
+
+uint8_t sendPackageAckAsyncStart(char *data_to_send, uint8_t len, bool canal_por_defecto) {
+  if (ack_waiting_async) return 0;
+  configureAndSendUplink(data_to_send, len, canal_por_defecto);
+  ack_waiting_async = true;
+  ack_waiting_start_ms = millis();
+  return 1;
+}
+
+int8_t sendPackageAckAsyncPoll() {
+  if (!ack_waiting_async) return 0;
+
+  lora.update();
+  uint8_t rta = lora.readAck();
+  if (rta) {
+    if (dbspk) {
+      Serial.println("-->ack ok");
+    }
+    SF_is_set = 1;
+    ack_waiting_async = false;
+    return 1;
+  }
+
+  if ((millis() - ack_waiting_start_ms) >= (uint32_t)(timeout * tick_time)) {
+    if (dbspk) {
+      Serial.println("-->NO ACK, time out");
+    }
+    SF_is_set = 0;
+    ack_waiting_async = false;
+    return -1;
+  }
+
+  return 2;
+}
+
+bool isSendPackageAckAsyncWaiting() {
+  return ack_waiting_async;
+}
+
 #if tipo_modulo == 0
 //RFM95W + ESP12 (Macro version)
 const sRFM_pins RFM_pins = {
@@ -84,51 +180,7 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
   uint8_t dato_ok = 0;
   uint8_t cont_timeout = 0;
 
-  if (canal_por_defecto) {
-    lora.setChannel(DEFAULT_CHANNEL);
-  }
-  else lora.setChannel(MULTI);
-  
-  if (canal_por_defecto) {
-    lora.setDataRate(DEFAULT_SF);
-  }
-  else if (SF_is_set) {  
-    if(SF_actual > 0){
-      uint8_t sf_ant = SF_actual - 1;
-      lora.setDataRate(SFvector[sf_ant]);
-      SF_actual = sf_ant;
-      if (dbspk) {
-        Serial.print("Reducir SF: "); Serial.println(SF_actual);
-        //if (nodo.modo_wifi) { telnet.print("Reducir SF: "); telnet.println(String(SF_actual)+"\r"); }
-      }
-    }
-    else {
-      lora.setDataRate(SFvector[SF_actual]);
-      if (dbspk) {
-        Serial.print("usar SF_actual: "); Serial.println(SF_actual);
-        //if (nodo.modo_wifi) { telnet.print("usar SF_actual: "); telnet.println(String(SF_actual)+"\r"); }
-      }
-    }
-  }
-  else {              //no esta seteado el SF aun...
-    lora.setDataRate(SFvector[SF_index]);
-    SF_actual = SF_index;
-    if (dbspk) {
-      Serial.print("-->Test SF: "); Serial.println(SF_index);
-      //if (nodo.modo_wifi) { telnet.print("-->Test SF: "); telnet.println(String(SF_index)+"\r"); }
-    }
-    cont_same_SF++;
-    if (cont_same_SF >= MAX_RETRY_SAME_SF) {
-      cont_same_SF = 0;
-      SF_index++;
-    }
-    if (SF_index > MAX_SF) {
-      SF_index = 0;
-    }
-  }
-  
-  if (canal_por_defecto) lora.sendUplink(data_to_send, len, 0, 1);
-  else lora.sendUplink(data_to_send, len, 1, 1);
+  configureAndSendUplink(data_to_send, len, canal_por_defecto);
 
   switch (rta_type)
   {

@@ -12,3 +12,6 @@ byte recvStatus = 0;                  //no usar bool para esta bandera ya que ge
 
 uint8_t initLoraTec();
 uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type,  bool canal_por_defecto );
+uint8_t sendPackageAckAsyncStart(char *data_to_send, uint8_t len, bool canal_por_defecto);
+int8_t sendPackageAckAsyncPoll();
+bool isSendPackageAckAsyncWaiting();

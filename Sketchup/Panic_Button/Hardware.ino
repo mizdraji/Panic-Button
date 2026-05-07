@@ -83,13 +83,18 @@ void ReceiveMode() {
 
 //Prueba de Red: Es el primer paquete LoRa. Envia un cero para establecer la conexion con la red LoRaWAN.
 void pdr_function() {
-  static uint32_t last_wait_tick_ms = 0;
+  static char uncero[1] = {0};
 
   if (nodo.pdr_ok == 0) {
     if (nodo.t_wait == 0) {
-      last_wait_tick_ms = millis();
-      char uncero[1] = {0};
-      if (sendPackage(uncero, 1, espera_ACK, 0)) {        //si llega el ACK se pone en 1 y entra al if
+      if (!isSendPackageAckAsyncWaiting()) {
+        sendPackageAckAsyncStart(uncero, 1, 0);
+      }
+
+      int8_t ackStatus = sendPackageAckAsyncPoll();
+      if (ackStatus == 2) return; //seguimos esperando ACK sin bloquear
+
+      if (ackStatus == 1) {        //si llega el ACK se pone en 1 y entra al if
         nodo.pdr_ok = 1;
         nodo.t_wait = random_time(0,MAX_RANDOM_LARGO);
         nodo.pausa_larga = 0;
@@ -97,7 +102,7 @@ void pdr_function() {
         nodo.cont_reintento_corto = 0;
         Serial.println("-->PRUEBA DE RED: OK");
       }
-      else {
+      else if (ackStatus == -1) {
         nodo.pdr_ok = 0;
         nodo.cont_reintento_corto++;
         if (nodo.cont_reintento_corto >= MAX_REINTENTOS) {
@@ -112,7 +117,6 @@ void pdr_function() {
           Serial.println("-->Cant Max de reintentos para PDR excedido, pausa larga");
           
           Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
-          last_wait_tick_ms = millis();
           
         }
         else {
@@ -120,23 +124,15 @@ void pdr_function() {
           Serial.println("-->PRUEBA DE RED: FALLO");
           
           Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
-          last_wait_tick_ms = millis();
           
         }
+      } else {
+        //si no hay envio activo todavia, esperamos al siguiente tick para volver a iniciar/pollear
+        return;
       }
     }
     else if (nodo.t_wait > 0) { //tiempo de espera 
-      uint32_t now_ms = millis();
-      uint32_t elapsed_ms = now_ms - last_wait_tick_ms;
-      if (elapsed_ms >= 1000) {
-        uint32_t elapsed_s = elapsed_ms / 1000;
-        if (elapsed_s >= (uint32_t)nodo.t_wait) {
-          nodo.t_wait = 0;
-        } else {
-          nodo.t_wait -= (int32_t)elapsed_s;
-        }
-        last_wait_tick_ms += elapsed_s * 1000;
-      }
+      nodo.t_wait--; //t_pdr corre cada 1 segundo, asi que el decremento es en segundos reales
     }
   }
 }
