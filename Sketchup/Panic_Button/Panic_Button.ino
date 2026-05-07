@@ -64,12 +64,6 @@ static bool isValidLoraPayload(const char *buf) {
 void setup() {                              
   SIM800L.begin(SERIAL_SIM);
   Serial.begin(SERIAL_SPEED);
-  Serial.println("FW DBG RX build activo");
-#if DEBUG_LORA_RX
-  Serial.println("DEBUG_LORA_RX=1");
-#else
-  Serial.println("DEBUG_LORA_RX=0");
-#endif
 
   delay(3000);                              //falta crear variable para initial random time
   config_pines();
@@ -96,20 +90,17 @@ void setup() {
   
 
   //configurar modulo GSM como modo SMS
-  //Serial.println("iniciando .........");
   ReceiveMode();
-  //Enviar_msj(numero.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
 
   //config Scheduler (ya inicializado antes de la prueba de red)
   delay(1000);
-  //lora.update();                     //actualización lora, mantener en la primer linea del loop.
   memset(datoEntrante, 0, sizeof(datoEntrante));
 
   //config interrupt
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
-  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive, RISING);                       //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
+  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive, RISING);            //habilita interrupcion de recepcion LoRa
 
   uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36);// | (1ULL << GPIO_NUM_13); //Comentar la ultima condición para hacer pruebas mientras esta conectado.
   esp_sleep_enable_ext1_wakeup(mask, ESP_EXT1_WAKEUP_ANY_HIGH);
@@ -127,10 +118,9 @@ void loop() {
       uint32_t numrcv = extraer_numero(mensaje_recibido); 
       Serial.print(mensaje_recibido);
     
-      //if(mensaje_recibido.indexOf("OK") != -1)  {Serial.println("se recibio OK");}                //comparo si recibo OK en el string de mensaje_recibido
       if(mensaje_recibido.indexOf("ERROR") != -1)  {
-      //Serial.println("se recibio ERROR");
-      //ESP.restart();                                                                              //Reset en caso de que falle el SIM800
+        Serial.println("Se recibio ERROR en SIM800, reiniciando...");
+        ESP.restart();                                                                              //Reset en caso de que falle el SIM800
       }
 
       if (mensaje_recibido.indexOf(rcv_atendido)  != -1 && numrcv == numsnt) t_atendido.enable();    //se ejecuta task de atendido
@@ -138,16 +128,12 @@ void loop() {
          mensaje_recibido.indexOf(rcv_bomberos) != -1 || 
          mensaje_recibido.indexOf(rcv_medica)   != -1) && numrcv == numsnt && checknum == false) {
         checknum = true;
-        //Serial.println("Recibi primero SMS");
         t_recibido.enable();      //se ejecuta task de recibido
       }
 
       if (mensaje_recibido.indexOf(rcv_informado) != -1 && numrcv == numsnt) {
-        //t_apagarLED.enable();                                                       //se ejecuta task de informado
-        //t_apagarLED.delay(delay_apagarLED);                                         //se ejecuta la tarea apagarLED con un delay de 15 segundos);
         Tinformadorcv_Led.enable();
       }
-      //if (mensaje_recibido.indexOf(msj.rcv_cerrado) != -1) task.enable();    //se ejecuta task de cerrado
     }
   }
     
@@ -191,19 +177,10 @@ void loop() {
       return;
     }
 
-    //lorarcv = false;
-    //lora.readData(datoEntrante);
     Serial.print("====>> ");
     Serial.println(datoEntrante);
     
     timer = 0;
-    //memset(datoEntrante, 0, sizeof(datoEntrante));
-    //lora.readData(datoEntrante);
-    //Serial.println(datoEntrante);
-    
-    
-      //Serial.print("====>> ");
-      //Serial.println(datoEntrante);
       uint32_t numrcv = extraer_numero(datoEntrante);
       if(strstr(datoEntrante, atendidorcv_lora) != NULL && 
         numrcv == numsnt) t_atendido.enable();                                                              //se ejecuta task de atendido
@@ -213,7 +190,6 @@ void loop() {
         strstr(datoEntrante, medicarcv_lora)   != NULL) && 
         numrcv == numsnt && checknum == false ) {
         checknum = true;
-       //Serial.println("Recibi primero LORA");
        t_recibido.enable();                                                 //se ejecuta task de recibido
       }
       if(strstr(datoEntrante, informadorcv_lora) != NULL && 
@@ -221,11 +197,8 @@ void loop() {
 #if DEBUG_LORA_RX
         Serial.println("MATCH informado LORA");
 #endif
-        //t_apagarLED.enable();                                                       //se ejecuta task de informado
-        //t_apagarLED.delay(delay_apagarLED);
         Tinformadorcv_Led.enable(); 
       }
-    //}
     memset(datoEntrante, 0, sizeof(datoEntrante));
   }
 #if DEBUG_LORA_RX

@@ -12,7 +12,7 @@
 #define DEFAULT_SF      SF7BW125               // Set Data Rate
 #define DEBUG           0 
 #define dbspk           1                      //lora send pakage
-#define DEBUG_LORA_RX   1                      //logs minimos para diagnostico de recepcion lora
+#define DEBUG_LORA_RX   0                      //1=diagnostico RX LoRa, 0=normal
 #define FORCE_FIXED_SF_TEST 0                  //1=fijar SF para ensayos, 0=logica normal/adaptativa
 #define FIXED_SF_INDEX  0                      //0:SF7, 1:SF8, 2:SF9, 3:SF10
 

@@ -68,8 +68,9 @@ void buttonTask1() {
     
     char mensaje_saliente_lora[50];
     sprintf(mensaje_saliente_lora, "%s, %s", policia_lora, idempotencia.c_str());                 //Concatena "policia" e "idempotencia" con una coma
+    Serial.print("LORA TX -> ");
+    Serial.println(mensaje_saliente_lora);
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-    //sendPackage(policia_lora, strlen(policia_lora), no_espera_ACK,  1);                         //LORA
 
     encenderLED(led1);
     
@@ -94,8 +95,9 @@ void buttonTask2() {
     
     char mensaje_saliente_lora[50];
     sprintf(mensaje_saliente_lora, "%s, %s", bomberos_lora, idempotencia.c_str());                 //Concatena "bomberos" e "idempotencia" con una coma
+    Serial.print("LORA TX -> ");
+    Serial.println(mensaje_saliente_lora);
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-    //sendPackage(bomberos_lora, strlen(bomberos_lora), no_espera_ACK,  1);                       //LORA
 
     encenderLED(led2);
     
@@ -119,8 +121,9 @@ void buttonTask3() {
 
     char mensaje_saliente_lora[50];
     sprintf(mensaje_saliente_lora, "%s, %s", medica_lora, idempotencia.c_str());                 //Concatena "media" e "idempotencia" con una coma
+    Serial.print("LORA TX -> ");
+    Serial.println(mensaje_saliente_lora);
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-    //sendPackage(medica_lora, strlen(medica_lora), no_espera_ACK,  1);      //LORA
 
     encenderLED(led3);
     
@@ -149,8 +152,6 @@ void trecibido() {
 
 void tatendido() {
   encenderLED(led_atendido);
-  //t_apagarLED.enable();
-  //t_apagarLED.delay(delay_apagarLED);       //se ejecuta la tarea apagarLED con un delay de X segundos
   t_atendido.disable();
   timer = 0;
 }
@@ -243,9 +244,6 @@ void Sleeping_init(){
     Serial.println("Going to sleep now");
     SleepSIM.enable();
     SleepSIM.delay(2000);
-    //dormirSIM800();
-    //delay(2000);
-    
   }
 }
 
