@@ -83,8 +83,11 @@ void ReceiveMode() {
 
 //Prueba de Red: Es el primer paquete LoRa. Envia un cero para establecer la conexion con la red LoRaWAN.
 void pdr_function() {
+  static uint32_t last_wait_tick_ms = 0;
+
   if (nodo.pdr_ok == 0) {
     if (nodo.t_wait == 0) {
+      last_wait_tick_ms = millis();
       char uncero[1] = {0};
       if (sendPackage(uncero, 1, espera_ACK, 0)) {        //si llega el ACK se pone en 1 y entra al if
         nodo.pdr_ok = 1;
@@ -109,6 +112,7 @@ void pdr_function() {
           Serial.println("-->Cant Max de reintentos para PDR excedido, pausa larga");
           
           Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
+          last_wait_tick_ms = millis();
           
         }
         else {
@@ -116,12 +120,23 @@ void pdr_function() {
           Serial.println("-->PRUEBA DE RED: FALLO");
           
           Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
+          last_wait_tick_ms = millis();
           
         }
       }
     }
     else if (nodo.t_wait > 0) { //tiempo de espera 
-      nodo.t_wait--; //vamos decrementando el t_wait
+      uint32_t now_ms = millis();
+      uint32_t elapsed_ms = now_ms - last_wait_tick_ms;
+      if (elapsed_ms >= 1000) {
+        uint32_t elapsed_s = elapsed_ms / 1000;
+        if (elapsed_s >= (uint32_t)nodo.t_wait) {
+          nodo.t_wait = 0;
+        } else {
+          nodo.t_wait -= (int32_t)elapsed_s;
+        }
+        last_wait_tick_ms += elapsed_s * 1000;
+      }
     }
   }
 }

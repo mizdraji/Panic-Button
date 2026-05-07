@@ -45,6 +45,7 @@ Scheduler interrupt;
 void led_blink();
 void blinkstb();
 void loraSend();
+void pdr_function();
 void buttonTask1();       //button1 pin 37 policia
 void buttonTask2();       //button2 pin 38 bomberos
 void buttonTask3();       //button3 pin 39 ambulancia
@@ -76,6 +77,7 @@ Task t2(500, TASK_FOREVER, &blinkstb, &taskManager);
 
 //TASK3: Envia paquete lora.
 //Task t3(5000, TASK_FOREVER, &loraSend, &taskManager);
+Task t_pdr(1000, TASK_FOREVER, &pdr_function, &taskManager);             //TASK PDR: prueba de red cada 1 segundo
 
 //TASK4: Envia mensaje sms.
 

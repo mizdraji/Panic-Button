@@ -10,6 +10,7 @@ void config_task(){
   t5.disable();
   t6.disable();
   t7.disable();
+  t_pdr.disable();
   t_recibido.disable();
   t_atendido.disable();
   lock.disable();

@@ -39,9 +39,12 @@ void setup() {
     Serial.println("-->LoraTec OK");
     Serial.print("-->devID: PB");
     Serial.println(devID);                          //Activacion Manual, devID predefinido
-    //char uncero[1] = {0};
-    //sendPackage(uncero, 1, espera_ACK,  1);      //envia un cero a travez de lora al iniciar para establecer la conexión
-    while(nodo.pdr_ok == 0) pdr_function();
+    config_task();
+    t_pdr.enable();
+    while (nodo.pdr_ok == 0) {
+      taskManager.execute();
+    }
+    t_pdr.disable();
   }
   
   
@@ -51,8 +54,7 @@ void setup() {
   ReceiveMode();
   //Enviar_msj(numero.Remitente1, "Inicializacion completa");                        //provisorio de prueba, comprueba que envia mensaje correctamente al iniciar
 
-  //config Scheduler
-  config_task();
+  //config Scheduler (ya inicializado antes de la prueba de red)
   delay(1000);
   //lora.update();                     //actualización lora, mantener en la primer linea del loop.
   memset(datoEntrante, 0, sizeof(datoEntrante));
