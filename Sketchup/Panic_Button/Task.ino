@@ -13,6 +13,7 @@ void config_task(){
   t_pdr.disable();
   t_recibido.disable();
   t_atendido.disable();
+  t_ensayo.disable();
   lock.disable();
   Tinformadorcv_Led.disable();
   SleepSIM.disable();
@@ -232,6 +233,30 @@ void informado_led() {
     Tinformadorcv_Led.disable();
     counterInformado = 0;
   }
+}
+
+// Modo ensayo: envia cada 5 minutos por SMS y LoRa
+// Formato payload: "Ens,<contador>,<timestamp_ms>"
+void ensayoTask() {
+  if (ensayo_counter >= ENSAYO_TOTAL_MENSAJES) {
+    Serial.println("ENSAYO finalizado: total de mensajes alcanzado");
+    t_ensayo.disable();
+    return;
+  }
+
+  ensayo_counter++;
+  uint32_t ts_ms = millis();
+  String payload = "Ens," + String(ensayo_counter) + "," + String(ts_ms);
+
+  Enviar_msj(numero.Remitente2, payload);
+
+  char payload_lora[64];
+  snprintf(payload_lora, sizeof(payload_lora), "Le,%u,%lu", (unsigned int)ensayo_counter, (unsigned long)ts_ms);
+  Serial.print("ENSAYO TX -> ");
+  Serial.println(payload_lora);
+  sendPackage(payload_lora, strlen(payload_lora), no_espera_ACK, 1);
+
+  timer = 0; //evita entrar en sleep durante el ensayo
 }
 
 void Sleeping_init(){

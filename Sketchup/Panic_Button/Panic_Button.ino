@@ -96,6 +96,13 @@ void setup() {
   delay(1000);
   memset(datoEntrante, 0, sizeof(datoEntrante));
 
+#if MODO_ENSAYO
+  ensayo_counter = 0;
+  t_ensayo.enable();
+  Serial.print("MODO ENSAYO activo. Total mensajes: ");
+  Serial.println((unsigned long)ENSAYO_TOTAL_MENSAJES);
+#endif
+
   //config interrupt
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente

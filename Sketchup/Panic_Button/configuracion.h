@@ -1,3 +1,6 @@
+// Evita dobles inclusiones del header en la misma unidad de compilacion.
+#pragma once
+
 //Version
 #define VERSION       "V1.8.8"
 
@@ -15,6 +18,12 @@
 #define DEBUG_LORA_RX   0                      //1=diagnostico RX LoRa, 0=normal
 #define FORCE_FIXED_SF_TEST 0                  //1=fijar SF para ensayos, 0=logica normal/adaptativa
 #define FIXED_SF_INDEX  0                      //0:SF7, 1:SF8, 2:SF9, 3:SF10
+
+//configuracion ensayo
+#define MODO_ENSAYO      1                      //1=habilita envio periodico de ensayo
+#define ENSAYO_INTERVALO_MS 300000UL            //5 minutos
+#define ENSAYO_DURACION_HS 48UL                 //48 horas
+#define ENSAYO_TOTAL_MENSAJES ((ENSAYO_DURACION_HS * 60UL * 60UL * 1000UL) / ENSAYO_INTERVALO_MS) //576 mensajes
 
 //configuracion GSM numeros de remitentes
 struct remitente {

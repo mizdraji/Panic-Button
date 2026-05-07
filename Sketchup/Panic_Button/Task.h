@@ -1,4 +1,5 @@
 #include "pinout.h"
+#include "configuracion.h"
 
 unsigned long previousMillis = 0;         // Variable para almacenar el tiempo anterior
 #define ledOnTime   200      // Tiempo de encendido en milisegundos (0.2 segundos)
@@ -59,6 +60,7 @@ void tatendido();
 void powerON();
 void unlock();
 void informado_led();
+void ensayoTask();
 void Sleeping_init();
 void dormirSIM800();
 void despertarSIM800L();
@@ -99,7 +101,9 @@ Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
 Task ADCpower(30000, TASK_FOREVER, &powerON, &taskManager);                  //se ejecuta cada 10 segundos para verificar si esta cargando con usb
 
 Task Tinformadorcv_Led(500, TASK_FOREVER, &informado_led, &taskManager);    //Tarea para secuencia led cuando se recibe informadorcv
+Task t_ensayo(300000, TASK_FOREVER, &ensayoTask, &taskManager);              //Tarea periodica de ensayo (5 min, SMS + LoRa)
 
 Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
 Task SleepSIM(1000, TASK_FOREVER, &dormirSIM800, &taskManager);
 bool slp = false;
+uint16_t ensayo_counter = 0;
