@@ -4,9 +4,9 @@
 void config_pines()
 {
   //configure pines
-  pinMode(button1, INPUT_PULLUP);            //boton de policia      - GPIO 37
-  pinMode(button2, INPUT_PULLUP);            //boton de bomberos     - GPIO 38
-  pinMode(button3, INPUT_PULLUP);            //boton de ambulancia   - GPIO 39
+  pinMode(button1, INPUT);            //boton de policia      - GPIO 37
+  pinMode(button2, INPUT);            //boton de bomberos     - GPIO 38
+  pinMode(button3, INPUT);            //boton de ambulancia   - GPIO 39
   pinMode(ADC_powerON, INPUT);
   pinMode(led1, OUTPUT);              //LED1 confirm policia  - GPIO 15
   pinMode(led2, OUTPUT);              //LED2 confirm bomberos - GPIO 2
@@ -83,18 +83,13 @@ void ReceiveMode() {
 
 //Prueba de Red: Es el primer paquete LoRa. Envia un cero para establecer la conexion con la red LoRaWAN.
 void pdr_function() {
-  static char uncero[1] = {0};
+  static uint32_t last_wait_tick_ms = 0;
 
   if (nodo.pdr_ok == 0) {
     if (nodo.t_wait == 0) {
-      if (!isSendPackageAckAsyncWaiting()) {
-        sendPackageAckAsyncStart(uncero, 1, 0);
-      }
-
-      int8_t ackStatus = sendPackageAckAsyncPoll();
-      if (ackStatus == 2) return; //seguimos esperando ACK sin bloquear
-
-      if (ackStatus == 1) {        //si llega el ACK se pone en 1 y entra al if
+      last_wait_tick_ms = millis();
+      char uncero[1] = {0};
+      if (sendPackage(uncero, 1, espera_ACK, 0)) {        //si llega el ACK se pone en 1 y entra al if
         nodo.pdr_ok = 1;
         nodo.t_wait = random_time(0,MAX_RANDOM_LARGO);
         nodo.pausa_larga = 0;
@@ -102,7 +97,7 @@ void pdr_function() {
         nodo.cont_reintento_corto = 0;
         Serial.println("-->PRUEBA DE RED: OK");
       }
-      else if (ackStatus == -1) {
+      else {
         nodo.pdr_ok = 0;
         nodo.cont_reintento_corto++;
         if (nodo.cont_reintento_corto >= MAX_REINTENTOS) {
@@ -117,6 +112,7 @@ void pdr_function() {
           Serial.println("-->Cant Max de reintentos para PDR excedido, pausa larga");
           
           Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
+          last_wait_tick_ms = millis();
           
         }
         else {
@@ -124,15 +120,23 @@ void pdr_function() {
           Serial.println("-->PRUEBA DE RED: FALLO");
           
           Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
+          last_wait_tick_ms = millis();
           
         }
-      } else {
-        //si no hay envio activo todavia, esperamos al siguiente tick para volver a iniciar/pollear
-        return;
       }
     }
     else if (nodo.t_wait > 0) { //tiempo de espera 
-      nodo.t_wait--; //t_pdr corre cada 1 segundo, asi que el decremento es en segundos reales
+      uint32_t now_ms = millis();
+      uint32_t elapsed_ms = now_ms - last_wait_tick_ms;
+      if (elapsed_ms >= 1000) {
+        uint32_t elapsed_s = elapsed_ms / 1000;
+        if (elapsed_s >= (uint32_t)nodo.t_wait) {
+          nodo.t_wait = 0;
+        } else {
+          nodo.t_wait -= (int32_t)elapsed_s;
+        }
+        last_wait_tick_ms += elapsed_s * 1000;
+      }
     }
   }
 }

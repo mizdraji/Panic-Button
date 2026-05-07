@@ -21,9 +21,55 @@
 
 SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
 
+#if DEBUG_LORA_RX
+static void printLoraRaw(const char *buf, uint8_t status) {
+  Serial.print("LORA RAW status=");
+  Serial.print(status);
+  Serial.print(" data=<");
+  for (uint8_t i = 0; i < INPUTBUFF && buf[i] != '\0'; i++) {
+    char c = buf[i];
+    if (c == '\r') Serial.print("\\r");
+    else if (c == '\n') Serial.print("\\n");
+    else if (isPrintable(c)) Serial.print(c);
+    else {
+      Serial.print("\\x");
+      if ((uint8_t)c < 16) Serial.print("0");
+      Serial.print((uint8_t)c, HEX);
+    }
+  }
+  Serial.println(">");
+}
+#endif
+
+static bool isValidLoraPayload(const char *buf) {
+  if (buf == NULL) return false;
+  if (buf[0] != 'L') return false;
+
+  const char *comma = strrchr(buf, ',');
+  if (comma == NULL) return false;
+
+  const char *p = comma + 1;
+  while (*p == ' ' || *p == '\t') p++;
+  if (*p == '\0') return false;
+
+  bool hasDigit = false;
+  while (*p != '\0') {
+    if (isdigit((unsigned char)*p)) hasDigit = true;
+    else if (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n') return false;
+    p++;
+  }
+  return hasDigit;
+}
+
 void setup() {                              
   SIM800L.begin(SERIAL_SIM);
   Serial.begin(SERIAL_SPEED);
+  Serial.println("FW DBG RX build activo");
+#if DEBUG_LORA_RX
+  Serial.println("DEBUG_LORA_RX=1");
+#else
+  Serial.println("DEBUG_LORA_RX=0");
+#endif
 
   delay(3000);                              //falta crear variable para initial random time
   config_pines();
@@ -63,7 +109,7 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);            //habilita interrupcion pulsador1 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button2), buttonInterrupt2, RISING);            //habilita interrupcion pulsador2 con flanco ascendente
   attachInterrupt(digitalPinToInterrupt(button3), buttonInterrupt3, RISING);            //habilita interrupcion pulsador3 con flanco ascendente
-  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive, CHANGE);                       //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
+  attachInterrupt(digitalPinToInterrupt(RFM_pins.DIO0), onReceive, RISING);                       //habilita interrupciones para mensajes recibidos lora, se utiliza CHANGE para cuando la señal cambia HIGH <-->LOW. Con RISING se generan multiples interrupciones.
 
   uint64_t mask = (1ULL << GPIO_NUM_39) | (1ULL << GPIO_NUM_38) | (1ULL << GPIO_NUM_36);// | (1ULL << GPIO_NUM_13); //Comentar la ultima condición para hacer pruebas mientras esta conectado.
   esp_sleep_enable_ext1_wakeup(mask, ESP_EXT1_WAKEUP_ANY_HIGH);
@@ -73,6 +119,8 @@ void setup() {
 }
 
 void loop() {      
+  static uint32_t last_lora_poll_ms = 0;
+
   if(SIM800L.available()) {
     while(SIM800L.available()>0) {
       String mensaje_recibido = SIM800L.readString();
@@ -109,7 +157,40 @@ void loop() {
   if (SIM800L.available() || (digitalRead(button1) || digitalRead(button2) || digitalRead(button3)) == HIGH) timer = 0;     //si se produce una interrupcion resetear contador timer para no entrar al modo sleep
   
   lora.update();                     //actualización lora
-  if(recvStatus) {
+  bool do_lora_read = false;
+  bool by_irq = false;
+
+  if (lora_irq_pending) {
+    lora_irq_pending = false;
+    do_lora_read = true;
+    by_irq = true;
+  } else if ((millis() - last_lora_poll_ms) >= 100) {
+    // respaldo: consultar RX periodicamente por si se pierde la interrupcion DIO0
+    do_lora_read = true;
+  }
+
+  if (do_lora_read) {
+    last_lora_poll_ms = millis();
+    recvStatus = lora.readData(datoEntrante);
+#if DEBUG_LORA_RX
+    if (recvStatus > 0) {
+      if (by_irq) Serial.println("IRQ LORA");
+      else Serial.println("POLL LORA RX");
+      printLoraRaw(datoEntrante, recvStatus);
+    }
+#endif
+  }
+
+  if(recvStatus > 1) {
+    if (!isValidLoraPayload(datoEntrante)) {
+#if DEBUG_LORA_RX
+      Serial.println("LORA descartado (trama no valida para app)");
+#endif
+      memset(datoEntrante, 0, sizeof(datoEntrante));
+      recvStatus = 0;
+      return;
+    }
+
     //lorarcv = false;
     //lora.readData(datoEntrante);
     Serial.print("====>> ");
@@ -124,19 +205,22 @@ void loop() {
       //Serial.print("====>> ");
       //Serial.println(datoEntrante);
       uint32_t numrcv = extraer_numero(datoEntrante);
-      if(strncmp(datoEntrante,  atendidorcv_lora, strlen(atendidorcv_lora)) == 0 && 
+      if(strstr(datoEntrante, atendidorcv_lora) != NULL && 
         numrcv == numsnt) t_atendido.enable();                                                              //se ejecuta task de atendido
       
-      if((strncmp(datoEntrante, policiarcv_lora,  strlen(policiarcv_lora))  == 0  ||                          //busca policiarcv_lora en los primeros lugares de datoEntrante, 
-        strncmp(datoEntrante, bomberosrcv_lora, strlen(bomberosrcv_lora)) == 0  ||                          //si encuentra la palabra buscada devuelve un 0.
-        strncmp(datoEntrante, medicarcv_lora,   strlen(medicarcv_lora))   == 0) && 
+      if((strstr(datoEntrante, policiarcv_lora)  != NULL  || 
+        strstr(datoEntrante, bomberosrcv_lora) != NULL  || 
+        strstr(datoEntrante, medicarcv_lora)   != NULL) && 
         numrcv == numsnt && checknum == false ) {
         checknum = true;
        //Serial.println("Recibi primero LORA");
        t_recibido.enable();                                                 //se ejecuta task de recibido
       }
-      if(strncmp(datoEntrante, informadorcv_lora, strlen(informadorcv_lora)) == 0 && 
+      if(strstr(datoEntrante, informadorcv_lora) != NULL && 
         numrcv == numsnt) {
+#if DEBUG_LORA_RX
+        Serial.println("MATCH informado LORA");
+#endif
         //t_apagarLED.enable();                                                       //se ejecuta task de informado
         //t_apagarLED.delay(delay_apagarLED);
         Tinformadorcv_Led.enable(); 
@@ -144,6 +228,11 @@ void loop() {
     //}
     memset(datoEntrante, 0, sizeof(datoEntrante));
   }
+#if DEBUG_LORA_RX
+  else if (recvStatus == 1) {
+    Serial.println("LORA CTRL frame (sin payload)");
+  }
+#endif
   recvStatus = 0;
 }
 

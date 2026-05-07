@@ -12,6 +12,7 @@
 #define DEFAULT_SF      SF7BW125               // Set Data Rate
 #define DEBUG           0 
 #define dbspk           1                      //lora send pakage
+#define DEBUG_LORA_RX   1                      //logs minimos para diagnostico de recepcion lora
 #define FORCE_FIXED_SF_TEST 0                  //1=fijar SF para ensayos, 0=logica normal/adaptativa
 #define FIXED_SF_INDEX  0                      //0:SF7, 1:SF8, 2:SF9, 3:SF10
 
@@ -38,11 +39,11 @@ remitente numero;
 //mensajes msj;
 
 //mensajes para enviar y recibir por lora
-  char policia_lora[]     = "Lpolicia";       //mensaje1 para enviar por lora.
-  char bomberos_lora[]    = "Lbomberos";      //mensaje1 para enviar por lora.
-  char medica_lora[]      = "Lmedica";        //mensaje1 para enviar por lora.
-  char policiarcv_lora[]  = "Lpoliciarcv";    //policia recibido por lora confirmacion - enviado de servidor de forma automática.
-  char bomberosrcv_lora[] = "Lbomberosrcv";   //bomberos recibido por lora confirmacion - enviado de servidor de forma automática.
-  char medicarcv_lora[]   = "Lmedicarcv";     //medica recibido por lora confirmacion - enviado de servidor de forma automática.
-  char atendidorcv_lora[] = "Latendidorcv";   //Respuesta por lora de operario, alerta atendida - enviado por operario de forma manual.
-  char informadorcv_lora[]= "Linformadorcv";  //Respuesta por lora de operario Informadorcv cuando se da aviso a la autoridad correspondiente
+  char policia_lora[]     = "Lp";             //envio: policia
+  char bomberos_lora[]    = "Lb";             //envio: bomberos
+  char medica_lora[]      = "Lm";             //envio: medica
+  char policiarcv_lora[]  = "Lpr";            //rx: policia recibido
+  char bomberosrcv_lora[] = "Lbr";            //rx: bomberos recibido
+  char medicarcv_lora[]   = "Lmr";            //rx: medica recibido
+  char atendidorcv_lora[] = "Lar";            //rx: atendido recibido
+  char informadorcv_lora[]= "Lir";            //rx: informado recibido
