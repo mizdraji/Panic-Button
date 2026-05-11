@@ -252,3 +252,69 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
 
   }
 }
+
+// --- Recepcion LoRa: validacion de payload y log de depuracion (DEBUG_LORA_RX) ---
+
+bool isValidLoraPayload(const char *buf) {
+  if (buf == NULL) return false;
+  if (buf[0] != 'L') return false;
+
+  const char *comma = strrchr(buf, ',');
+  if (comma == NULL) return false;
+
+  const char *p = comma + 1;
+  while (*p == ' ' || *p == '\t') p++;
+  if (*p == '\0') return false;
+
+  bool hasDigit = false;
+  while (*p != '\0') {
+    if (isdigit((unsigned char)*p)) hasDigit = true;
+    else if (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n') return false;
+    p++;
+  }
+  return hasDigit;
+}
+
+#if DEBUG_LORA_RX
+static void loraRxPrintRaw(const char *buf, uint8_t status) {
+  Serial.print("LORA RAW status=");
+  Serial.print(status);
+  Serial.print(" data=<");
+  for (uint8_t i = 0; i < INPUTBUFF && buf[i] != '\0'; i++) {
+    char c = buf[i];
+    if (c == '\r') Serial.print("\\r");
+    else if (c == '\n') Serial.print("\\n");
+    else if (isPrintable(c)) Serial.print(c);
+    else {
+      Serial.print("\\x");
+      if ((uint8_t)c < 16) Serial.print("0");
+      Serial.print((uint8_t)c, HEX);
+    }
+  }
+  Serial.println(">");
+}
+#endif
+
+void loraRxDebugAfterRead(const char *buf, uint8_t status, bool by_irq) {
+#if DEBUG_LORA_RX
+  if (status > 0) {
+    if (by_irq) Serial.println("IRQ LORA");
+    else Serial.println("POLL LORA RX");
+    loraRxPrintRaw(buf, status);
+  }
+#else
+  (void)buf;
+  (void)status;
+  (void)by_irq;
+#endif
+}
+
+void loraRxDebugCtrlFrame(uint8_t status) {
+#if DEBUG_LORA_RX
+  if (status == 1) {
+    Serial.println("LORA CTRL frame (sin payload)");
+  }
+#else
+  (void)status;
+#endif
+}

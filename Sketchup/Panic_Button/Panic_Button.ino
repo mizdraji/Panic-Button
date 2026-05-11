@@ -1,11 +1,10 @@
-/*Detalle de versiones:
-* V1.8.7:
-* Se agrega modo sleep para el sim800. 
-* Se agregan las funciones dormirSIM800 y despertarSIM800.
-* Se hacen modificaciones con respecto a como se administra la interrupción de lora.
-* Se cambia de lugar el lora.update() porque habia un BUG que mostraba el mensaje anterior recibido debido a que el buffer no se actualizaba en el tiempo correcto.
-* Se retira todo el código viejo que correspondia al uso de 2 cores.
-*/
+/* Detalle de versiones
+ * V1.8.8:
+ *   PDR con TaskScheduler y ACK async; recepcion LoRa sin readData en ISR; poll RX de respaldo.
+ *   Parser numeros tolerante; tokens LoRa compactos (Lp/Lpr/Lar/Lir); modo ensayo SMS+LoRa.
+ *   SF test opcional (FORCE_FIXED_SF_TEST); documentacion en docs/.
+ *   Helpers de RX/depuracion en LoraTec (isValidLoraPayload, loraRxDebug*); pragma once en configuracion.h.
+ */
 
 //librerias utilizadas
 #define _TASK_PRIORITY
@@ -20,46 +19,6 @@
 #include <SoftwareSerial.h>         //Libreria para definir tx y rx de sim800
 
 SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
-
-#if DEBUG_LORA_RX
-static void printLoraRaw(const char *buf, uint8_t status) {
-  Serial.print("LORA RAW status=");
-  Serial.print(status);
-  Serial.print(" data=<");
-  for (uint8_t i = 0; i < INPUTBUFF && buf[i] != '\0'; i++) {
-    char c = buf[i];
-    if (c == '\r') Serial.print("\\r");
-    else if (c == '\n') Serial.print("\\n");
-    else if (isPrintable(c)) Serial.print(c);
-    else {
-      Serial.print("\\x");
-      if ((uint8_t)c < 16) Serial.print("0");
-      Serial.print((uint8_t)c, HEX);
-    }
-  }
-  Serial.println(">");
-}
-#endif
-
-static bool isValidLoraPayload(const char *buf) {
-  if (buf == NULL) return false;
-  if (buf[0] != 'L') return false;
-
-  const char *comma = strrchr(buf, ',');
-  if (comma == NULL) return false;
-
-  const char *p = comma + 1;
-  while (*p == ' ' || *p == '\t') p++;
-  if (*p == '\0') return false;
-
-  bool hasDigit = false;
-  while (*p != '\0') {
-    if (isdigit((unsigned char)*p)) hasDigit = true;
-    else if (*p != ' ' && *p != '\t' && *p != '\r' && *p != '\n') return false;
-    p++;
-  }
-  return hasDigit;
-}
 
 void setup() {                              
   SIM800L.begin(SERIAL_SIM);
@@ -165,13 +124,7 @@ void loop() {
   if (do_lora_read) {
     last_lora_poll_ms = millis();
     recvStatus = lora.readData(datoEntrante);
-#if DEBUG_LORA_RX
-    if (recvStatus > 0) {
-      if (by_irq) Serial.println("IRQ LORA");
-      else Serial.println("POLL LORA RX");
-      printLoraRaw(datoEntrante, recvStatus);
-    }
-#endif
+    loraRxDebugAfterRead(datoEntrante, recvStatus, by_irq);
   }
 
   if(recvStatus > 1) {
@@ -208,11 +161,7 @@ void loop() {
       }
     memset(datoEntrante, 0, sizeof(datoEntrante));
   }
-#if DEBUG_LORA_RX
-  else if (recvStatus == 1) {
-    Serial.println("LORA CTRL frame (sin payload)");
-  }
-#endif
+  loraRxDebugCtrlFrame(recvStatus);
   recvStatus = 0;
 }
 

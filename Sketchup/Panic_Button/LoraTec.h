@@ -15,3 +15,8 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type,  bool ca
 uint8_t sendPackageAckAsyncStart(char *data_to_send, uint8_t len, bool canal_por_defecto);
 int8_t sendPackageAckAsyncPoll();
 bool isSendPackageAckAsyncWaiting();
+
+// Recepcion / depuracion (usa DEBUG_LORA_RX en configuracion.h)
+bool isValidLoraPayload(const char *buf);
+void loraRxDebugAfterRead(const char *buf, uint8_t status, bool by_irq);
+void loraRxDebugCtrlFrame(uint8_t status);
