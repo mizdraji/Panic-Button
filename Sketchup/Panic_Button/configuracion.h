@@ -20,9 +20,10 @@
 #define FIXED_SF_INDEX  0                      //0:SF7, 1:SF8, 2:SF9, 3:SF10
 
 //configuracion ensayo
-#define MODO_ENSAYO      1                      //1 = habilita modo ensayo, 0 = modo normal
-#define ENSAYO_INTERVALO_MS 300000UL            //5 minutos
-#define ENSAYO_DURACION_HS 24UL                 //48 horas - 24 horas
+#define MODO_ENSAYO      1                       //1 = habilita modo ensayo, 0 = modo normal
+#define ENSAYO_INCLUIR_SMS  1                    //1 = incluye SMS en el ensayo, 0 = solo LoRa  
+#define ENSAYO_INTERVALO_MS 300000UL             //5 minutos
+#define ENSAYO_DURACION_HS 24UL                  //48 horas - 24 horas
 #define ENSAYO_TOTAL_MENSAJES ((ENSAYO_DURACION_HS * 60UL * 60UL * 1000UL) / ENSAYO_INTERVALO_MS) //576 mensajes - 288 mensajes
 
 //configuracion GSM numeros de remitentes

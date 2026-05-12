@@ -235,8 +235,8 @@ void informado_led() {
   }
 }
 
-// Modo ensayo: envia cada 5 minutos por SMS y LoRa
-// Formato payload: "Ens,<contador>,<timestamp_ms>"
+// Modo ensayo: cada ENSAYO_INTERVALO_MS segun ENSAYO_INCLUIR_SMS (solo LoRa o SMS+LoRa).
+// SMS formato: "Ens,<contador>,<timestamp_ms>"
 void ensayoTask() {
   if (ensayo_counter >= ENSAYO_TOTAL_MENSAJES) {
     Serial.println("ENSAYO finalizado: total de mensajes alcanzado");
@@ -246,9 +246,10 @@ void ensayoTask() {
 
   ensayo_counter++;
   uint32_t ts_ms = millis();
+#if ENSAYO_INCLUIR_SMS
   String payload = "Ens," + String(ensayo_counter) + "," + String(ts_ms);
-
   Enviar_msj(numero.Remitente2, payload);
+#endif
 
   char payload_lora[64];
   snprintf(payload_lora, sizeof(payload_lora), "Le,%u,%lu", (unsigned int)ensayo_counter, (unsigned long)ts_ms);

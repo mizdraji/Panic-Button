@@ -1,7 +1,7 @@
 /* Detalle de versiones
  * V1.8.8:
  *   PDR con TaskScheduler y ACK async; recepcion LoRa sin readData en ISR; poll RX de respaldo.
- *   Parser numeros tolerante; tokens LoRa compactos (Lp/Lpr/Lar/Lir); modo ensayo SMS+LoRa.
+ *   Parser numeros tolerante; tokens LoRa compactos (Lp/Lpr/Lar/Lir); modo ensayo (LoRa; SMS opcional ENSAYO_INCLUIR_SMS).
  *   SF test opcional (FORCE_FIXED_SF_TEST); documentacion en docs/.
  *   Helpers de RX/depuracion en LoraTec (isValidLoraPayload, loraRxDebug*); pragma once en configuracion.h.
  */
@@ -60,6 +60,11 @@ void setup() {
   t_ensayo.enable();
   Serial.print("MODO ENSAYO activo. Total mensajes: ");
   Serial.println((unsigned long)ENSAYO_TOTAL_MENSAJES);
+#if ENSAYO_INCLUIR_SMS
+  Serial.println("Ensayo: SMS + LoRa por tick");
+#else
+  Serial.println("Ensayo: solo LoRa por tick");
+#endif
 #endif
 
   //config interrupt

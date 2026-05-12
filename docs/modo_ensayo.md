@@ -1,8 +1,8 @@
-# Modo Ensayo (SMS + LoRa)
+# Modo Ensayo (LoRa y opcionalmente SMS)
 
 ## Objetivo
 
-El modo ensayo envia un mensaje periodico por **SMS y LoRa** al mismo tiempo, para medir:
+El modo ensayo envia un mensaje periodico por **LoRa** y, si se configura, tambien por **SMS** en el mismo instante, para medir:
 
 - tasa de entrega,
 - latencia de cada canal,
@@ -15,6 +15,9 @@ En `Sketchup/Panic_Button/configuracion.h`:
 - `MODO_ENSAYO`
   - `0`: modo normal
   - `1`: habilita modo ensayo
+- `ENSAYO_INCLUIR_SMS`
+  - `0`: en cada tick solo se envia **LoRa** (`Le,...`)
+  - `1`: en cada tick se envian **SMS y LoRa** a la vez (`Ens,...` y `Le,...`)
 - `ENSAYO_INTERVALO_MS`
   - intervalo entre envios en ms
   - valor actual: `300000` (5 minutos)
@@ -49,13 +52,14 @@ Ejemplo:
 ## Comportamiento
 
 - El contador arranca en `1`.
-- Se envia cada 5 minutos.
+- Se envia cada 5 minutos (o el valor de `ENSAYO_INTERVALO_MS`).
+- Con `ENSAYO_INCLUIR_SMS 1`, SMS y LoRa salen en el mismo tick; con `0`, solo LoRa.
 - Al llegar a `576`, la tarea se deshabilita automaticamente.
 - Durante el ensayo se resetea `timer` para evitar sleep.
 
 ## Activar / desactivar
 
-1. Editar `MODO_ENSAYO` en `configuracion.h`.
+1. Editar `MODO_ENSAYO` y opcionalmente `ENSAYO_INCLUIR_SMS` en `configuracion.h`.
 2. Compilar y cargar firmware.
 3. Para volver a operacion normal, dejar `MODO_ENSAYO 0`.
 
