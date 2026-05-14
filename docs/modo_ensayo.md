@@ -19,8 +19,8 @@ En `Sketchup/Panic_Button/configuracion.h`:
   - `0`: en cada tick solo se envia **LoRa** (`Le,...`)
   - `1`: en cada tick se envian **SMS y LoRa** a la vez (`Ens,...` y `Le,...`)
 - `ENSAYO_INTERVALO_MS`
-  - intervalo entre envios en ms
-  - valor actual: `300000` (5 minutos)
+  - intervalo entre envios en ms (lo usa el programador de tareas `t_ensayo` y el calculo de `ENSAYO_TOTAL_MENSAJES`)
+  - valor de ejemplo: `300000` (5 minutos)
 - `ENSAYO_DURACION_HS`
   - duracion total del ensayo
   - valor actual: `48` horas

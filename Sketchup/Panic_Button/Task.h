@@ -101,7 +101,7 @@ Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
 Task ADCpower(30000, TASK_FOREVER, &powerON, &taskManager);                  //se ejecuta cada 10 segundos para verificar si esta cargando con usb
 
 Task Tinformadorcv_Led(500, TASK_FOREVER, &informado_led, &taskManager);    //Tarea para secuencia led cuando se recibe informadorcv
-Task t_ensayo(300000, TASK_FOREVER, &ensayoTask, &taskManager);              //Ensayo periodico (intervalo en .cpp; SMS segun ENSAYO_INCLUIR_SMS)
+Task t_ensayo(ENSAYO_INTERVALO_MS, TASK_FOREVER, &ensayoTask, &taskManager);  //intervalo: configuracion.h ENSAYO_INTERVALO_MS; SMS segun ENSAYO_INCLUIR_SMS
 
 Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
 Task SleepSIM(1000, TASK_FOREVER, &dormirSIM800, &taskManager);

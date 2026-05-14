@@ -2,6 +2,8 @@
 
 ## Configuracion LoRa/LoRaWAN actual del firmware
 
+La banda activa en la libreria Beelan esta en `libraries/Beelan_LoRaWAN-1.5.3/src/arduino-rfm/Config.h` (**`AU_915`**).
+
 ### 1) Tipo de activacion y credenciales
 
 - Activacion: **ABP**.
@@ -35,13 +37,15 @@
   - En inicializacion, con `RANDOM_CHANNEL=1`, se usa `MULTI`.
   - Si una llamada usa `canal_por_defecto=true`, fuerza `DEFAULT_CHANNEL` (`CH0`).
 
-### 5) Data rate / Spreading Factor
+### 5) Data rate / Spreading Factor (AU915, Beelan)
 
 - `DEFAULT_SF = SF7BW125`
-- Vector de SF disponible:
+- En **AU915** esta libreria solo expone **SF7..SF10 con BW125** para uplink (ver `Struct.h`); no existen `SF11BW125` / `SF12BW125` en el enum.
+- Vector usado en firmware (escalera de mas corto a mas largo alcance en 125 kHz):
   - `SFvector = { SF7BW125, SF8BW125, SF9BW125, SF10BW125 }`
-- Límite de prueba adaptativa actual:
-  - `MAX_SF = 2` => prueba hasta indice 2 (SF9).
+- Limite adaptativo:
+  - `MAX_SF` se deriva del tamano del vector (ultimo indice = SF10BW125).
+- Otros DR del enum (p. ej. `SF8BW500`, `SF12BW500`) son **500 kHz**; no estan en `SFvector` actual.
 - Reintentos por SF antes de avanzar:
   - `MAX_RETRY_SAME_SF = 2`
 
@@ -77,11 +81,8 @@ En `Sketchup/Panic_Button/configuracion.h`:
 - `FORCE_FIXED_SF_TEST`
   - `0`: modo normal (logica adaptativa)
   - `1`: fuerza SF fijo de prueba
-- `FIXED_SF_INDEX`
-  - `0` => SF7
-  - `1` => SF8
-  - `2` => SF9
-  - `3` => SF10
+- `FIXED_SF_INDEX` (indice en `SFvector`, AU915 125 kHz)
+  - `0` => SF7, `1` => SF8, `2` => SF9, `3` => SF10
 
 ### Como usarlo
 
@@ -91,7 +92,7 @@ En `Sketchup/Panic_Button/configuracion.h`:
 4. Compilar y cargar firmware.
 5. Verificar en monitor serie el log:
    - `-->SF FIJO TEST: X`
-6. Repetir para cada SF (0,1,2,3) y comparar resultados.
+6. Repetir para cada SF (0..3) y comparar resultados.
 7. Al terminar ensayos, volver a:
    - `FORCE_FIXED_SF_TEST 0`
 

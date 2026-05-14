@@ -1,7 +1,14 @@
-#define MAX_SF 2                  //Se refiere a la posicion dentro del vector de SF, es decir el maximo sera: SF9
 #define MAX_RETRY_SAME_SF 2
 
-const unsigned char SFvector[4] = { SF7BW125, SF8BW125, SF9BW125, SF10BW125 }; //toma solamente hasta los primeros 4 SF
+// AU915 / US915 (Beelan `dataRates_t` en Struct.h): uplinks 125 kHz solo SF7..SF10
+// (no hay SF11BW125/SF12BW125 en esta banda en la libreria; DR mas lento 125 kHz = SF10).
+// Escalera adaptativa: de SF7 (menos alcance / mas rapido) hacia SF10 (maximo alcance 125 kHz).
+// MAX_SF = ultimo indice valido; alinear FIXED_SF_INDEX en configuracion.h.
+const unsigned char SFvector[] = {
+  SF7BW125, SF8BW125, SF9BW125, SF10BW125
+};
+#define SF_VECTOR_COUNT ((uint8_t)(sizeof(SFvector) / sizeof(SFvector[0])))
+#define MAX_SF          ((uint8_t)(SF_VECTOR_COUNT - 1u))
 uint8_t SF_actual    = 0;            //para saber cual se esta usando
 uint8_t SF_is_set    = 0;            //para saber si esta seteado el SF
 uint8_t SF_index     = 0;             //para movernos dentro del vector
@@ -22,7 +29,7 @@ static void configureAndSendUplink(char *data_to_send, uint8_t len, bool canal_p
   
   if (FORCE_FIXED_SF_TEST) {
     uint8_t sf_fixed = FIXED_SF_INDEX;
-    if (sf_fixed > 3) sf_fixed = 3;
+    if (sf_fixed > MAX_SF) sf_fixed = MAX_SF;
     lora.setDataRate(SFvector[sf_fixed]);
     SF_actual = sf_fixed;
     SF_is_set = 1;
