@@ -16,11 +16,11 @@
 #define DEBUG           0 
 #define dbspk           1                      //lora send pakage
 #define DEBUG_LORA_RX   0                      //1=diagnostico RX LoRa, 0=normal
-#define FORCE_FIXED_SF_TEST 1                  //1=fijar SF para ensayos, 0=logica normal/adaptativa
+#define FORCE_FIXED_SF_TEST 0                  //1=fijar SF para ensayos, 0=logica normal/adaptativa
 #define FIXED_SF_INDEX  0                      //AU915: indice en SFvector: 0=SF7, 1=SF8, 2=SF9, 3=SF10 (max 125 kHz)
 
 //configuracion ensayo
-#define MODO_ENSAYO      1                       //1 = habilita modo ensayo, 0 = modo normal
+#define MODO_ENSAYO      0                       //1 = habilita modo ensayo, 0 = modo normal
 #define ENSAYO_INCLUIR_SMS  0                    //1 = incluye SMS en el ensayo, 0 = solo LoRa  
 #define ENSAYO_INTERVALO_MS 42000UL             //5 minutos = 300000UL
 #define ENSAYO_DURACION_HS 1UL                  //48 horas - 24 horas
