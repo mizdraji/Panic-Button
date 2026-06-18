@@ -14,7 +14,7 @@ bool LED_state2 = LOW;
 
 //variables para deepsleep
 uint8_t timer = 0;        //contador de tiempo
-#define tiempo 120         //tiempo de espera para iniciar deepsleep
+#define tiempo 20         //tiempo de espera para iniciar deepsleep
 
 //estados de los pulsadores
 bool statebutton1 = false;         //monitorea el estado del button1 en pin 37

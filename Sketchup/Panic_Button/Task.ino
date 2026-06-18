@@ -87,20 +87,14 @@ void buttonTask1() {
 //TASK6: interrupcion por pulsador button2
 void buttonTask2() {
   if(!bloqueo) {
+    encenderLED(led2);
+
     idempotencia = idempotencia_random();
     numsnt = idempotencia.toInt();
     checknum = false;
-    String mensaje_saliente = bomberos + ", " + idempotencia;
-    //Enviar_msj(numero.Remitente2, msj.bomberos);          //SMS
-    Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
     
-    char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", bomberos_lora, idempotencia.c_str());                 //Concatena "bomberos" e "idempotencia" con una coma
-    Serial.print("LORA TX -> ");
-    Serial.println(mensaje_saliente_lora);
-    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-
-    encenderLED(led2);
+    String mensaje_saliente = bomberos + ", " + idempotencia;
+    Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
     
     statebutton2 = false;           // Reinicia el estado del pulsador
     t6.disable();
@@ -113,21 +107,21 @@ void buttonTask2() {
 //TASK7: interrupcion por pulsador button3
 void buttonTask3() {
   if(!bloqueo) {
+    encenderLED(led3);
+
     idempotencia = idempotencia_random();
     numsnt = idempotencia.toInt();
     checknum = false;
-    String mensaje_saliente = medica + ", " + idempotencia;
-    //Enviar_msj(numero.Remitente2, msj.medica);            //SMS
-    Enviar_msj(numero.Remitente2, mensaje_saliente);        //SMS
 
     char mensaje_saliente_lora[50];
     sprintf(mensaje_saliente_lora, "%s, %s", medica_lora, idempotencia.c_str());                 //Concatena "media" e "idempotencia" con una coma
     Serial.print("LORA TX -> ");
     Serial.println(mensaje_saliente_lora);
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-
-    encenderLED(led3);
     
+    String mensaje_saliente = medica + ", " + idempotencia;
+    Enviar_msj(numero.Remitente2, mensaje_saliente);        //SMS
+        
     statebutton3 = false;           // Reinicia el estado del pulsador
     t7.disable();
 
@@ -191,7 +185,7 @@ void powerON () {
   if(analogRead(ADC_powerON) > ADC_powerON_value) {         //USB CONECTADO
     digitalWrite(led_powerON, HIGH);
     t2.disable();
-    timer = 0;                                              //Resetea el timer cuando el USB esta conectado para no entrar a modo sleep.
+    //timer = 0;                                              //Resetea el timer cuando el USB esta conectado para no entrar a modo sleep.
   }  
   else t2.enable();                                         //USB DESCONECTADO
 }
@@ -246,16 +240,17 @@ void ensayoTask() {
 
   ensayo_counter++;
   uint32_t ts_ms = millis();
-#if ENSAYO_INCLUIR_SMS
-  String payload = "Ens," + String(ensayo_counter) + "," + String(ts_ms);
-  Enviar_msj(numero.Remitente2, payload);
-#endif
 
   char payload_lora[64];
   snprintf(payload_lora, sizeof(payload_lora), "Le,%u,%lu", (unsigned int)ensayo_counter, (unsigned long)ts_ms);
   Serial.print("ENSAYO TX -> ");
   Serial.println(payload_lora);
   sendPackage(payload_lora, strlen(payload_lora), no_espera_ACK, 1);
+
+  #if ENSAYO_INCLUIR_SMS
+    String payload = "Ens," + String(ensayo_counter) + "," + String(ts_ms);
+    Enviar_msj(numero.Remitente2, payload);
+  #endif
 
   timer = 0; //evita entrar en sleep durante el ensayo
 }
@@ -275,10 +270,11 @@ void Sleeping_init(){
 
 
 void dormirSIM800() {
-  //digitalWrite(DTR, HIGH);                //DTR HIGH -> DORMIR
+  digitalWrite(DTR, HIGH);                //DTR HIGH -> DORMIR
   Serial.println("sleep now");
+  delay(100);
   //SIM800L.print("AT+CFUN=0\r\n");       // = 0 Minimum functionality - Este comando se usa para reducir aun mas el consumo
-  //delay(100);
+  
   SIM800L.print("AT+CSCLK=1\r\n");        //= 1 Dormir
   
   SleepSIM.disable();
@@ -287,10 +283,12 @@ void dormirSIM800() {
 }
 
 void despertarSIM800L() {
-  //digitalWrite(DTR, LOW);               //DTR LOW -> DESPIERTA
-  //SIM800L.print("AT+CFUN=1\r\n");     // = 1 Full functionality (Default) - Este comando se usa para reducir aun mas el consumo
-  //delay(10000);
-  SIM800L.print("AT+CSCLK=0\r\n");      //= 0 Despierta
+  digitalWrite(DTR, LOW);               //DTR LOW -> DESPIERTA
   Serial.println("wake up");
+  delay(100);
+  //SIM800L.print("AT+CFUN=1\r\n");     // = 1 Full functionality (Default) - Este comando se usa para reducir aun mas el consumo
+  
+  SIM800L.print("AT+CSCLK=0\r\n");      //= 0 Despierta
+  
   delay(100);          // Esperar 100ms
 }

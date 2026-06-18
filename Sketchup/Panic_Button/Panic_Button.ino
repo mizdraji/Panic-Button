@@ -16,12 +16,11 @@
 #include "pinout.h"                 //libreria para asignacion de pines.
 #include "Hardware.h"
 #include "configuracion.h"
-#include <SoftwareSerial.h>         //Libreria para definir tx y rx de sim800
 
-SoftwareSerial SIM800L(RX, TX);              //RX y TX de heltec
+HardwareSerial SIM800L(2);      //UART2 HARDWARE
 
 void setup() {                              
-  SIM800L.begin(SERIAL_SIM);
+  SIM800L.begin(SERIAL_SIM, SERIAL_8N1, RX, TX);
   Serial.begin(SERIAL_SPEED);
 
   delay(3000);                              //falta crear variable para initial random time
@@ -88,11 +87,12 @@ void loop() {
       String mensaje_recibido = SIM800L.readString();
       uint32_t numrcv = extraer_numero(mensaje_recibido); 
       Serial.print(mensaje_recibido);
-    
+      /*    
       if(mensaje_recibido.indexOf("ERROR") != -1)  {
         Serial.println("Se recibio ERROR en SIM800, reiniciando...");
         ESP.restart();                                                                              //Reset en caso de que falle el SIM800
       }
+      */
 
       if (mensaje_recibido.indexOf(rcv_atendido)  != -1 && numrcv == numsnt) t_atendido.enable();    //se ejecuta task de atendido
       if ((mensaje_recibido.indexOf(rcv_policia)  != -1 || 
