@@ -36,6 +36,28 @@ const char htmlPage[] PROGMEM = R"rawliteral(
         input { width: 100%; padding: 8px; margin: 10px 0; border: 1px solid #ccc; border-radius: 5px; }
         button { background: #28a745; color: white; padding: 10px; border: none; border-radius: 5px; cursor: pointer; }
         button:hover { background: #218838; }
+
+        /* Estilo para la firma */
+        footer { 
+            margin-top: 30px; 
+            font-size: 16px; 
+            color: #333; 
+            text-align: center;
+            background-color: #f8f8f8;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+        }
+        
+        footer p {
+            margin: 0;
+            font-weight: bold;
+        }
+
+        footer .signature {
+            font-size: 14px;
+            color: #888;
+        }
     </style>
     <script>
         function saveData() {
@@ -58,6 +80,11 @@ const char htmlPage[] PROGMEM = R"rawliteral(
         <label>Medica: <input id="medical" type="text"></label><br>
         <button onclick="saveData()">Guardar</button>
     </div>
+    <!-- Firma personalizada -->
+        <footer>        
+        <p>Hecho por German Mizdraji</p>
+        <p class="signature">Proyecto Final de Carrera</p>
+    </footer>
 </body>
 </html>
 )rawliteral";

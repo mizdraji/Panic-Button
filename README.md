@@ -16,6 +16,7 @@
 * *****************************
 * GPIO16 RX SIM800L
 * GPIO17 TX SIM800L
+* GPIO21 DTR SIM800L (sleep/wake del modulo GSM)
 *******************************
 * GPIO36 button1 - pulsador con resistencia pull-down.
 * GPIO38 button2 - pulsador con resistencia pull-down.
@@ -31,6 +32,10 @@
 *******************************
 * GPIO13 ADC_powerON	- entrada ADC para medir alimentacion usb +5V.
 *******************************
+## ORDEN DE ENVIO (V1.8.9)
+Al presionar cualquier boton (policia, bomberos, medica) o en modo ensayo con SMS habilitado: **primero LoRa, luego SMS**.
+
+*******************************
 ## MENSAJES ENVIADOS SMS
 * String "policia"              //mensaje1 para enviar.
 * String "bomberos"             //mensaje2 para enviar.
@@ -45,15 +50,25 @@
 * String "cerradorcv"           //Es cuando se da por finalizada la alerta, pero puede pasar mucho tiempo. Todavia sin funcionalidad en el módulo.
 *******************************
 ## MENSAJES ENVIADOS LORA
-* char "Lpolicia"	- Base64: THBvbGljaWE=	//mensaje1 para enviar por lora.
-* char "Lbomberos"	- Base64: TGJvbWJlcm9z 	//mensaje1 para enviar por lora.
-* char "Lmedica"	- Base64: TG1lZGljYQ==	//mensaje1 para enviar por lora.
+Formato: `<token>, <idempotencia>` (tokens compactos desde V1.8.8).
+
+* char "Lp"   //policia
+* char "Lb"   //bomberos
+* char "Lm"   //medica
+* char "Le"   //modo ensayo (contador + timestamp)
 *****************************
 ## MENSAJES RECIBIDOS LORA
-* char "Lpoliciarcv"	- Base64: THBvbGljaWFyY3Y=	//policia recibido por lora confirmacion - enviado de servidor de forma automática.
-* char "Lbomberosrcv" 	- Base64: TGJvbWJlcm9zcmN2	//bomberos recibido por lora confirmacion - enviado de servidor de forma automática.
-* char "Lmedicarcv"		- Base64: TG1lZGljYXJjdg==	//medica recibido por lora confirmacion - enviado de servidor de forma automática.
-* char "Latendidorcv"	- Base64: TGF0ZW5kaWRvcmN2	//Respuesta por lora de operario, alerta atendida - enviado por operario de forma manual.
+* char "Lpr"  //policia recibido confirmacion - enviado de servidor de forma automatica.
+* char "Lbr"  //bomberos recibido confirmacion - enviado de servidor de forma automatica.
+* char "Lmr"  //medica recibido confirmacion - enviado de servidor de forma automatica.
+* char "Lar"  //Respuesta de operario, alerta atendida - enviado por operario de forma manual.
+* char "Lir"  //informadorcv cuando se da aviso a la autoridad correspondiente.
+***********************
+## COMUNICACION GSM
+* UART: **HardwareSerial UART2** (9600 baud, `SERIAL_8N1`) — reemplaza `SoftwareSerial` desde V1.8.9.
+* Sleep del SIM800: pin **DTR** (GPIO21) + comando `AT+CSCLK=1` antes de `esp_deep_sleep_start()`.
+* Wake: DTR en LOW + `AT+CSCLK=0` al despertar por boton o alimentacion.
+* Deep sleep: tras `tiempo` segundos sin actividad (`#define tiempo` en `Task.h`; **20 s en pruebas**, **120 s o mas en produccion**). Los botones GPIO36/38/39 despiertan el ESP32.
 ***********************
 * Full Document TaskScheduler:
 * https://github.com/arkhipenko/TaskScheduler/wiki/Full-Document

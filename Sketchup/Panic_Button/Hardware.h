@@ -22,6 +22,8 @@ void IRAM_ATTR buttonInterrupt1();
 void IRAM_ATTR buttonInterrupt2();
 void IRAM_ATTR buttonInterrupt3();
 void IRAM_ATTR onReceive();
+bool lorarcv = false;
+volatile bool lora_irq_pending = false;
 
 uint16_t random_time(unsigned int MIN_,unsigned int MAX_);
 uint32_t idempotencia_random();

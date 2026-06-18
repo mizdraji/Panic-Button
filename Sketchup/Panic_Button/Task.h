@@ -1,4 +1,5 @@
 #include "pinout.h"
+#include "configuracion.h"
 
 unsigned long previousMillis = 0;         // Variable para almacenar el tiempo anterior
 #define ledOnTime   200      // Tiempo de encendido en milisegundos (0.2 segundos)
@@ -13,7 +14,7 @@ bool LED_state2 = LOW;
 
 //variables para deepsleep
 uint8_t timer = 0;        //contador de tiempo
-#define tiempo 60         //tiempo en el que quiero que duerma en segundos
+#define tiempo 20         //tiempo de espera para iniciar deepsleep se usa 20 seg para pruebas, normalmente va 120 o mas
 
 //estados de los pulsadores
 bool statebutton1 = false;         //monitorea el estado del button1 en pin 37
@@ -45,6 +46,7 @@ Scheduler interrupt;
 void led_blink();
 void blinkstb();
 void loraSend();
+void pdr_function();
 void buttonTask1();       //button1 pin 37 policia
 void buttonTask2();       //button2 pin 38 bomberos
 void buttonTask3();       //button3 pin 39 ambulancia
@@ -58,7 +60,10 @@ void tatendido();
 void powerON();
 void unlock();
 void informado_led();
+void ensayoTask();
 void Sleeping_init();
+void dormirSIM800();
+void despertarSIM800L();
 
 
 //Tareas:
@@ -74,26 +79,31 @@ Task t2(500, TASK_FOREVER, &blinkstb, &taskManager);
 
 //TASK3: Envia paquete lora.
 //Task t3(5000, TASK_FOREVER, &loraSend, &taskManager);
+Task t_pdr(1000, TASK_FOREVER, &pdr_function, &taskManager);             //TASK PDR: prueba de red cada 1 segundo
 
 //TASK4: Envia mensaje sms.
 
 
-Task t5(100, TASK_FOREVER, &buttonTask1, &interrupt);                //TASK5: buttontask1                
-Task t6(100, TASK_FOREVER, &buttonTask2, &interrupt);                //TASK6: buttontask2          
-Task t7(100, TASK_FOREVER, &buttonTask3, &interrupt);                //TASK7: buttontask3     
+Task t5(500, TASK_FOREVER, &buttonTask1, &interrupt);                //TASK5: buttontask1                
+Task t6(500, TASK_FOREVER, &buttonTask2, &interrupt);                //TASK6: buttontask2          
+Task t7(500, TASK_FOREVER, &buttonTask3, &interrupt);                //TASK7: buttontask3     
 Task lock(3000, TASK_FOREVER, &unlock, &interrupt);                  //   
 
 //tareas para apagar leds:
-Task t_apagarLED(5000, TASK_FOREVER, &apagarLED, &taskManager);     //TASK apagar todos los leds
-Task t_apagarLED1(5000, TASK_FOREVER, &apagarLED1, &taskManager);   //TASK apaga led1
-Task t_apagarLED2(5000, TASK_FOREVER, &apagarLED2, &taskManager);   //TASK apaga led2
-Task t_apagarLED3(5000, TASK_FOREVER, &apagarLED3, &taskManager);   //TASK apaga led3
+Task t_apagarLED(5001, TASK_FOREVER, &apagarLED, &taskManager);     //TASK apagar todos los leds
+Task t_apagarLED1(5002, TASK_FOREVER, &apagarLED1, &taskManager);   //TASK apaga led1
+Task t_apagarLED2(5003, TASK_FOREVER, &apagarLED2, &taskManager);   //TASK apaga led2
+Task t_apagarLED3(5004, TASK_FOREVER, &apagarLED3, &taskManager);   //TASK apaga led3
 
 Task t_recibido(1000, TASK_FOREVER, &trecibido, &taskManager);
 Task t_atendido(1000, TASK_FOREVER, &tatendido, &taskManager);
 
-Task ADCpower(10000, TASK_FOREVER, &powerON, &taskManager);                  //se ejecuta cada 10 segundos para verificar si esta cargando con usb
+Task ADCpower(30000, TASK_FOREVER, &powerON, &taskManager);                  //se ejecuta cada 10 segundos para verificar si esta cargando con usb
 
 Task Tinformadorcv_Led(500, TASK_FOREVER, &informado_led, &taskManager);    //Tarea para secuencia led cuando se recibe informadorcv
+Task t_ensayo(ENSAYO_INTERVALO_MS, TASK_FOREVER, &ensayoTask, &taskManager);  //intervalo: configuracion.h ENSAYO_INTERVALO_MS; SMS segun ENSAYO_INCLUIR_SMS
 
-Task Sleep(1000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
+Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
+Task SleepSIM(1000, TASK_FOREVER, &dormirSIM800, &taskManager);
+bool slp = false;
+uint16_t ensayo_counter = 0;

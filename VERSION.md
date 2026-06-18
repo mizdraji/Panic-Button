@@ -97,3 +97,26 @@ por baja tension que genera el modulo SIM800.
 * * Los botones despierta del deep_sleep y envia el mensaje correspondiente.
 * * No entra en modo sleep cuando esta conectado por usb.
 * * Despierta del modo sleep conectando alimentación.
+
+* V1.8.7
+* * Se agrega modo sleep para el sim800. 
+* * Se agregan las funciones dormirSIM800 y despertarSIM800.
+* * Se hacen modificaciones con respecto a como se administra la interrupción de lora.
+* * Se cambia de lugar el lora.update() porque habia un BUG que mostraba el mensaje anterior recibido debido a que el buffer no se actualizaba en el tiempo correcto.
+* * Se retira todo el código viejo que correspondia al uso de 2 cores.
+
+* V1.8.8
+* * PDR con TaskScheduler y ACK async (no bloqueante); tarea `t_pdr` cada 1 segundo.
+* * Recepcion LoRa: la ISR solo levanta bandera; `readData` en `loop()` con poll de respaldo cada 100 ms.
+* * Parser de idempotencia tolerante a espacios tras la coma (SMS y LoRa).
+* * Tokens LoRa compactos: `Lp`, `Lb`, `Lm` (envio); `Lpr`, `Lbr`, `Lmr`, `Lar`, `Lir` (recepcion).
+* * Modo ensayo periodico por LoRa (`Le,...`); SMS opcional con `ENSAYO_INCLUIR_SMS`.
+* * SF test opcional (`FORCE_FIXED_SF_TEST`, `FIXED_SF_INDEX`); documentacion en `docs/`.
+* * Helpers de RX/depuracion en LoraTec (`isValidLoraPayload`, `loraRxDebug*`); `pragma once` en `configuracion.h`.
+
+* V1.8.9
+* * Se reemplaza `SoftwareSerial` por `HardwareSerial` (UART2 del ESP32, GPIO16/17).
+* * Se configura el pin DTR (GPIO21) para sleep/wake del SIM800 (`AT+CSCLK` + nivel DTR).
+* * Envio LoRa antes que SMS en los tres botones y en modo ensayo (menor latencia en alerta).
+* * Parametro `tiempo` en `Task.h` para deep sleep: valor actual `20` s (pruebas); en produccion usar `120` s o mas.
+* * Reinicio automatico por mensaje `ERROR` del SIM800 deshabilitado temporalmente (comentado).

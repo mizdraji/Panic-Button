@@ -1,10 +1,10 @@
-//configuracion de pines para el setup
+// Configuracion de pines del hardware.
+
 void config_pines()
 {
-  //configure pines
-  pinMode(button1, INPUT_PULLUP);            //boton de policia      - GPIO 37
-  pinMode(button2, INPUT_PULLUP);            //boton de bomberos     - GPIO 38
-  pinMode(button3, INPUT_PULLUP);            //boton de ambulancia   - GPIO 39
+  pinMode(button1, INPUT);            //boton de policia      - GPIO 37
+  pinMode(button2, INPUT);            //boton de bomberos     - GPIO 38
+  pinMode(button3, INPUT);            //boton de ambulancia   - GPIO 39
   pinMode(ADC_powerON, INPUT);
   pinMode(led1, OUTPUT);              //LED1 confirm policia  - GPIO 15
   pinMode(led2, OUTPUT);              //LED2 confirm bomberos - GPIO 2
@@ -12,11 +12,11 @@ void config_pines()
   pinMode(led_powerON, OUTPUT);       //LED blanco
   pinMode(led_recibido, OUTPUT);      //LED amarillo
   pinMode(led_atendido, OUTPUT);      //LED naranja
-  pinMode(RFM_pins.DIO0, INPUT);       //PIN INTERRUPCION LORA
-  //pinMode(LED_BUILTIN, OUTPUT);       //LED integrado         - GPIO 25
+  pinMode(RFM_pins.DIO0, INPUT);                //PIN INTERRUPCION LORA
+  pinMode(DTR, OUTPUT);      //PDR para modo sleep del sim800
 }
 
-//estado incial de los leds
+// Estado inicial de los leds al arrancar.
 void config_inicial()
 {
   digitalWrite(led1, LOW);
@@ -25,6 +25,7 @@ void config_inicial()
   digitalWrite(led_powerON, HIGH);
   digitalWrite(led_recibido, LOW);
   digitalWrite(led_atendido, LOW);
+  digitalWrite(DTR, LOW);
 }
 
 //Función para enviar mensaje SMS
@@ -47,9 +48,8 @@ void Enviar_msj(String numero, String msj) {
   Serial.println("Mensaje enviado");
 }
 
-//This is used with ReceiveMode function, it's okay to use for tests with Serial monitor
+// Pasarela simple entre Serial y SIM800 para diagnostico manual.
 void Serialcom() {      
-  //delay(500);
   while(Serial.available()) {
     SIM800L.write(Serial.read());//Forward what Serial received to Software Serial Port
   }
@@ -77,20 +77,29 @@ void ReceiveMode() {
   Serialcom();
 }
 
-//Prueba de Red: Es el primer paquete LoRa. Envia un cero para establecer la conexion con la red LoRaWAN.
+// Prueba de red (PDR): inicia envio con ACK y hace polling no bloqueante.
+// La funcion se ejecuta cada 1s desde t_pdr.
 void pdr_function() {
+  static char uncero[1] = {0};
+
   if (nodo.pdr_ok == 0) {
     if (nodo.t_wait == 0) {
-      char uncero[1]={0};
-      if (sendPackage(uncero, 1, espera_ACK, 0)) {        //si llega el ACK se pone en 1 y entra al if
+      if (!isSendPackageAckAsyncWaiting()) {
+        sendPackageAckAsyncStart(uncero, 1, 0);
+      }
+
+      int8_t ackStatus = sendPackageAckAsyncPoll();
+      if (ackStatus == 2) return; //seguimos esperando ACK sin bloquear
+
+      if (ackStatus == 1) {        //si llega el ACK se pone en 1 y entra al if
         nodo.pdr_ok = 1;
         nodo.t_wait = random_time(0,MAX_RANDOM_LARGO);
         nodo.pausa_larga = 0;
-        nodo.cont_pausas_largas=0;
+        nodo.cont_pausas_largas = 0;
         nodo.cont_reintento_corto = 0;
         Serial.println("-->PRUEBA DE RED: OK");
       }
-      else {
+      else if (ackStatus == -1) {
         nodo.pdr_ok = 0;
         nodo.cont_reintento_corto++;
         if (nodo.cont_reintento_corto >= MAX_REINTENTOS) {
@@ -114,55 +123,64 @@ void pdr_function() {
           Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
           
         }
+      } else {
+        // Estado inesperado (sin envio activo): reintentar en el siguiente tick.
+        return;
       }
     }
     else if (nodo.t_wait > 0) { //tiempo de espera 
-      nodo.t_wait--; //vamos decrementando el t_wait
+      nodo.t_wait--; //t_pdr corre cada 1 segundo, asi que el decremento es en segundos reales
     }
   }
 }
 
-//FUNCIONES DE INTERRUPCIONES CON ANTIREBOTE:
-//interrupción pulsador1
+// Interrupciones con antirebote.
+// Interrupcion pulsador1
 void IRAM_ATTR buttonInterrupt1() {           
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
-  // If interrupts come faster than 200ms, assume it's a bounce and ignore
   if (interrupt_time - last_interrupt_time > 200) {
     statebutton1 = true;
-    t5.enable();
+    t5.enableIfNot();                           //Habilita la tarea solo si estaba desactivada previamente
   }
   last_interrupt_time = interrupt_time;
 }
-//interrupción pulsador2
+
+// Interrupcion pulsador2
 void IRAM_ATTR buttonInterrupt2() {           
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
-  // If interrupts come faster than 200ms, assume it's a bounce and ignore
   if (interrupt_time - last_interrupt_time > 200) {
     statebutton2 = true;
-    t6.enable();
+    t6.enableIfNot();                           //Habilita la tarea solo si estaba desactivada previamente
   }
   last_interrupt_time = interrupt_time;
 }
-//interrupción pulsador3
+
+// Interrupcion pulsador3
 void IRAM_ATTR buttonInterrupt3() {           
   static unsigned long last_interrupt_time = 0;
   unsigned long interrupt_time = millis();
-  // If interrupts come faster than 200ms, assume it's a bounce and ignore
   if (interrupt_time - last_interrupt_time > 200) {
     statebutton3 = true;
-    t7.enable();
+    t7.enableIfNot();                             //Habilita la tarea solo si estaba desactivada previamente
   }
   last_interrupt_time = interrupt_time;
 }
 
-// Función de interrupción para mensajes recibidos lora
+// Interrupcion LoRa RX:
+// solo levanta bandera, la lectura SPI se hace en loop() para evitar bloqueos en ISR.
 void IRAM_ATTR onReceive() {
-  recvStatus = lora.readData(datoEntrante); // Cambia bandera cuando hay un paquete recibido
+  // En ISR solo marcar bandera; evitar SPI/readData dentro de interrupcion.
+  static unsigned long last_interrupt_time = 0;
+  unsigned long interrupt_time = millis();
+  if (interrupt_time - last_interrupt_time > 30) {
+    lora_irq_pending = true;
+  }
+  last_interrupt_time = interrupt_time;
 }
 
-//Genera un número aleatorio de 8 digitos para usar de idempotencia
+// Genera un numero aleatorio de 8 digitos para idempotencia.
 uint32_t idempotencia_random() {
     int32_t timestamp = esp_timer_get_time();                   // Obtener el timestamp actual en microsegundos
     srand((unsigned int)(timestamp));                           //Sembrar el generador de números aleatorios con el timestamp (opcional, para mayor variabilidad)
@@ -170,30 +188,33 @@ uint32_t idempotencia_random() {
     return random_number;
 }
 
-//funcion para extraer el número de un mensaje del tipo char[]: "mensaje, numero"
+// Extrae numero de payload char[] del tipo "Lxx, 12345678".
+// Tolera coma con o sin espacio.
 uint32_t extraer_numero(char mensaje_completo[]) {
-    char *coma_pos = strchr(mensaje_completo, ',');                   // Encontrar la posición de la coma en el mensaje    
-    // Verificar si la coma fue encontrada
+    char *coma_pos = strrchr(mensaje_completo, ',');                  // Buscar la ultima coma
     if (coma_pos != NULL) {
-        char *parte_numerica = coma_pos + 2;                          // Saltar la coma y el espacio para obtener la parte numérica
-        uint32_t numero = strtol(parte_numerica, NULL, 10);           // Convertir la parte numérica en un uint32_t usando strtol
+        char *parte_numerica = coma_pos + 1;                          // posicion despues de la coma
+        while (*parte_numerica == ' ' || *parte_numerica == '\t') {   // tolerar formato ",123" o ", 123"
+          parte_numerica++;
+        }
+        uint32_t numero = strtoul(parte_numerica, NULL, 10);
         return numero;
     }
-    return 0;  // Si no se encontró la coma, devolver 0
+    return 0;
 }
-//funcion para extraer el número de un mensaje del tipo String: "mensaje, numero", extrae el número despues de la ULTIMA COMA.
+
+// Extrae numero de payload String tomando la ultima coma.
 uint32_t extraer_numero(String mensaje_completo) {
-    int posicion_ultima_coma = mensaje_completo.lastIndexOf(',');     // Buscar la última coma en el mensaje
-
-    if (posicion_ultima_coma != -1) {                                  // Verificar si se encontró la coma
-        // Extraer la parte numérica después de la última coma y espacio
-        String numero = mensaje_completo.substring(posicion_ultima_coma + 2);  // +2 para saltar la coma y el espacio
-        return numero.toInt();  // Convertir a uint32_t y retornar
+    int posicion_ultima_coma = mensaje_completo.lastIndexOf(',');
+    if (posicion_ultima_coma != -1) {
+        String numero = mensaje_completo.substring(posicion_ultima_coma + 1);  // despues de la coma
+        numero.trim();                                                           // tolera espacios
+        return numero.toInt();
     }
-    return 0;     // Si no se encontró la coma, devolver 0
+    return 0;
 }
 
-//Genera un número aleatorio entre MIN y MAX
+// Genera un numero aleatorio entre MIN y MAX.
 uint16_t random_time(unsigned int MIN_,unsigned int MAX_) {
   return random(MIN_, MAX_);          //calcula un nuevo tiempo
 }
