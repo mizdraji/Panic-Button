@@ -17,18 +17,20 @@ En `Sketchup/Panic_Button/configuracion.h`:
   - `1`: habilita modo ensayo
 - `ENSAYO_INCLUIR_SMS`
   - `0`: en cada tick solo se envia **LoRa** (`Le,...`)
-  - `1`: en cada tick se envian **SMS y LoRa** a la vez (`Ens,...` y `Le,...`)
+  - `1`: en cada tick se envia **LoRa** y luego **SMS** (`Le,...` y `Ens,...`)
 - `ENSAYO_INTERVALO_MS`
   - intervalo entre envios en ms (lo usa el programador de tareas `t_ensayo` y el calculo de `ENSAYO_TOTAL_MENSAJES`)
   - valor de ejemplo: `300000` (5 minutos)
 - `ENSAYO_DURACION_HS`
-  - duracion total del ensayo
-  - valor actual: `48` horas
+  - duracion total del ensayo en horas
+  - valor de ejemplo: `48` horas
+  - valor de desarrollo actual en firmware: `1` hora
 - `ENSAYO_TOTAL_MENSAJES`
-  - calculado automaticamente
-  - con 48h y 5 min: `576` mensajes
+  - calculado automaticamente: `(ENSAYO_DURACION_HS * 3600 * 1000) / ENSAYO_INTERVALO_MS`
+  - con 48 h y 5 min: `576` mensajes
+  - con 1 h y 42 s (config actual): `~86` mensajes
 
-Calculo:
+Calculo de ejemplo (48 h, intervalo 5 min):
 
 - `48 horas * 60 min / 5 min = 576`
 
@@ -52,10 +54,11 @@ Ejemplo:
 ## Comportamiento
 
 - El contador arranca en `1`.
-- Se envia cada 5 minutos (o el valor de `ENSAYO_INTERVALO_MS`).
-- Con `ENSAYO_INCLUIR_SMS 1`, SMS y LoRa salen en el mismo tick; con `0`, solo LoRa.
-- Al llegar a `576`, la tarea se deshabilita automaticamente.
-- Durante el ensayo se resetea `timer` para evitar sleep.
+- Se envia cada `ENSAYO_INTERVALO_MS` (ejemplo: 5 min = `300000`; desarrollo: `42000` = 42 s).
+- Con `ENSAYO_INCLUIR_SMS 1`, en cada tick se envia **primero LoRa** y luego SMS (mismo criterio que los tres botones de alerta desde V1.8.9).
+- Con `ENSAYO_INCLUIR_SMS 0`, solo LoRa.
+- Al alcanzar `ENSAYO_TOTAL_MENSAJES`, la tarea se deshabilita automaticamente.
+- Durante el ensayo se resetea `timer` para evitar deep sleep.
 
 ## Activar / desactivar
 

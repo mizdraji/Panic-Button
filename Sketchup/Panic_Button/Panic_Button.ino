@@ -1,4 +1,7 @@
 /* Detalle de versiones
+ * V1.8.9:
+ *   HardwareSerial UART2 (reemplaza SoftwareSerial); DTR GPIO21 para sleep/wake SIM800.
+ *   LoRa antes que SMS en los tres botones y en ensayo; deep sleep configurable en `tiempo` (Task.h).
  * V1.8.8:
  *   PDR con TaskScheduler y ACK async; recepcion LoRa sin readData en ISR; poll RX de respaldo.
  *   Parser numeros tolerante; tokens LoRa compactos (Lp/Lpr/Lar/Lir); modo ensayo (LoRa; SMS opcional ENSAYO_INCLUIR_SMS).

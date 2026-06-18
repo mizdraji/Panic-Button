@@ -60,21 +60,22 @@ void loraSend() {
 //TASK5: interrupcion por pulsador button1
 void buttonTask1() {
   if(!bloqueo) {
+    encenderLED(led1);
+
     idempotencia = idempotencia_random();
     numsnt = idempotencia.toInt();
     checknum = false;
-    String mensaje_saliente = policia + ", " + idempotencia;
-    //Enviar_msj(numero.Remitente2, msj.policia);          //SMS
-    Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
-    
+
     char mensaje_saliente_lora[50];
     sprintf(mensaje_saliente_lora, "%s, %s", policia_lora, idempotencia.c_str());                 //Concatena "policia" e "idempotencia" con una coma
     Serial.print("LORA TX -> ");
     Serial.println(mensaje_saliente_lora);
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-
-    encenderLED(led1);
     
+    String mensaje_saliente = policia + ", " + idempotencia;
+    //Enviar_msj(numero.Remitente2, msj.policia);          //SMS
+    Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
+        
     statebutton1 = false;             // Reinicia el estado del pulsador
     t5.disable();
 
@@ -92,6 +93,12 @@ void buttonTask2() {
     idempotencia = idempotencia_random();
     numsnt = idempotencia.toInt();
     checknum = false;
+
+    char mensaje_saliente_lora[50];
+    sprintf(mensaje_saliente_lora, "%s, %s", bomberos_lora, idempotencia.c_str());                 //Concatena "bomberos" e "idempotencia" con una coma
+    Serial.print("LORA TX -> ");
+    Serial.println(mensaje_saliente_lora);
+    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
     
     String mensaje_saliente = bomberos + ", " + idempotencia;
     Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS

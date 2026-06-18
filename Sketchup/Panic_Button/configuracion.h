@@ -2,7 +2,7 @@
 #pragma once
 
 //Version
-#define VERSION       "V1.8.8"
+#define VERSION       "V1.8.9"
 
 //Serial
 #define SERIAL_SPEED  115200

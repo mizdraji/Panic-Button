@@ -70,6 +70,19 @@ La banda activa en la libreria Beelan esta en `libraries/Beelan_LoRaWAN-1.5.3/sr
   - `MAX_PAUSAS_LARGAS=3`
   - luego espera `UN_DIA=84600` s (como esta definido actualmente).
 
+### 8) Tokens de payload LoRa (aplicacion)
+
+Desde V1.8.8 los mensajes usan tokens compactos (formato `token, idempotencia`):
+
+| Direccion | Token | Significado |
+|-----------|-------|-------------|
+| TX alerta | `Lp`, `Lb`, `Lm` | policia, bomberos, medica |
+| TX ensayo | `Le` | ensayo (`Le,<n>,<ms>`) |
+| RX confirmacion | `Lpr`, `Lbr`, `Lmr` | recibido por servicio |
+| RX operador | `Lar`, `Lir` | atendido, informado |
+
+La validacion de tramas recibidas usa `isValidLoraPayload()` en `LoraTec.ino` (debe empezar con `L` y tener idempotencia numerica tras la ultima coma).
+
 ## Guia rapida: SF test (SF fijo)
 
 Se agrego un modo de ensayo para fijar SF y comparar cobertura/ACK en campo.

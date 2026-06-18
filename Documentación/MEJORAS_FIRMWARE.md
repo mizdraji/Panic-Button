@@ -208,10 +208,11 @@ void IRAM_ATTR buttonInterrupt1() {
 ```
 
 ### 11. Optimización del Buffer de Serial
-**Problema actual:** Buffer de SIM800 puede ser insuficiente para mensajes largos.
+**Problema actual:** Buffer de recepcion del SIM800 puede ser insuficiente para mensajes largos.
+
+**Estado V1.8.9:** Se migro de `SoftwareSerial` a `HardwareSerial` (UART2). Queda pendiente evaluar si el buffer por defecto de UART hardware es suficiente en campo.
 
 **Mejora propuesta:**
-- Aumentar tamaño de buffer de SoftwareSerial
 - Implementar buffer circular para datos entrantes
 - Procesar mensajes en chunks si son muy largos
 - Limpiar buffer periódicamente
@@ -241,6 +242,8 @@ void IRAM_ATTR buttonInterrupt1() {
 ### 14. Modo Sleep Mejorado
 **Problema actual:** El deep sleep funciona pero podría optimizarse más.
 
+**Estado V1.8.9:** Deep sleep tras `tiempo` segundos de inactividad (`#define tiempo` en `Task.h`; valor actual **20 s para pruebas**, en produccion **120 s o mas**). SIM800 entra en sleep con DTR + `AT+CSCLK=1` antes de `esp_deep_sleep_start()`. Wakeup por botones (EXT1) o alimentacion.
+
 **Mejora propuesta:**
 - Diferentes niveles de sleep según situación
 - Light sleep para operaciones rápidas
@@ -269,8 +272,10 @@ void entrar_modo_sleep_optimizado() {
 ### 15. Gestión Inteligente del SIM800
 **Problema actual:** El SIM800 consume mucha energía incluso en sleep.
 
+**Estado V1.8.9:** Implementado sleep basico con pin DTR (GPIO21) + `AT+CSCLK=1` antes de deep sleep, y wake con DTR LOW + `AT+CSCLK=0`. `AT+CFUN=0` sigue comentado como opcion de menor consumo.
+
 **Mejora propuesta:**
-- Usar modo mínimo (AT+CFUN=0) cuando no se necesita
+- Evaluar `AT+CFUN=0` (modo minimo) cuando no se necesita GSM
 - Desactivar completamente cuando no hay cobertura
 - Encender solo cuando se necesita enviar
 - Monitorear consumo y ajustar estrategia
@@ -544,7 +549,7 @@ Para cada mejora, se debe:
 4. Validar en condiciones reales
 5. Documentar cambios
 
-**Versión del documento:** 1.0  
-**Fecha:** 2024  
-**Firmware base:** V1.8.7
+**Versión del documento:** 1.1  
+**Fecha:** Junio 2026  
+**Firmware base:** V1.8.9
 
