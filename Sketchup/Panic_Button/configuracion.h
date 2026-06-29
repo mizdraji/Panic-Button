@@ -21,8 +21,8 @@
 
 //configuracion ensayo
 #define MODO_ENSAYO      0                       //1 = habilita modo ensayo, 0 = modo normal
-#define ENSAYO_INCLUIR_SMS  0                    //1 = incluye SMS en el ensayo, 0 = solo LoRa  
-#define ENSAYO_INTERVALO_MS 42000UL             //5 minutos = 300000UL
+#define ENSAYO_INCLUIR_SMS  1                    //1 = incluye SMS en el ensayo, 0 = solo LoRa  
+#define ENSAYO_INTERVALO_MS 25000UL             //5 minutos = 300000UL
 #define ENSAYO_DURACION_HS 1UL                  //48 horas - 24 horas
 #define ENSAYO_TOTAL_MENSAJES ((ENSAYO_DURACION_HS * 60UL * 60UL * 1000UL) / ENSAYO_INTERVALO_MS) //576 mensajes - 288 mensajes
 

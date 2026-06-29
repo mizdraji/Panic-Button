@@ -36,15 +36,15 @@ void Enviar_msj(String numero, String msj) {
   
   //Enviar comando para un nuevos SMS al numero establecido
   SIM800L.print(config_numero);
-  delay(10);
+  delay(50);
 
   //Enviar contenido del SMS
   SIM800L.print(msj);
-  delay(10);
+  delay(50);
 
   //Enviar Ctrl+Z
   SIM800L.write((char)26);
-  delay(10);
+  delay(50);
   Serial.println("Mensaje enviado");
 }
 
