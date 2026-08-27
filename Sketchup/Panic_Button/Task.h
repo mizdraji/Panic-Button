@@ -27,8 +27,7 @@ uint counterInformado = 0;         //Contador para apagar secuencia de leds cuan
 
 bool statusLED = false;
 
-String idempotencia;
-uint32_t numsnt = 0;      //number sent, numero de idempotencia enviado en uint32_t
+uint32_t numsnt = 0;
 bool checknum = false;    //bandera para chekear si numsnt = numrcv
 //uint32_t numrcv = 0;
 
@@ -59,6 +58,8 @@ void trecibido();
 void tatendido();
 void powerON();
 void unlock();
+void queueSms(const char* msj);
+void sendPendingSmsTask();
 void informado_led();
 void ensayoTask();
 void Sleeping_init();
@@ -84,10 +85,11 @@ Task t_pdr(1000, TASK_FOREVER, &pdr_function, &taskManager);             //TASK 
 //TASK4: Envia mensaje sms.
 
 
-Task t5(500, TASK_FOREVER, &buttonTask1, &interrupt);                //TASK5: buttontask1                
-Task t6(500, TASK_FOREVER, &buttonTask2, &interrupt);                //TASK6: buttontask2          
-Task t7(500, TASK_FOREVER, &buttonTask3, &interrupt);                //TASK7: buttontask3     
-Task lock(3000, TASK_FOREVER, &unlock, &interrupt);                  //   
+Task t5(500, TASK_FOREVER, &buttonTask1, &taskManager);
+Task t6(500, TASK_FOREVER, &buttonTask2, &taskManager);
+Task t7(500, TASK_FOREVER, &buttonTask3, &taskManager);
+Task lock(3000, TASK_FOREVER, &unlock, &taskManager);
+Task t_sms_send(0, TASK_ONCE, &sendPendingSmsTask, &taskManager);
 
 //tareas para apagar leds:
 Task t_apagarLED(5001, TASK_FOREVER, &apagarLED, &taskManager);     //TASK apagar todos los leds
@@ -103,7 +105,8 @@ Task ADCpower(30000, TASK_FOREVER, &powerON, &taskManager);                  //s
 Task Tinformadorcv_Led(500, TASK_FOREVER, &informado_led, &taskManager);    //Tarea para secuencia led cuando se recibe informadorcv
 Task t_ensayo(ENSAYO_INTERVALO_MS, TASK_FOREVER, &ensayoTask, &taskManager);  //intervalo: configuracion.h ENSAYO_INTERVALO_MS; SMS segun ENSAYO_INCLUIR_SMS
 
-Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
+//Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
 Task SleepSIM(1000, TASK_FOREVER, &dormirSIM800, &taskManager);
+
 bool slp = false;
 uint16_t ensayo_counter = 0;

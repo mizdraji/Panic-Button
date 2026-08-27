@@ -30,6 +30,12 @@
 #endif
 
 #ifdef AU_915
+    // LoraTec Class C: downlink fijo SF7 BW500 (DR13).
+    // 1 = RX no sigue al SF de uplink (TX SF10 / RX SF7-500).
+    // 0 = RX1 LoRaWAN (Datarate_Rx = TX + 0x0A) para ensayar bajada SF10/500.
+#ifndef LORATEC_RX_FIXED_SF7
+#define LORATEC_RX_FIXED_SF7  1
+#endif
     //Select the subband youre working on
     // make sure your gateway is working in one of these bands
     //#define SUBND_0     // 915.2 - 916.6 Mhz

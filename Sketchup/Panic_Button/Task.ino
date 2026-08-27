@@ -1,8 +1,7 @@
 //configuracion task para setup:
 void config_task(){
-  Serial.println("Initialized scheduler");
-  taskManager.setHighPriorityScheduler(&interrupt);          //Configura Scheduler interrupt como alta prioridad
-  taskManager.enableAll(true);                               //this will recursively enable the higher priority tasks as well
+  taskManager.setHighPriorityScheduler(&interrupt);
+  taskManager.enableAll(true);
   t_apagarLED.disable();
   t_apagarLED1.disable();
   t_apagarLED2.disable();
@@ -15,12 +14,27 @@ void config_task(){
   t_atendido.disable();
   t_ensayo.disable();
   lock.disable();
+  t_sms_send.disable();
   Tinformadorcv_Led.disable();
   SleepSIM.disable();
 }
 
 
 //Definimos nuestras tareas:
+
+static char pending_sms_msg[64];
+
+void sendPendingSmsTask() {
+  Enviar_msj(pending_sms_msg);
+  t_sms_send.disable();
+}
+
+void queueSms(const char* msj) {
+  if (msj == NULL) return;
+  strncpy(pending_sms_msg, msj, sizeof(pending_sms_msg) - 1);
+  pending_sms_msg[sizeof(pending_sms_msg) - 1] = '\0';
+  t_sms_send.restartDelayed(DEMO_SMS_DELAY_MS);
+}
 
 //TASK1
 void led_blink() {
@@ -51,8 +65,6 @@ void blinkstb() {
 void loraSend() {
   char uncmd[1]={0x14};
   sendPackage(uncmd, 1, no_espera_ACK,  1);
-  Serial.println("se envia uncmd");
-
 }
 
 //TASK4: Envia mensaje
@@ -62,19 +74,18 @@ void buttonTask1() {
   if(!bloqueo) {
     encenderLED(led1);
 
-    idempotencia = idempotencia_random();
-    numsnt = idempotencia.toInt();
+    numsnt = idempotencia_random();
     checknum = false;
 
     char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", policia_lora, idempotencia.c_str());                 //Concatena "policia" e "idempotencia" con una coma
+    char mensaje_saliente_sms[64];
+    snprintf(mensaje_saliente_lora, sizeof(mensaje_saliente_lora), "%s, %lu", policia_lora, (unsigned long)numsnt);
+    snprintf(mensaje_saliente_sms, sizeof(mensaje_saliente_sms), "%s, %lu", policia, (unsigned long)numsnt);
     Serial.print("LORA TX -> ");
     Serial.println(mensaje_saliente_lora);
-    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-    
-    String mensaje_saliente = policia + ", " + idempotencia;
-    //Enviar_msj(numero.Remitente2, msj.policia);          //SMS
-    Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
+    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);
+    yield();
+    queueSms(mensaje_saliente_sms);
         
     statebutton1 = false;             // Reinicia el estado del pulsador
     t5.disable();
@@ -90,18 +101,18 @@ void buttonTask2() {
   if(!bloqueo) {
     encenderLED(led2);
 
-    idempotencia = idempotencia_random();
-    numsnt = idempotencia.toInt();
+    numsnt = idempotencia_random();
     checknum = false;
 
     char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", bomberos_lora, idempotencia.c_str());                 //Concatena "bomberos" e "idempotencia" con una coma
+    char mensaje_saliente_sms[64];
+    snprintf(mensaje_saliente_lora, sizeof(mensaje_saliente_lora), "%s, %lu", bomberos_lora, (unsigned long)numsnt);
+    snprintf(mensaje_saliente_sms, sizeof(mensaje_saliente_sms), "%s, %lu", bomberos, (unsigned long)numsnt);
     Serial.print("LORA TX -> ");
     Serial.println(mensaje_saliente_lora);
-    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-    
-    String mensaje_saliente = bomberos + ", " + idempotencia;
-    Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
+    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);
+    yield();
+    queueSms(mensaje_saliente_sms);
     
     statebutton2 = false;           // Reinicia el estado del pulsador
     t6.disable();
@@ -116,18 +127,18 @@ void buttonTask3() {
   if(!bloqueo) {
     encenderLED(led3);
 
-    idempotencia = idempotencia_random();
-    numsnt = idempotencia.toInt();
+    numsnt = idempotencia_random();
     checknum = false;
 
     char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", medica_lora, idempotencia.c_str());                 //Concatena "media" e "idempotencia" con una coma
+    char mensaje_saliente_sms[64];
+    snprintf(mensaje_saliente_lora, sizeof(mensaje_saliente_lora), "%s, %lu", medica_lora, (unsigned long)numsnt);
+    snprintf(mensaje_saliente_sms, sizeof(mensaje_saliente_sms), "%s, %lu", medica, (unsigned long)numsnt);
     Serial.print("LORA TX -> ");
     Serial.println(mensaje_saliente_lora);
-    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-    
-    String mensaje_saliente = medica + ", " + idempotencia;
-    Enviar_msj(numero.Remitente2, mensaje_saliente);        //SMS
+    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);
+    yield();
+    queueSms(mensaje_saliente_sms);
         
     statebutton3 = false;           // Reinicia el estado del pulsador
     t7.disable();
@@ -255,17 +266,19 @@ void ensayoTask() {
   sendPackage(payload_lora, strlen(payload_lora), no_espera_ACK, 1);
 
   #if ENSAYO_INCLUIR_SMS
-    String payload = "Ens," + String(ensayo_counter) + "," + String(ts_ms);
-    Enviar_msj(numero.Remitente2, payload);
+    char payload_sms[64];
+    snprintf(payload_sms, sizeof(payload_sms), "Ens,%u,%lu", (unsigned int)ensayo_counter, (unsigned long)ts_ms);
+    Enviar_msj(payload_sms);
   #endif
 
   timer = 0; //evita entrar en sleep durante el ensayo
 }
 
 void Sleeping_init(){
+#if MODO_DEMO
+  return;
+#endif
   timer ++;
-  Serial.print("timer: ");
-  Serial.println(timer);
   if((digitalRead(button1) && digitalRead(button2) && digitalRead(button3)) == LOW && (timer > tiempo) && (slp == false)) {
     
     slp = true;

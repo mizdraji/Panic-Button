@@ -28,53 +28,243 @@ void config_inicial()
   digitalWrite(DTR, LOW);
 }
 
-//Función para enviar mensaje SMS
-void Enviar_msj(String numero, String msj) {
-  //Se establece el formato de SMS en ASCII
-  String config_numero = "AT+CMGS=\"+549" + numero + "\"\r\n";
-  Serial.println(config_numero);
-  
-  //Enviar comando para un nuevos SMS al numero establecido
-  SIM800L.print(config_numero);
-  delay(10);
+// Envia SMS al destino fijo SMS_NUMERO_DESTINO (configuracion.h).
+void Enviar_msj(const char* msj) {
+  if (msj == NULL) return;
 
-  //Enviar contenido del SMS
+  Serial.print("SMS TX -> ");
+  Serial.println(msj);
+
+  SIM800L.print(SMS_CMGS_CMD);
+  delay(50);
+  yield();
   SIM800L.print(msj);
-  delay(10);
-
-  //Enviar Ctrl+Z
+  delay(50);
+  yield();
   SIM800L.write((char)26);
-  delay(10);
-  Serial.println("Mensaje enviado");
+  delay(50);
+  yield();
 }
 
-// Pasarela simple entre Serial y SIM800 para diagnostico manual.
-void Serialcom() {      
-  while(Serial.available()) {
-    SIM800L.write(Serial.read());//Forward what Serial received to Software Serial Port
+// --- RX SMS linea a linea ---
+
+static void trim_sms_line(char* line) {
+  if (line == NULL) return;
+  char* start = line;
+  while (*start == '\r' || *start == '\n' || *start == ' ' || *start == '\t') {
+    start++;
   }
-  while(SIM800L.available()) {
-    Serial.write(SIM800L.read());//Forward what Software Serial received to Serial Port
+  if (start != line) {
+    memmove(line, start, strlen(start) + 1);
+  }
+  size_t n = strlen(line);
+  while (n > 0 && (line[n - 1] == '\r' || line[n - 1] == '\n' || line[n - 1] == ' ')) {
+    line[--n] = '\0';
   }
 }
 
-//Set the SIM800L Receive mode  
-void ReceiveMode() {       
-  SIM800L.print("AT\r"); //If everything is Okay it will show "OK" on the serial monitor
-  delay(200);
-  Serialcom();
-  SIM800L.write("AT+CMGF=1\r"); // Configuring TEXT mode
-  delay(200);
-  Serialcom();
-  // SIM800L.write("AT+CMGD=1,4\r"); // Limpia memoria de mensajes
-  // delay(200);
-  // Serialcom();
-  SIM800L.print("AT+CSCS=\"GSM\"\r");
-  delay(200);
-  Serialcom();
-  SIM800L.print("AT+CNMI=2,2,0,0,0\r"); //Configure the SIM800L on how to manage the Received SMS... Check the SIM800L AT commands manual
-  delay(200);
-  Serialcom();
+static bool sms_has_token(const char* line) {
+  if (line == NULL || line[0] == '\0') return false;
+  return (strstr(line, rcv_policia_sms)   != NULL ||
+          strstr(line, rcv_bomberos_sms)  != NULL ||
+          strstr(line, rcv_medica_sms)    != NULL ||
+          strstr(line, rcv_atendido_sms)  != NULL ||
+          strstr(line, rcv_informado_sms) != NULL);
+}
+
+static bool sms_is_echo_line(const char* line) {
+  if (line == NULL || line[0] == '\0') return true;
+  if (line[0] == '>') return true;
+  if (line[0] == '+') return true;
+  if (strncmp(line, "OK", 2) == 0) return true;
+  if (strncmp(line, "RING", 4) == 0) return true;
+  if (strstr(line, "AT+CMGS") != NULL) return true;
+  return false;
+}
+
+static void procesar_sms_linea(const char* mensaje) {
+  if (!sms_has_token(mensaje)) return;
+
+  uint32_t numrcv = extraer_numero(mensaje);
+
+  if (strstr(mensaje, rcv_atendido_sms) != NULL && numrcv == numsnt) {
+    t_atendido.enable();
+  }
+  if ((strstr(mensaje, rcv_policia_sms)  != NULL ||
+       strstr(mensaje, rcv_bomberos_sms) != NULL ||
+       strstr(mensaje, rcv_medica_sms)   != NULL) &&
+      numrcv == numsnt && !checknum) {
+    checknum = true;
+    t_recibido.enable();
+  }
+  if (strstr(mensaje, rcv_informado_sms) != NULL && numrcv == numsnt) {
+    Tinformadorcv_Led.enable();
+  }
+}
+
+void poll_sim800_messages() {
+  static char acc[SMS_LINE_BUF_SIZE];
+  static uint16_t len = 0;
+
+  if (!SIM800L.available()) return;
+
+  uint8_t n = 0;
+  while (SIM800L.available() && n < SIM800_READ_CHUNK) {
+    char c = SIM800L.read();
+    n++;
+
+    if (c == '\n') {
+      acc[len] = '\0';
+      len = 0;
+      trim_sms_line(acc);
+      if (acc[0] == '\0') continue;
+#if DEBUG_GSM
+      Serial.println(acc);
+#endif
+      if (!sms_is_echo_line(acc)) {
+#if !DEBUG_GSM
+        Serial.print("SMS RX -> ");
+        Serial.println(acc);
+#endif
+        procesar_sms_linea(acc);
+      }
+      continue;
+    }
+
+    if (len < sizeof(acc) - 1) {
+      acc[len++] = c;
+    } else {
+      while (SIM800L.available() && c != '\n') {
+        c = SIM800L.read();
+        n++;
+        if (n >= SIM800_READ_CHUNK) break;
+      }
+      len = 0;
+    }
+    yield();
+  }
+}
+
+void processPendingButtons() {
+  static uint32_t last_btn1_ms = 0;
+  static uint32_t last_btn2_ms = 0;
+  static uint32_t last_btn3_ms = 0;
+  uint32_t now = millis();
+
+  if (btn1_pending) {
+    btn1_pending = false;
+    if (last_btn1_ms == 0 || (uint32_t)(now - last_btn1_ms) >= BTN_DEBOUNCE_MS) {
+      last_btn1_ms = now;
+      statebutton1 = true;
+      t5.enableIfNot();
+    }
+  }
+  if (btn2_pending) {
+    btn2_pending = false;
+    if (last_btn2_ms == 0 || (uint32_t)(now - last_btn2_ms) >= BTN_DEBOUNCE_MS) {
+      last_btn2_ms = now;
+      statebutton2 = true;
+      t6.enableIfNot();
+    }
+  }
+  if (btn3_pending) {
+    btn3_pending = false;
+    if (last_btn3_ms == 0 || (uint32_t)(now - last_btn3_ms) >= BTN_DEBOUNCE_MS) {
+      last_btn3_ms = now;
+      statebutton3 = true;
+      t7.enableIfNot();
+    }
+  }
+}
+
+bool processPendingLora() {
+  static uint32_t last_lora_irq_ms = 0;
+
+  if (!lora_irq_pending) return false;
+  lora_irq_pending = false;
+
+  uint32_t now = millis();
+  if (last_lora_irq_ms != 0 && (uint32_t)(now - last_lora_irq_ms) < LORA_IRQ_DEBOUNCE_MS) {
+    return false;
+  }
+  last_lora_irq_ms = now;
+  return true;
+}
+
+#define SIM800_AT_RESP_SIZE   128
+#define SIM800_AT_TIMEOUT_MS  800
+
+// Vacia RX del SIM800 (sin reenviar desde el monitor USB).
+static void sim800_drain_rx(void) {
+  while (SIM800L.available()) {
+#if DEBUG_GSM
+    Serial.write(SIM800L.read());
+#else
+    (void)SIM800L.read();
+#endif
+  }
+}
+
+// Envia AT, espera OK/ERROR con timeout y deja el UART limpio.
+static bool sim800_send_at(const char* cmd) {
+  if (cmd == NULL) return false;
+
+  sim800_drain_rx();
+  SIM800L.print(cmd);
+
+#if DEBUG_GSM
+  Serial.print(">> ");
+  Serial.print(cmd);
+#endif
+
+  char resp[SIM800_AT_RESP_SIZE];
+  uint16_t n = 0;
+  uint32_t deadline = millis() + SIM800_AT_TIMEOUT_MS;
+
+  while ((int32_t)(millis() - deadline) < 0) {
+    while (SIM800L.available()) {
+      char c = SIM800L.read();
+#if DEBUG_GSM
+      Serial.write(c);
+#endif
+      if (n < sizeof(resp) - 1) {
+        resp[n++] = c;
+        resp[n] = '\0';
+      }
+      if (strstr(resp, "OK") != NULL) return true;
+      if (strstr(resp, "ERROR") != NULL) {
+        Serial.print("SIM800 ERROR: ");
+        Serial.println(cmd);
+        return false;
+      }
+    }
+    yield();
+    delay(1);
+  }
+
+  Serial.print("SIM800 timeout: ");
+  Serial.println(cmd);
+  return false;
+}
+
+#if DEBUG_GSM
+// Solo USB -> SIM800. El RX del modem lo consume poll_sim800_messages()
+// (si Serialcom tambien lee SIM800L, se parte el SMS y no se procesa).
+void Serialcom() {
+  while (Serial.available()) {
+    SIM800L.write(Serial.read());
+  }
+}
+#endif
+
+void ReceiveMode() {
+  bool ok = true;
+  ok &= sim800_send_at("AT\r");
+  ok &= sim800_send_at("AT+CMGF=1\r");
+  ok &= sim800_send_at("AT+CSCS=\"GSM\"\r");
+  ok &= sim800_send_at("AT+CNMI=2,2,0,0,0\r");
+  if (!ok) Serial.println("SIM800 SMS setup con errores");
+  sim800_drain_rx();
 }
 
 // Prueba de red (PDR): inicia envio con ACK y hace polling no bloqueante.
@@ -97,7 +287,7 @@ void pdr_function() {
         nodo.pausa_larga = 0;
         nodo.cont_pausas_largas = 0;
         nodo.cont_reintento_corto = 0;
-        Serial.println("-->PRUEBA DE RED: OK");
+        Serial.println("PDR OK");
       }
       else if (ackStatus == -1) {
         nodo.pdr_ok = 0;
@@ -108,21 +298,16 @@ void pdr_function() {
           nodo.cont_pausas_largas++;
           if (nodo.cont_pausas_largas >= MAX_PAUSAS_LARGAS) {
             nodo.cont_pausas_largas = 0;
-            nodo.t_wait = UN_DIA; //esperar un dia completo
+            nodo.t_wait = UN_DIA;
           }
-          else nodo.t_wait = LONG_TIME_TO_WAIT; //este es un tiempo largo y fijo
-          Serial.println("-->Cant Max de reintentos para PDR excedido, pausa larga");
-          
-          Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
-          
+          else nodo.t_wait = LONG_TIME_TO_WAIT;
         }
         else {
-          nodo.t_wait = random_time(MIN_RANDOM,MAX_RANDOM); //devuelve en segundos
-          Serial.println("-->PRUEBA DE RED: FALLO");
-          
-          Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
-          
+          nodo.t_wait = random_time(MIN_RANDOM, MAX_RANDOM);
         }
+        Serial.print("PDR FALLO, reintento en ");
+        Serial.print(nodo.t_wait);
+        Serial.println(" s");
       } else {
         // Estado inesperado (sin envio activo): reintentar en el siguiente tick.
         return;
@@ -134,51 +319,11 @@ void pdr_function() {
   }
 }
 
-// Interrupciones con antirebote.
-// Interrupcion pulsador1
-void IRAM_ATTR buttonInterrupt1() {           
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 200) {
-    statebutton1 = true;
-    t5.enableIfNot();                           //Habilita la tarea solo si estaba desactivada previamente
-  }
-  last_interrupt_time = interrupt_time;
-}
-
-// Interrupcion pulsador2
-void IRAM_ATTR buttonInterrupt2() {           
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 200) {
-    statebutton2 = true;
-    t6.enableIfNot();                           //Habilita la tarea solo si estaba desactivada previamente
-  }
-  last_interrupt_time = interrupt_time;
-}
-
-// Interrupcion pulsador3
-void IRAM_ATTR buttonInterrupt3() {           
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 200) {
-    statebutton3 = true;
-    t7.enableIfNot();                             //Habilita la tarea solo si estaba desactivada previamente
-  }
-  last_interrupt_time = interrupt_time;
-}
-
-// Interrupcion LoRa RX:
-// solo levanta bandera, la lectura SPI se hace en loop() para evitar bloqueos en ISR.
-void IRAM_ATTR onReceive() {
-  // En ISR solo marcar bandera; evitar SPI/readData dentro de interrupcion.
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 30) {
-    lora_irq_pending = true;
-  }
-  last_interrupt_time = interrupt_time;
-}
+// ISR: solo banderas. Antirebote y TaskScheduler en loop().
+void IRAM_ATTR buttonInterrupt1() { btn1_pending = true; }
+void IRAM_ATTR buttonInterrupt2() { btn2_pending = true; }
+void IRAM_ATTR buttonInterrupt3() { btn3_pending = true; }
+void IRAM_ATTR onReceive() { lora_irq_pending = true; }
 
 // Genera un numero aleatorio de 8 digitos para idempotencia.
 uint32_t idempotencia_random() {
@@ -190,26 +335,14 @@ uint32_t idempotencia_random() {
 
 // Extrae numero de payload char[] del tipo "Lxx, 12345678".
 // Tolera coma con o sin espacio.
-uint32_t extraer_numero(char mensaje_completo[]) {
-    char *coma_pos = strrchr(mensaje_completo, ',');                  // Buscar la ultima coma
+uint32_t extraer_numero(const char* mensaje_completo) {
+    const char *coma_pos = strrchr(mensaje_completo, ',');
     if (coma_pos != NULL) {
-        char *parte_numerica = coma_pos + 1;                          // posicion despues de la coma
-        while (*parte_numerica == ' ' || *parte_numerica == '\t') {   // tolerar formato ",123" o ", 123"
+        const char *parte_numerica = coma_pos + 1;
+        while (*parte_numerica == ' ' || *parte_numerica == '\t') {
           parte_numerica++;
         }
-        uint32_t numero = strtoul(parte_numerica, NULL, 10);
-        return numero;
-    }
-    return 0;
-}
-
-// Extrae numero de payload String tomando la ultima coma.
-uint32_t extraer_numero(String mensaje_completo) {
-    int posicion_ultima_coma = mensaje_completo.lastIndexOf(',');
-    if (posicion_ultima_coma != -1) {
-        String numero = mensaje_completo.substring(posicion_ultima_coma + 1);  // despues de la coma
-        numero.trim();                                                           // tolera espacios
-        return numero.toInt();
+        return (uint32_t)strtoul(parte_numerica, NULL, 10);
     }
     return 0;
 }
@@ -217,4 +350,26 @@ uint32_t extraer_numero(String mensaje_completo) {
 // Genera un numero aleatorio entre MIN y MAX.
 uint16_t random_time(unsigned int MIN_,unsigned int MAX_) {
   return random(MIN_, MAX_);          //calcula un nuevo tiempo
+}
+
+void report_heap(bool force) {
+  static uint32_t last_ms = 0;
+  uint32_t now = millis();
+  uint32_t free_now = ESP.getFreeHeap();
+  uint32_t min_now = ESP.getMinFreeHeap();
+  uint32_t maxblk = ESP.getMaxAllocHeap();
+  bool warn = (free_now < HEAP_WARN_BYTES) || (min_now < HEAP_WARN_BYTES);
+  bool periodic = (HEAP_REPORT_MS > 0) &&
+                  (last_ms == 0 || (uint32_t)(now - last_ms) >= HEAP_REPORT_MS);
+
+  if (!force && !warn && !periodic) return;
+
+  last_ms = now;
+  Serial.print("Heap free=");
+  Serial.print(free_now);
+  Serial.print(" min=");
+  Serial.print(min_now);
+  Serial.print(" maxblk=");
+  Serial.println(maxblk);
+  if (warn) Serial.println("Heap BAJO");
 }
