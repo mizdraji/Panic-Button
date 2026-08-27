@@ -23,6 +23,7 @@
 HardwareSerial SIM800L(2);      //UART2 HARDWARE
 
 void setup() {                              
+  SIM800L.setRxBufferSize(1024);
   SIM800L.begin(SERIAL_SIM, SERIAL_8N1, RX, TX);
   Serial.begin(SERIAL_SPEED);
 
@@ -85,36 +86,10 @@ void setup() {
 void loop() {      
   static uint32_t last_lora_poll_ms = 0;
 
-  if(SIM800L.available()) {
-    while(SIM800L.available()>0) {
-      String mensaje_recibido = SIM800L.readString();
-      uint32_t numrcv = extraer_numero(mensaje_recibido); 
-      Serial.print(mensaje_recibido);
-      /*    
-      if(mensaje_recibido.indexOf("ERROR") != -1)  {
-        Serial.println("Se recibio ERROR en SIM800, reiniciando...");
-        ESP.restart();                                                                              //Reset en caso de que falle el SIM800
-      }
-      */
-
-      if (mensaje_recibido.indexOf(rcv_atendido)  != -1 && numrcv == numsnt) t_atendido.enable();    //se ejecuta task de atendido
-      if ((mensaje_recibido.indexOf(rcv_policia)  != -1 || 
-         mensaje_recibido.indexOf(rcv_bomberos) != -1 || 
-         mensaje_recibido.indexOf(rcv_medica)   != -1) && numrcv == numsnt && checknum == false) {
-        checknum = true;
-        t_recibido.enable();      //se ejecuta task de recibido
-      }
-
-      if (mensaje_recibido.indexOf(rcv_informado) != -1 && numrcv == numsnt) {
-        Tinformadorcv_Led.enable();
-      }
-    }
-  }
-    
   taskManager.execute();             // Es necesario ejecutar el runner en cada loop
   interrupt.execute();
   
-  if (SIM800L.available() || (digitalRead(button1) || digitalRead(button2) || digitalRead(button3)) == HIGH) timer = 0;     //si se produce una interrupcion resetear contador timer para no entrar al modo sleep
+  if ((digitalRead(button1) || digitalRead(button2) || digitalRead(button3)) == HIGH) timer = 0;     //reset contador sleep por pulsador (SIM800 en tLeerSIM800)
   
   lora.update();                     //actualización lora
   bool do_lora_read = false;

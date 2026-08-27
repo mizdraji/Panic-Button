@@ -16,14 +16,14 @@
 #define DEBUG           0 
 #define dbspk           1                      //lora send pakage
 #define DEBUG_LORA_RX   0                      //1=diagnostico RX LoRa, 0=normal
-#define FORCE_FIXED_SF_TEST 0                  //1=fijar SF para ensayos, 0=logica normal/adaptativa
-#define FIXED_SF_INDEX  0                      //AU915: indice en SFvector: 0=SF7, 1=SF8, 2=SF9, 3=SF10 (max 125 kHz)
+#define FORCE_FIXED_SF_TEST 1                  //1=fijar SF para ensayos, 0=logica normal/adaptativa
+#define FIXED_SF_INDEX  3                      //AU915: indice en SFvector: 0=SF7, 1=SF8, 2=SF9, 3=SF10 (max 125 kHz)
 
 //configuracion ensayo
-#define MODO_ENSAYO      0                       //1 = habilita modo ensayo, 0 = modo normal
+#define MODO_ENSAYO      1                       //1 = habilita modo ensayo, 0 = modo normal
 #define ENSAYO_INCLUIR_SMS  1                    //1 = incluye SMS en el ensayo, 0 = solo LoRa  
-#define ENSAYO_INTERVALO_MS 25000UL             //5 minutos = 300000UL
-#define ENSAYO_DURACION_HS 1UL                  //48 horas - 24 horas
+#define ENSAYO_INTERVALO_MS 300000UL             //5 minutos = 300000UL
+#define ENSAYO_DURACION_HS 24UL                  //48 horas - 24 horas
 #define ENSAYO_TOTAL_MENSAJES ((ENSAYO_DURACION_HS * 60UL * 60UL * 1000UL) / ENSAYO_INTERVALO_MS) //576 mensajes - 288 mensajes
 
 //configuracion GSM numeros de remitentes
@@ -33,6 +33,10 @@ String Remitente2 = "3795572356";    //NUMERO REMITENTE 2
 String Remitente3 = "";              //NUMERO REMITENTE 3
 };
 remitente numero;
+
+// Destino fijo para Enviar_msj (sin prefijo +549)
+#define SMS_NUMERO_DESTINO  "3795572356"
+#define SMS_CMGS_CMD        "AT+CMGS=\"+549" SMS_NUMERO_DESTINO "\"\r\n"
 
 //mensajes para enviar y recibir por sms
 //struct mensajes {

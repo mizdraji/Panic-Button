@@ -31,3 +31,5 @@ uint32_t extraer_numero(String mensaje_completo);
 uint32_t extraer_numero(char mensaje_completo[]);
 void pdr_function();
 void config_pines();
+void esperarSim800(uint32_t ms);
+void ReceiveMode();

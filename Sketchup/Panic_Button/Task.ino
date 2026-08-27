@@ -73,8 +73,7 @@ void buttonTask1() {
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
     
     String mensaje_saliente = policia + ", " + idempotencia;
-    //Enviar_msj(numero.Remitente2, msj.policia);          //SMS
-    Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
+    Enviar_msj(mensaje_saliente);       //SMS
         
     statebutton1 = false;             // Reinicia el estado del pulsador
     t5.disable();
@@ -101,7 +100,7 @@ void buttonTask2() {
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
     
     String mensaje_saliente = bomberos + ", " + idempotencia;
-    Enviar_msj(numero.Remitente2, mensaje_saliente);       //SMS
+    Enviar_msj(mensaje_saliente);       //SMS
     
     statebutton2 = false;           // Reinicia el estado del pulsador
     t6.disable();
@@ -127,7 +126,7 @@ void buttonTask3() {
     sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
     
     String mensaje_saliente = medica + ", " + idempotencia;
-    Enviar_msj(numero.Remitente2, mensaje_saliente);        //SMS
+    Enviar_msj(mensaje_saliente);        //SMS
         
     statebutton3 = false;           // Reinicia el estado del pulsador
     t7.disable();
@@ -256,7 +255,7 @@ void ensayoTask() {
 
   #if ENSAYO_INCLUIR_SMS
     String payload = "Ens," + String(ensayo_counter) + "," + String(ts_ms);
-    Enviar_msj(numero.Remitente2, payload);
+    Enviar_msj(payload);
   #endif
 
   timer = 0; //evita entrar en sleep durante el ensayo
@@ -298,4 +297,55 @@ void despertarSIM800L() {
   SIM800L.print("AT+CSCLK=0\r\n");      //= 0 Despierta
   
   delay(100);          // Esperar 100ms
+}
+
+#define SIM_RX_BUF_SIZE 256
+
+static char sim_rx_buffer[SIM_RX_BUF_SIZE];
+static uint16_t sim_rx_len = 0;
+
+static void sim_rx_reset() {
+  sim_rx_len = 0;
+  sim_rx_buffer[0] = '\0';
+}
+
+// Procesa una linea/chunk recibido del SIM800 (confirmaciones SMS).
+static void procesarSimRx(const char* msg) {
+  if (msg == NULL || msg[0] == '\0') return;
+
+  uint32_t numrcv = extraer_numero((char*)msg);
+  if (strstr(msg, rcv_atendido.c_str()) != NULL && numrcv == numsnt) t_atendido.enable();
+  if ((strstr(msg, rcv_policia.c_str()) != NULL ||
+       strstr(msg, rcv_bomberos.c_str()) != NULL ||
+       strstr(msg, rcv_medica.c_str()) != NULL) && numrcv == numsnt && checknum == false) {
+    checknum = true;
+    t_recibido.enable();
+  }
+  if (strstr(msg, rcv_informado.c_str()) != NULL && numrcv == numsnt) {
+    Tinformadorcv_Led.enable();
+  }
+}
+
+// Lectura continua del UART del SIM800 (cada 20 ms via TaskScheduler).
+// Reemplaza Serialcom: eco SIM800->Serial (respuestas AT) y Serial->SIM800.
+void LeerSIM800() {
+  while (Serial.available()) {
+    SIM800L.write(Serial.read());
+  }
+
+  while (SIM800L.available()) {
+    char c = SIM800L.read();
+    Serial.write(c);
+    timer = 0;
+
+    if (sim_rx_len < SIM_RX_BUF_SIZE - 1) {
+      sim_rx_buffer[sim_rx_len++] = c;
+      sim_rx_buffer[sim_rx_len] = '\0';
+    }
+
+    if (c == '\n' || sim_rx_len >= SIM_RX_BUF_SIZE - 1) {
+      procesarSimRx(sim_rx_buffer);
+      sim_rx_reset();
+    }
+  }
 }

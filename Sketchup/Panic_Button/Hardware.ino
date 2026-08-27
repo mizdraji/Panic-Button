@@ -28,53 +28,38 @@ void config_inicial()
   digitalWrite(DTR, LOW);
 }
 
-//Función para enviar mensaje SMS
-void Enviar_msj(String numero, String msj) {
-  //Se establece el formato de SMS en ASCII
-  String config_numero = "AT+CMGS=\"+549" + numero + "\"\r\n";
-  Serial.println(config_numero);
-  
-  //Enviar comando para un nuevos SMS al numero establecido
-  SIM800L.print(config_numero);
-  delay(50);
+// Envia SMS al destino fijo SMS_NUMERO_DESTINO (configuracion.h).
+void Enviar_msj(const String& msj) {
+  Serial.println(SMS_CMGS_CMD);
 
-  //Enviar contenido del SMS
+  SIM800L.print(SMS_CMGS_CMD);
+  esperarSim800(80);
+
   SIM800L.print(msj);
-  delay(50);
-
-  //Enviar Ctrl+Z
   SIM800L.write((char)26);
-  delay(50);
   Serial.println("Mensaje enviado");
 }
 
-// Pasarela simple entre Serial y SIM800 para diagnostico manual.
-void Serialcom() {      
-  while(Serial.available()) {
-    SIM800L.write(Serial.read());//Forward what Serial received to Software Serial Port
-  }
-  while(SIM800L.available()) {
-    Serial.write(SIM800L.read());//Forward what Software Serial received to Serial Port
+// Espera no bloqueante: ejecuta el scheduler para que tLeerSIM800 lea el UART.
+void esperarSim800(uint32_t ms) {
+  uint32_t t0 = millis();
+  while (millis() - t0 < ms) {
+    taskManager.execute();
   }
 }
 
-//Set the SIM800L Receive mode  
-void ReceiveMode() {       
-  SIM800L.print("AT\r"); //If everything is Okay it will show "OK" on the serial monitor
-  delay(200);
-  Serialcom();
-  SIM800L.write("AT+CMGF=1\r"); // Configuring TEXT mode
-  delay(200);
-  Serialcom();
-  // SIM800L.write("AT+CMGD=1,4\r"); // Limpia memoria de mensajes
-  // delay(200);
-  // Serialcom();
+// Configura el SIM800 en modo SMS. Las respuestas AT las lee tLeerSIM800.
+void ReceiveMode() {
+  Serial.println("--> Configurando SIM800...");
+  SIM800L.print("AT\r");
+  esperarSim800(400);
+  SIM800L.print("AT+CMGF=1\r");
+  esperarSim800(400);
   SIM800L.print("AT+CSCS=\"GSM\"\r");
-  delay(200);
-  Serialcom();
-  SIM800L.print("AT+CNMI=2,2,0,0,0\r"); //Configure the SIM800L on how to manage the Received SMS... Check the SIM800L AT commands manual
-  delay(200);
-  Serialcom();
+  esperarSim800(400);
+  SIM800L.print("AT+CNMI=2,2,0,0,0\r");
+  esperarSim800(400);
+  Serial.println("--> SIM800 configurado");
 }
 
 // Prueba de red (PDR): inicia envio con ACK y hace polling no bloqueante.

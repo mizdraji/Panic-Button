@@ -64,6 +64,7 @@ void ensayoTask();
 void Sleeping_init();
 void dormirSIM800();
 void despertarSIM800L();
+void LeerSIM800();
 
 
 //Tareas:
@@ -103,7 +104,9 @@ Task ADCpower(30000, TASK_FOREVER, &powerON, &taskManager);                  //s
 Task Tinformadorcv_Led(500, TASK_FOREVER, &informado_led, &taskManager);    //Tarea para secuencia led cuando se recibe informadorcv
 Task t_ensayo(ENSAYO_INTERVALO_MS, TASK_FOREVER, &ensayoTask, &taskManager);  //intervalo: configuracion.h ENSAYO_INTERVALO_MS; SMS segun ENSAYO_INCLUIR_SMS
 
-Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
+//Task Sleep(2000, TASK_FOREVER, &Sleeping_init, &taskManager);               //Tarea para entrar al modo sleep
 Task SleepSIM(1000, TASK_FOREVER, &dormirSIM800, &taskManager);
+Task tLeerSIM800(20, TASK_FOREVER, &LeerSIM800, &taskManager);   //lectura continua del serial SIM800
+
 bool slp = false;
 uint16_t ensayo_counter = 0;
