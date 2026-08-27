@@ -1,35 +1,51 @@
-//estructura para guardar variables del nodo
-#define MAX_RANDOM_LARGO       50        //50 segundos
-#define MAX_REINTENTOS         6         //es la cantidad  maxima de reintentos que hace con un intervalo de tiempo pequeño, luego espera un tiempo mas largo y vuelve a intentar. Min 6 para que use todos los SF  
-#define MAX_PAUSAS_LARGAS      3         //Maximo de pausas largas que se realizan cuando los reintentos cortos fallan, superado este numero se espera un dia completo
-#define LONG_TIME_TO_WAIT      180       //3 minutos
-#define MIN_RANDOM             10        //10 segundos
-#define MAX_RANDOM             40        //40 segundos
-#define UN_DIA                 84600     //24hs = 86400 segundos
+#include "Arduino.h"
+
+extern HardwareSerial SIM800L;
+
+#define MAX_RANDOM_LARGO       50
+#define MAX_REINTENTOS         6
+#define MAX_PAUSAS_LARGAS      3
+#define LONG_TIME_TO_WAIT      180
+#define MIN_RANDOM             10
+#define MAX_RANDOM             40
+#define UN_DIA                 84600
+#define PDR_SETUP_TIMEOUT_MS   120000UL
+#define SMS_LINE_BUF_SIZE      160
+#define SIM800_RX_BUF_SIZE     1024
+#define SIM800_READ_CHUNK      64
+#define BTN_DEBOUNCE_MS        200
+#define LORA_IRQ_DEBOUNCE_MS   30
 
 struct str {
-  uint8_t pdr_ok                = 0;        // =1 cuando la prueba de red dio ok, sino =0
-  //variables de tiempo
-  int32_t t_wait                = 0;        //tiempo de espera
-  uint8_t pausa_larga           = 0;        //=1 esperar tiempo largo
-  uint8_t cont_pausas_largas    = 0;        //cuenta las pausas largas que se realizan cuando los reintentos cortos fallan
-  uint8_t cont_reintento_corto  = 0;        //usado para contar los intentos uplink de las funciones pdr, sync e ident
+  uint8_t pdr_ok                = 0;
+  int32_t t_wait                = 0;
+  uint8_t pausa_larga           = 0;
+  uint8_t cont_pausas_largas    = 0;
+  uint8_t cont_reintento_corto  = 0;
 };
 str nodo;
 
-//interrupciones:
 void IRAM_ATTR buttonInterrupt1();
 void IRAM_ATTR buttonInterrupt2();
 void IRAM_ATTR buttonInterrupt3();
 void IRAM_ATTR onReceive();
-bool lorarcv = false;
-volatile bool lora_irq_pending = false;
 
-uint16_t random_time(unsigned int MIN_,unsigned int MAX_);
+volatile bool lora_irq_pending = false;
+volatile bool btn1_pending = false;
+volatile bool btn2_pending = false;
+volatile bool btn3_pending = false;
+
+uint16_t random_time(unsigned int MIN_, unsigned int MAX_);
 uint32_t idempotencia_random();
-uint32_t extraer_numero(String mensaje_completo);
-uint32_t extraer_numero(char mensaje_completo[]);
+uint32_t extraer_numero(const char* mensaje_completo);
 void pdr_function();
 void config_pines();
-void esperarSim800(uint32_t ms);
+void config_inicial();
+void Enviar_msj(const char* numero, const char* msj);
 void ReceiveMode();
+void processPendingButtons();
+bool processPendingLora();
+void poll_sim800_messages();
+#if DEBUG_GSM
+void Serialcom();
+#endif

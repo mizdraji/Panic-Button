@@ -15,12 +15,36 @@ void config_task(){
   t_atendido.disable();
   t_ensayo.disable();
   lock.disable();
+  t_sms_send.disable();
   Tinformadorcv_Led.disable();
   SleepSIM.disable();
+#if MODO_DEMO
+  Serial.println("MODO DEMO: deep sleep deshabilitado");
+#endif
 }
 
 
 //Definimos nuestras tareas:
+
+static char pending_sms_num[20];
+static char pending_sms_msg[64];
+
+void sendPendingSmsTask() {
+  Enviar_msj(pending_sms_num, pending_sms_msg);
+  t_sms_send.disable();
+}
+
+void queueSms(const char* numero, const char* msj) {
+  if (numero == NULL || msj == NULL) return;
+  strncpy(pending_sms_num, numero, sizeof(pending_sms_num) - 1);
+  pending_sms_num[sizeof(pending_sms_num) - 1] = '\0';
+  strncpy(pending_sms_msg, msj, sizeof(pending_sms_msg) - 1);
+  pending_sms_msg[sizeof(pending_sms_msg) - 1] = '\0';
+  Serial.print("SMS en cola (");
+  Serial.print((unsigned long)DEMO_SMS_DELAY_MS);
+  Serial.println(" ms)");
+  t_sms_send.restartDelayed(DEMO_SMS_DELAY_MS);
+}
 
 //TASK1
 void led_blink() {
@@ -62,18 +86,18 @@ void buttonTask1() {
   if(!bloqueo) {
     encenderLED(led1);
 
-    idempotencia = idempotencia_random();
-    numsnt = idempotencia.toInt();
+    numsnt = idempotencia_random();
     checknum = false;
 
     char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", policia_lora, idempotencia.c_str());                 //Concatena "policia" e "idempotencia" con una coma
+    char mensaje_saliente_sms[64];
+    snprintf(mensaje_saliente_lora, sizeof(mensaje_saliente_lora), "%s, %lu", policia_lora, (unsigned long)numsnt);
+    snprintf(mensaje_saliente_sms, sizeof(mensaje_saliente_sms), "%s, %lu", policia.c_str(), (unsigned long)numsnt);
     Serial.print("LORA TX -> ");
     Serial.println(mensaje_saliente_lora);
-    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-    
-    String mensaje_saliente = policia + ", " + idempotencia;
-    Enviar_msj(mensaje_saliente);       //SMS
+    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);
+    yield();
+    queueSms(numero.Remitente2.c_str(), mensaje_saliente_sms);
         
     statebutton1 = false;             // Reinicia el estado del pulsador
     t5.disable();
@@ -89,18 +113,18 @@ void buttonTask2() {
   if(!bloqueo) {
     encenderLED(led2);
 
-    idempotencia = idempotencia_random();
-    numsnt = idempotencia.toInt();
+    numsnt = idempotencia_random();
     checknum = false;
 
     char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", bomberos_lora, idempotencia.c_str());                 //Concatena "bomberos" e "idempotencia" con una coma
+    char mensaje_saliente_sms[64];
+    snprintf(mensaje_saliente_lora, sizeof(mensaje_saliente_lora), "%s, %lu", bomberos_lora, (unsigned long)numsnt);
+    snprintf(mensaje_saliente_sms, sizeof(mensaje_saliente_sms), "%s, %lu", bomberos.c_str(), (unsigned long)numsnt);
     Serial.print("LORA TX -> ");
     Serial.println(mensaje_saliente_lora);
-    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-    
-    String mensaje_saliente = bomberos + ", " + idempotencia;
-    Enviar_msj(mensaje_saliente);       //SMS
+    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);
+    yield();
+    queueSms(numero.Remitente2.c_str(), mensaje_saliente_sms);
     
     statebutton2 = false;           // Reinicia el estado del pulsador
     t6.disable();
@@ -115,18 +139,18 @@ void buttonTask3() {
   if(!bloqueo) {
     encenderLED(led3);
 
-    idempotencia = idempotencia_random();
-    numsnt = idempotencia.toInt();
+    numsnt = idempotencia_random();
     checknum = false;
 
     char mensaje_saliente_lora[50];
-    sprintf(mensaje_saliente_lora, "%s, %s", medica_lora, idempotencia.c_str());                 //Concatena "media" e "idempotencia" con una coma
+    char mensaje_saliente_sms[64];
+    snprintf(mensaje_saliente_lora, sizeof(mensaje_saliente_lora), "%s, %lu", medica_lora, (unsigned long)numsnt);
+    snprintf(mensaje_saliente_sms, sizeof(mensaje_saliente_sms), "%s, %lu", medica.c_str(), (unsigned long)numsnt);
     Serial.print("LORA TX -> ");
     Serial.println(mensaje_saliente_lora);
-    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);         //LORA
-    
-    String mensaje_saliente = medica + ", " + idempotencia;
-    Enviar_msj(mensaje_saliente);        //SMS
+    sendPackage(mensaje_saliente_lora, strlen(mensaje_saliente_lora), no_espera_ACK,  1);
+    yield();
+    queueSms(numero.Remitente2.c_str(), mensaje_saliente_sms);
         
     statebutton3 = false;           // Reinicia el estado del pulsador
     t7.disable();
@@ -254,14 +278,18 @@ void ensayoTask() {
   sendPackage(payload_lora, strlen(payload_lora), no_espera_ACK, 1);
 
   #if ENSAYO_INCLUIR_SMS
-    String payload = "Ens," + String(ensayo_counter) + "," + String(ts_ms);
-    Enviar_msj(payload);
+    char payload_sms[64];
+    snprintf(payload_sms, sizeof(payload_sms), "Ens,%u,%lu", (unsigned int)ensayo_counter, (unsigned long)ts_ms);
+    Enviar_msj(numero.Remitente2.c_str(), payload_sms);
   #endif
 
   timer = 0; //evita entrar en sleep durante el ensayo
 }
 
 void Sleeping_init(){
+#if MODO_DEMO
+  return;
+#endif
   timer ++;
   Serial.print("timer: ");
   Serial.println(timer);
@@ -297,55 +325,4 @@ void despertarSIM800L() {
   SIM800L.print("AT+CSCLK=0\r\n");      //= 0 Despierta
   
   delay(100);          // Esperar 100ms
-}
-
-#define SIM_RX_BUF_SIZE 256
-
-static char sim_rx_buffer[SIM_RX_BUF_SIZE];
-static uint16_t sim_rx_len = 0;
-
-static void sim_rx_reset() {
-  sim_rx_len = 0;
-  sim_rx_buffer[0] = '\0';
-}
-
-// Procesa una linea/chunk recibido del SIM800 (confirmaciones SMS).
-static void procesarSimRx(const char* msg) {
-  if (msg == NULL || msg[0] == '\0') return;
-
-  uint32_t numrcv = extraer_numero((char*)msg);
-  if (strstr(msg, rcv_atendido.c_str()) != NULL && numrcv == numsnt) t_atendido.enable();
-  if ((strstr(msg, rcv_policia.c_str()) != NULL ||
-       strstr(msg, rcv_bomberos.c_str()) != NULL ||
-       strstr(msg, rcv_medica.c_str()) != NULL) && numrcv == numsnt && checknum == false) {
-    checknum = true;
-    t_recibido.enable();
-  }
-  if (strstr(msg, rcv_informado.c_str()) != NULL && numrcv == numsnt) {
-    Tinformadorcv_Led.enable();
-  }
-}
-
-// Lectura continua del UART del SIM800 (cada 20 ms via TaskScheduler).
-// Reemplaza Serialcom: eco SIM800->Serial (respuestas AT) y Serial->SIM800.
-void LeerSIM800() {
-  while (Serial.available()) {
-    SIM800L.write(Serial.read());
-  }
-
-  while (SIM800L.available()) {
-    char c = SIM800L.read();
-    Serial.write(c);
-    timer = 0;
-
-    if (sim_rx_len < SIM_RX_BUF_SIZE - 1) {
-      sim_rx_buffer[sim_rx_len++] = c;
-      sim_rx_buffer[sim_rx_len] = '\0';
-    }
-
-    if (c == '\n' || sim_rx_len >= SIM_RX_BUF_SIZE - 1) {
-      procesarSimRx(sim_rx_buffer);
-      sim_rx_reset();
-    }
-  }
 }

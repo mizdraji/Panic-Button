@@ -74,6 +74,7 @@ static void configureAndSendUplink(char *data_to_send, uint8_t len, bool canal_p
   
   if (canal_por_defecto) lora.sendUplink(data_to_send, len, 0, 1);
   else lora.sendUplink(data_to_send, len, 1, 1);
+  yield();
 }
 
 uint8_t sendPackageAckAsyncStart(char *data_to_send, uint8_t len, bool canal_por_defecto) {
@@ -198,6 +199,7 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
         rta = lora.readAck();
 
         delay(tick_time);
+        yield();
         cont_timeout++; //contador de time out
         //Serial.print("cont_timeout: "); Serial.println(cont_timeout);
       }
@@ -229,6 +231,7 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
           //dato_ok = procesarDatoEntrante();
         }
         delay(tick_time);
+        yield();
         cont_timeout++; //contador de time out
       }
       if (dato_ok) {

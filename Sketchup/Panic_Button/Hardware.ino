@@ -28,38 +28,246 @@ void config_inicial()
   digitalWrite(DTR, LOW);
 }
 
-// Envia SMS al destino fijo SMS_NUMERO_DESTINO (configuracion.h).
-void Enviar_msj(const String& msj) {
-  Serial.println(SMS_CMGS_CMD);
+// Envia SMS sin String (buffers fijos).
+void Enviar_msj(const char* numero, const char* msj) {
+  if (numero == NULL || msj == NULL) return;
 
-  SIM800L.print(SMS_CMGS_CMD);
-  esperarSim800(80);
+  char cmd[48];
+  snprintf(cmd, sizeof(cmd), "AT+CMGS=\"+549%s\"\r\n", numero);
+  Serial.print("SMS TX -> ");
+  Serial.println(numero);
 
+  SIM800L.print(cmd);
+  delay(50);
+  yield();
   SIM800L.print(msj);
+  delay(50);
+  yield();
   SIM800L.write((char)26);
+  delay(50);
+  yield();
   Serial.println("Mensaje enviado");
 }
 
-// Espera no bloqueante: ejecuta el scheduler para que tLeerSIM800 lea el UART.
-void esperarSim800(uint32_t ms) {
-  uint32_t t0 = millis();
-  while (millis() - t0 < ms) {
-    taskManager.execute();
+// --- RX SMS linea a linea ---
+
+static void trim_sms_line(char* line) {
+  if (line == NULL) return;
+  char* start = line;
+  while (*start == '\r' || *start == '\n' || *start == ' ' || *start == '\t') {
+    start++;
+  }
+  if (start != line) {
+    memmove(line, start, strlen(start) + 1);
+  }
+  size_t n = strlen(line);
+  while (n > 0 && (line[n - 1] == '\r' || line[n - 1] == '\n' || line[n - 1] == ' ')) {
+    line[--n] = '\0';
   }
 }
 
-// Configura el SIM800 en modo SMS. Las respuestas AT las lee tLeerSIM800.
+static bool sms_has_token(const char* line) {
+  if (line == NULL || line[0] == '\0') return false;
+  return (strstr(line, rcv_policia_sms)   != NULL ||
+          strstr(line, rcv_bomberos_sms)  != NULL ||
+          strstr(line, rcv_medica_sms)    != NULL ||
+          strstr(line, rcv_atendido_sms)  != NULL ||
+          strstr(line, rcv_informado_sms) != NULL);
+}
+
+static bool sms_is_echo_line(const char* line) {
+  if (line == NULL || line[0] == '\0') return true;
+  if (line[0] == '>') return true;
+  if (strncmp(line, "OK", 2) == 0) return true;
+  if (strncmp(line, "+CMGS:", 7) == 0) return true;
+  if (strstr(line, "AT+CMGS") != NULL) return true;
+  return false;
+}
+
+static void procesar_sms_linea(const char* mensaje) {
+  if (!sms_has_token(mensaje)) return;
+
+  uint32_t numrcv = extraer_numero(mensaje);
+  Serial.print("SMS RX -> ");
+  Serial.println(mensaje);
+
+  if (strstr(mensaje, rcv_atendido_sms) != NULL && numrcv == numsnt) {
+    t_atendido.enable();
+  }
+  if ((strstr(mensaje, rcv_policia_sms)  != NULL ||
+       strstr(mensaje, rcv_bomberos_sms) != NULL ||
+       strstr(mensaje, rcv_medica_sms)   != NULL) &&
+      numrcv == numsnt && !checknum) {
+    checknum = true;
+    t_recibido.enable();
+  }
+  if (strstr(mensaje, rcv_informado_sms) != NULL && numrcv == numsnt) {
+    Tinformadorcv_Led.enable();
+  }
+}
+
+void poll_sim800_messages() {
+  static char acc[SMS_LINE_BUF_SIZE];
+  static uint16_t len = 0;
+
+  if (!SIM800L.available()) return;
+
+  uint8_t n = 0;
+  while (SIM800L.available() && n < SIM800_READ_CHUNK) {
+    char c = SIM800L.read();
+    n++;
+
+    if (c == '\n') {
+      acc[len] = '\0';
+      len = 0;
+      trim_sms_line(acc);
+      if (acc[0] != '\0' && !sms_is_echo_line(acc)) {
+#if DEBUG_GSM
+        Serial.print("SMS line: ");
+        Serial.println(acc);
+#endif
+        procesar_sms_linea(acc);
+      }
+      continue;
+    }
+
+    if (len < sizeof(acc) - 1) {
+      acc[len++] = c;
+    } else {
+      while (SIM800L.available() && c != '\n') {
+        c = SIM800L.read();
+        n++;
+        if (n >= SIM800_READ_CHUNK) break;
+      }
+      len = 0;
+    }
+    yield();
+  }
+}
+
+void processPendingButtons() {
+  static uint32_t last_btn1_ms = 0;
+  static uint32_t last_btn2_ms = 0;
+  static uint32_t last_btn3_ms = 0;
+  uint32_t now = millis();
+
+  if (btn1_pending) {
+    btn1_pending = false;
+    if (last_btn1_ms == 0 || (uint32_t)(now - last_btn1_ms) >= BTN_DEBOUNCE_MS) {
+      last_btn1_ms = now;
+      statebutton1 = true;
+      t5.enableIfNot();
+    }
+  }
+  if (btn2_pending) {
+    btn2_pending = false;
+    if (last_btn2_ms == 0 || (uint32_t)(now - last_btn2_ms) >= BTN_DEBOUNCE_MS) {
+      last_btn2_ms = now;
+      statebutton2 = true;
+      t6.enableIfNot();
+    }
+  }
+  if (btn3_pending) {
+    btn3_pending = false;
+    if (last_btn3_ms == 0 || (uint32_t)(now - last_btn3_ms) >= BTN_DEBOUNCE_MS) {
+      last_btn3_ms = now;
+      statebutton3 = true;
+      t7.enableIfNot();
+    }
+  }
+}
+
+bool processPendingLora() {
+  static uint32_t last_lora_irq_ms = 0;
+
+  if (!lora_irq_pending) return false;
+  lora_irq_pending = false;
+
+  uint32_t now = millis();
+  if (last_lora_irq_ms != 0 && (uint32_t)(now - last_lora_irq_ms) < LORA_IRQ_DEBOUNCE_MS) {
+    return false;
+  }
+  last_lora_irq_ms = now;
+  return true;
+}
+
+#define SIM800_AT_RESP_SIZE   128
+#define SIM800_AT_TIMEOUT_MS  800
+
+// Vacia RX del SIM800 (sin reenviar desde el monitor USB).
+static void sim800_drain_rx(void) {
+  while (SIM800L.available()) {
+#if DEBUG_GSM
+    Serial.write(SIM800L.read());
+#else
+    (void)SIM800L.read();
+#endif
+  }
+}
+
+// Envia AT, espera OK/ERROR con timeout y deja el UART limpio.
+static bool sim800_send_at(const char* cmd) {
+  if (cmd == NULL) return false;
+
+  sim800_drain_rx();
+  SIM800L.print(cmd);
+
+#if DEBUG_GSM
+  Serial.print(">> ");
+  Serial.print(cmd);
+#endif
+
+  char resp[SIM800_AT_RESP_SIZE];
+  uint16_t n = 0;
+  uint32_t deadline = millis() + SIM800_AT_TIMEOUT_MS;
+
+  while ((int32_t)(millis() - deadline) < 0) {
+    while (SIM800L.available()) {
+      char c = SIM800L.read();
+#if DEBUG_GSM
+      Serial.write(c);
+#endif
+      if (n < sizeof(resp) - 1) {
+        resp[n++] = c;
+        resp[n] = '\0';
+      }
+      if (strstr(resp, "OK") != NULL) return true;
+      if (strstr(resp, "ERROR") != NULL) {
+        Serial.print("--> SIM800 ERROR: ");
+        Serial.println(cmd);
+        return false;
+      }
+    }
+    yield();
+    delay(1);
+  }
+
+  Serial.print("--> SIM800 timeout: ");
+  Serial.println(cmd);
+  return false;
+}
+
+#if DEBUG_GSM
+// Passthrough Serial <-> SIM800 (solo depuracion manual; llamar desde loop).
+void Serialcom() {
+  while (Serial.available()) {
+    SIM800L.write(Serial.read());
+  }
+  while (SIM800L.available()) {
+    Serial.write(SIM800L.read());
+  }
+}
+#endif
+
 void ReceiveMode() {
-  Serial.println("--> Configurando SIM800...");
-  SIM800L.print("AT\r");
-  esperarSim800(400);
-  SIM800L.print("AT+CMGF=1\r");
-  esperarSim800(400);
-  SIM800L.print("AT+CSCS=\"GSM\"\r");
-  esperarSim800(400);
-  SIM800L.print("AT+CNMI=2,2,0,0,0\r");
-  esperarSim800(400);
-  Serial.println("--> SIM800 configurado");
+  bool ok = true;
+  ok &= sim800_send_at("AT\r");
+  ok &= sim800_send_at("AT+CMGF=1\r");
+  ok &= sim800_send_at("AT+CSCS=\"GSM\"\r");
+  ok &= sim800_send_at("AT+CNMI=2,2,0,0,0\r");
+  if (ok) Serial.println("--> SIM800 SMS RX mode OK");
+  else    Serial.println("--> SIM800 SMS setup con errores");
+  sim800_drain_rx();
 }
 
 // Prueba de red (PDR): inicia envio con ACK y hace polling no bloqueante.
@@ -119,51 +327,11 @@ void pdr_function() {
   }
 }
 
-// Interrupciones con antirebote.
-// Interrupcion pulsador1
-void IRAM_ATTR buttonInterrupt1() {           
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 200) {
-    statebutton1 = true;
-    t5.enableIfNot();                           //Habilita la tarea solo si estaba desactivada previamente
-  }
-  last_interrupt_time = interrupt_time;
-}
-
-// Interrupcion pulsador2
-void IRAM_ATTR buttonInterrupt2() {           
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 200) {
-    statebutton2 = true;
-    t6.enableIfNot();                           //Habilita la tarea solo si estaba desactivada previamente
-  }
-  last_interrupt_time = interrupt_time;
-}
-
-// Interrupcion pulsador3
-void IRAM_ATTR buttonInterrupt3() {           
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 200) {
-    statebutton3 = true;
-    t7.enableIfNot();                             //Habilita la tarea solo si estaba desactivada previamente
-  }
-  last_interrupt_time = interrupt_time;
-}
-
-// Interrupcion LoRa RX:
-// solo levanta bandera, la lectura SPI se hace en loop() para evitar bloqueos en ISR.
-void IRAM_ATTR onReceive() {
-  // En ISR solo marcar bandera; evitar SPI/readData dentro de interrupcion.
-  static unsigned long last_interrupt_time = 0;
-  unsigned long interrupt_time = millis();
-  if (interrupt_time - last_interrupt_time > 30) {
-    lora_irq_pending = true;
-  }
-  last_interrupt_time = interrupt_time;
-}
+// ISR: solo banderas. Antirebote y TaskScheduler en loop().
+void IRAM_ATTR buttonInterrupt1() { btn1_pending = true; }
+void IRAM_ATTR buttonInterrupt2() { btn2_pending = true; }
+void IRAM_ATTR buttonInterrupt3() { btn3_pending = true; }
+void IRAM_ATTR onReceive() { lora_irq_pending = true; }
 
 // Genera un numero aleatorio de 8 digitos para idempotencia.
 uint32_t idempotencia_random() {
@@ -175,26 +343,14 @@ uint32_t idempotencia_random() {
 
 // Extrae numero de payload char[] del tipo "Lxx, 12345678".
 // Tolera coma con o sin espacio.
-uint32_t extraer_numero(char mensaje_completo[]) {
-    char *coma_pos = strrchr(mensaje_completo, ',');                  // Buscar la ultima coma
+uint32_t extraer_numero(const char* mensaje_completo) {
+    const char *coma_pos = strrchr(mensaje_completo, ',');
     if (coma_pos != NULL) {
-        char *parte_numerica = coma_pos + 1;                          // posicion despues de la coma
-        while (*parte_numerica == ' ' || *parte_numerica == '\t') {   // tolerar formato ",123" o ", 123"
+        const char *parte_numerica = coma_pos + 1;
+        while (*parte_numerica == ' ' || *parte_numerica == '\t') {
           parte_numerica++;
         }
-        uint32_t numero = strtoul(parte_numerica, NULL, 10);
-        return numero;
-    }
-    return 0;
-}
-
-// Extrae numero de payload String tomando la ultima coma.
-uint32_t extraer_numero(String mensaje_completo) {
-    int posicion_ultima_coma = mensaje_completo.lastIndexOf(',');
-    if (posicion_ultima_coma != -1) {
-        String numero = mensaje_completo.substring(posicion_ultima_coma + 1);  // despues de la coma
-        numero.trim();                                                           // tolera espacios
-        return numero.toInt();
+        return (uint32_t)strtoul(parte_numerica, NULL, 10);
     }
     return 0;
 }

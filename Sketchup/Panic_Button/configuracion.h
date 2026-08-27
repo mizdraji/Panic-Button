@@ -2,7 +2,11 @@
 #pragma once
 
 //Version
-#define VERSION       "V1.8.9"
+#define VERSION       "V1.9.4"
+
+// 1 = demo: sin deep sleep, firmware maximo robustez
+#define MODO_DEMO        1
+#define DEMO_SMS_DELAY_MS  1500UL   // pausa LoRa->SMS para evitar pico SIM800 + INT_WDT
 
 //Serial
 #define SERIAL_SPEED  115200
@@ -16,6 +20,7 @@
 #define DEBUG           0 
 #define dbspk           1                      //lora send pakage
 #define DEBUG_LORA_RX   0                      //1=diagnostico RX LoRa, 0=normal
+#define DEBUG_GSM       0                      //1=passthrough Serial<->SIM800 en loop()
 #define FORCE_FIXED_SF_TEST 1                  //1=fijar SF para ensayos, 0=logica normal/adaptativa
 #define FIXED_SF_INDEX  3                      //AU915: indice en SFvector: 0=SF7, 1=SF8, 2=SF9, 3=SF10 (max 125 kHz)
 
@@ -48,9 +53,15 @@ remitente numero;
   String rcv_medica       = "medicarcv";            //medica recibido confirmacion
   String rcv_atendido     = "atendidorcv";          //Respuesta de operario, alerta atendida
   String rcv_informado    = "informadorcv";         //Informadorcv cuando se da aviso a la autoridad correspondiente.
-  String rcv_cerrado      = "cerradorcv";           // es cuando se da por finalizada la alerta, pero puede pasar mucho tiempo
-//};
+  String rcv_cerrado      = "cerradorcv";
 //mensajes msj;
+
+// tokens SMS (char[] fijo, sin heap en RX)
+  char rcv_policia_sms[]   = "policiarcv";
+  char rcv_bomberos_sms[]  = "bomberosrcv";
+  char rcv_medica_sms[]    = "medicarcv";
+  char rcv_atendido_sms[]  = "atendidorcv";
+  char rcv_informado_sms[] = "informadorcv";
 
 //mensajes para enviar y recibir por lora
   char policia_lora[]     = "Lp";             //envio: policia
