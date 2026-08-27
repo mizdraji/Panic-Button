@@ -92,8 +92,12 @@ bool LoRaWANClass::init(void)
 #elif defined(EU_868)
     LoRa_Settings.Datarate_Rx = 0x03;   //set to SF9 BW 125 kHz
 #else //US_915 or AU_915
+#if defined(AU_915) && LORATEC_RX_FIXED_SF7
+    LoRa_Settings.Datarate_Rx = 0x0D;   // SF7 BW 500 kHz (LoraTec Class C)
+#else
     LoRa_Settings.Datarate_Rx = 0x0C;   //set to SF8 BW 500 kHz
     //LoRa_Settings.Datarate_Rx = 0x08;   //set to SF12 BW 500 kHz
+#endif
 #endif
     LoRa_Settings.Channel_Rx = 0x0A;    // set to recv channel
 
@@ -301,7 +305,11 @@ void LoRaWANClass::setDataRate(unsigned char data_rate)
 #elif defined(AU_915)
   if(drate_common <= 0x04){
     LoRa_Settings.Datarate_Tx = drate_common;
+#if LORATEC_RX_FIXED_SF7
+    LoRa_Settings.Datarate_Rx = SF7BW500;   // DR13, igual que LoraTec
+#else
     LoRa_Settings.Datarate_Rx = data_rate + 0x0A;
+#endif
   }
 #else
   //Check if the value is oke

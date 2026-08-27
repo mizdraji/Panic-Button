@@ -58,7 +58,7 @@ void trecibido();
 void tatendido();
 void powerON();
 void unlock();
-void queueSms(const char* numero, const char* msj);
+void queueSms(const char* msj);
 void sendPendingSmsTask();
 void informado_led();
 void ensayoTask();

@@ -11,7 +11,7 @@ extern HardwareSerial SIM800L;
 #define UN_DIA                 84600
 #define PDR_SETUP_TIMEOUT_MS   120000UL
 #define SMS_LINE_BUF_SIZE      160
-#define SIM800_RX_BUF_SIZE     1024
+#define SIM800_RX_BUF_SIZE     512
 #define SIM800_READ_CHUNK      64
 #define BTN_DEBOUNCE_MS        200
 #define LORA_IRQ_DEBOUNCE_MS   30
@@ -41,11 +41,12 @@ uint32_t extraer_numero(const char* mensaje_completo);
 void pdr_function();
 void config_pines();
 void config_inicial();
-void Enviar_msj(const char* numero, const char* msj);
+void Enviar_msj(const char* msj);
 void ReceiveMode();
 void processPendingButtons();
 bool processPendingLora();
 void poll_sim800_messages();
+void report_heap(bool force);
 #if DEBUG_GSM
 void Serialcom();
 #endif

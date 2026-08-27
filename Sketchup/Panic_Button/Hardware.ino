@@ -28,16 +28,14 @@ void config_inicial()
   digitalWrite(DTR, LOW);
 }
 
-// Envia SMS sin String (buffers fijos).
-void Enviar_msj(const char* numero, const char* msj) {
-  if (numero == NULL || msj == NULL) return;
+// Envia SMS al destino fijo SMS_NUMERO_DESTINO (configuracion.h).
+void Enviar_msj(const char* msj) {
+  if (msj == NULL) return;
 
-  char cmd[48];
-  snprintf(cmd, sizeof(cmd), "AT+CMGS=\"+549%s\"\r\n", numero);
   Serial.print("SMS TX -> ");
-  Serial.println(numero);
+  Serial.println(msj);
 
-  SIM800L.print(cmd);
+  SIM800L.print(SMS_CMGS_CMD);
   delay(50);
   yield();
   SIM800L.print(msj);
@@ -46,7 +44,6 @@ void Enviar_msj(const char* numero, const char* msj) {
   SIM800L.write((char)26);
   delay(50);
   yield();
-  Serial.println("Mensaje enviado");
 }
 
 // --- RX SMS linea a linea ---
@@ -78,8 +75,9 @@ static bool sms_has_token(const char* line) {
 static bool sms_is_echo_line(const char* line) {
   if (line == NULL || line[0] == '\0') return true;
   if (line[0] == '>') return true;
+  if (line[0] == '+') return true;
   if (strncmp(line, "OK", 2) == 0) return true;
-  if (strncmp(line, "+CMGS:", 7) == 0) return true;
+  if (strncmp(line, "RING", 4) == 0) return true;
   if (strstr(line, "AT+CMGS") != NULL) return true;
   return false;
 }
@@ -88,8 +86,6 @@ static void procesar_sms_linea(const char* mensaje) {
   if (!sms_has_token(mensaje)) return;
 
   uint32_t numrcv = extraer_numero(mensaje);
-  Serial.print("SMS RX -> ");
-  Serial.println(mensaje);
 
   if (strstr(mensaje, rcv_atendido_sms) != NULL && numrcv == numsnt) {
     t_atendido.enable();
@@ -121,9 +117,13 @@ void poll_sim800_messages() {
       acc[len] = '\0';
       len = 0;
       trim_sms_line(acc);
-      if (acc[0] != '\0' && !sms_is_echo_line(acc)) {
+      if (acc[0] == '\0') continue;
 #if DEBUG_GSM
-        Serial.print("SMS line: ");
+      Serial.println(acc);
+#endif
+      if (!sms_is_echo_line(acc)) {
+#if !DEBUG_GSM
+        Serial.print("SMS RX -> ");
         Serial.println(acc);
 #endif
         procesar_sms_linea(acc);
@@ -233,7 +233,7 @@ static bool sim800_send_at(const char* cmd) {
       }
       if (strstr(resp, "OK") != NULL) return true;
       if (strstr(resp, "ERROR") != NULL) {
-        Serial.print("--> SIM800 ERROR: ");
+        Serial.print("SIM800 ERROR: ");
         Serial.println(cmd);
         return false;
       }
@@ -242,19 +242,17 @@ static bool sim800_send_at(const char* cmd) {
     delay(1);
   }
 
-  Serial.print("--> SIM800 timeout: ");
+  Serial.print("SIM800 timeout: ");
   Serial.println(cmd);
   return false;
 }
 
 #if DEBUG_GSM
-// Passthrough Serial <-> SIM800 (solo depuracion manual; llamar desde loop).
+// Solo USB -> SIM800. El RX del modem lo consume poll_sim800_messages()
+// (si Serialcom tambien lee SIM800L, se parte el SMS y no se procesa).
 void Serialcom() {
   while (Serial.available()) {
     SIM800L.write(Serial.read());
-  }
-  while (SIM800L.available()) {
-    Serial.write(SIM800L.read());
   }
 }
 #endif
@@ -265,8 +263,7 @@ void ReceiveMode() {
   ok &= sim800_send_at("AT+CMGF=1\r");
   ok &= sim800_send_at("AT+CSCS=\"GSM\"\r");
   ok &= sim800_send_at("AT+CNMI=2,2,0,0,0\r");
-  if (ok) Serial.println("--> SIM800 SMS RX mode OK");
-  else    Serial.println("--> SIM800 SMS setup con errores");
+  if (!ok) Serial.println("SIM800 SMS setup con errores");
   sim800_drain_rx();
 }
 
@@ -290,7 +287,7 @@ void pdr_function() {
         nodo.pausa_larga = 0;
         nodo.cont_pausas_largas = 0;
         nodo.cont_reintento_corto = 0;
-        Serial.println("-->PRUEBA DE RED: OK");
+        Serial.println("PDR OK");
       }
       else if (ackStatus == -1) {
         nodo.pdr_ok = 0;
@@ -301,21 +298,16 @@ void pdr_function() {
           nodo.cont_pausas_largas++;
           if (nodo.cont_pausas_largas >= MAX_PAUSAS_LARGAS) {
             nodo.cont_pausas_largas = 0;
-            nodo.t_wait = UN_DIA; //esperar un dia completo
+            nodo.t_wait = UN_DIA;
           }
-          else nodo.t_wait = LONG_TIME_TO_WAIT; //este es un tiempo largo y fijo
-          Serial.println("-->Cant Max de reintentos para PDR excedido, pausa larga");
-          
-          Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
-          
+          else nodo.t_wait = LONG_TIME_TO_WAIT;
         }
         else {
-          nodo.t_wait = random_time(MIN_RANDOM,MAX_RANDOM); //devuelve en segundos
-          Serial.println("-->PRUEBA DE RED: FALLO");
-          
-          Serial.print("-->Esperando t = "); Serial.print(nodo.t_wait); Serial.println(" s para reintentar PDR...");
-          
+          nodo.t_wait = random_time(MIN_RANDOM, MAX_RANDOM);
         }
+        Serial.print("PDR FALLO, reintento en ");
+        Serial.print(nodo.t_wait);
+        Serial.println(" s");
       } else {
         // Estado inesperado (sin envio activo): reintentar en el siguiente tick.
         return;
@@ -358,4 +350,26 @@ uint32_t extraer_numero(const char* mensaje_completo) {
 // Genera un numero aleatorio entre MIN y MAX.
 uint16_t random_time(unsigned int MIN_,unsigned int MAX_) {
   return random(MIN_, MAX_);          //calcula un nuevo tiempo
+}
+
+void report_heap(bool force) {
+  static uint32_t last_ms = 0;
+  uint32_t now = millis();
+  uint32_t free_now = ESP.getFreeHeap();
+  uint32_t min_now = ESP.getMinFreeHeap();
+  uint32_t maxblk = ESP.getMaxAllocHeap();
+  bool warn = (free_now < HEAP_WARN_BYTES) || (min_now < HEAP_WARN_BYTES);
+  bool periodic = (HEAP_REPORT_MS > 0) &&
+                  (last_ms == 0 || (uint32_t)(now - last_ms) >= HEAP_REPORT_MS);
+
+  if (!force && !warn && !periodic) return;
+
+  last_ms = now;
+  Serial.print("Heap free=");
+  Serial.print(free_now);
+  Serial.print(" min=");
+  Serial.print(min_now);
+  Serial.print(" maxblk=");
+  Serial.println(maxblk);
+  if (warn) Serial.println("Heap BAJO");
 }

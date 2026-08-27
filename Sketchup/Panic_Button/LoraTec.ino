@@ -21,21 +21,24 @@ uint8_t cont_same_SF = 0;         //para probar mas d euna vez cada SF
 bool ack_waiting_async = false;
 uint32_t ack_waiting_start_ms = 0;
 
-static void configureAndSendUplink(char *data_to_send, uint8_t len, bool canal_por_defecto) {
+// apply_fixed_sf: false en PDR (TX SF7 rapido); true en botones/ensayo (FORCE_FIXED_SF_TEST).
+// RX Class C sigue en SF7/500 si LORATEC_RX_FIXED_SF7=1; no hay que cambiarlo despues de PDR.
+static void configureAndSendUplink(char *data_to_send, uint8_t len, bool canal_por_defecto, bool apply_fixed_sf) {
   if (canal_por_defecto) {
     lora.setChannel(DEFAULT_CHANNEL);
   }
   else lora.setChannel(MULTI);
-  
-  if (FORCE_FIXED_SF_TEST) {
+
+  if (FORCE_FIXED_SF_TEST && apply_fixed_sf) {
     uint8_t sf_fixed = FIXED_SF_INDEX;
     if (sf_fixed > MAX_SF) sf_fixed = MAX_SF;
     lora.setDataRate(SFvector[sf_fixed]);
     SF_actual = sf_fixed;
     SF_is_set = 1;
-    if (dbspk) {
-      Serial.print("-->SF FIJO TEST: "); Serial.println(sf_fixed);
-    }
+  }
+  else if (FORCE_FIXED_SF_TEST && !apply_fixed_sf) {
+    lora.setDataRate(DEFAULT_SF);
+    SF_actual = 0;
   }
   else if (canal_por_defecto) {
     lora.setDataRate(DEFAULT_SF);
@@ -45,23 +48,14 @@ static void configureAndSendUplink(char *data_to_send, uint8_t len, bool canal_p
       uint8_t sf_ant = SF_actual - 1;
       lora.setDataRate(SFvector[sf_ant]);
       SF_actual = sf_ant;
-      if (dbspk) {
-        Serial.print("Reducir SF: "); Serial.println(SF_actual);
-      }
     }
     else {
       lora.setDataRate(SFvector[SF_actual]);
-      if (dbspk) {
-        Serial.print("usar SF_actual: "); Serial.println(SF_actual);
-      }
     }
   }
   else {              //no esta seteado el SF aun...
     lora.setDataRate(SFvector[SF_index]);
     SF_actual = SF_index;
-    if (dbspk) {
-      Serial.print("-->Test SF: "); Serial.println(SF_index);
-    }
     cont_same_SF++;
     if (cont_same_SF >= MAX_RETRY_SAME_SF) {
       cont_same_SF = 0;
@@ -79,7 +73,7 @@ static void configureAndSendUplink(char *data_to_send, uint8_t len, bool canal_p
 
 uint8_t sendPackageAckAsyncStart(char *data_to_send, uint8_t len, bool canal_por_defecto) {
   if (ack_waiting_async) return 0;
-  configureAndSendUplink(data_to_send, len, canal_por_defecto);
+  configureAndSendUplink(data_to_send, len, canal_por_defecto, false);
   ack_waiting_async = true;
   ack_waiting_start_ms = millis();
   return 1;
@@ -91,18 +85,12 @@ int8_t sendPackageAckAsyncPoll() {
   lora.update();
   uint8_t rta = lora.readAck();
   if (rta) {
-    if (dbspk) {
-      Serial.println("-->ack ok");
-    }
     SF_is_set = 1;
     ack_waiting_async = false;
     return 1;
   }
 
   if ((millis() - ack_waiting_start_ms) >= (uint32_t)(timeout * tick_time)) {
-    if (dbspk) {
-      Serial.println("-->NO ACK, time out");
-    }
     SF_is_set = 0;
     ack_waiting_async = false;
     return -1;
@@ -156,22 +144,16 @@ uint8_t initLoraTec( void )
       lora.setChannel(DEFAULT_CHANNEL);
     }
 
-    Serial.print("nwkSKey: "); Serial.println(nwkSKey);
-    Serial.print("appSKey: "); Serial.println(appSKey);
-    
     lora.setNwkSKey(nwkSKey);
     lora.setAppSKey(appSKey);
-    lora.setDevAddr(devAddr); //Activacion Manual, devAddr predefinido
-    Serial.print("devAddr: "); Serial.println(devAddr);
+    lora.setDevAddr(devAddr);
 
-    //SF_is_set = 0;
-    return 1; //todo OK
+    return 1;
   }
   else
   {
-    Serial.println("-->LoraTec: error transceptor");
-    //if (nodo.modo_wifi) telnet.println("-->LoraTec: error transceptor\r");
-    return 0; //error de transeptor
+    Serial.println("LoraTec: error transceptor");
+    return 0;
   }
 }
 
@@ -188,7 +170,7 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
   uint8_t dato_ok = 0;
   uint8_t cont_timeout = 0;
 
-  configureAndSendUplink(data_to_send, len, canal_por_defecto);
+  configureAndSendUplink(data_to_send, len, canal_por_defecto, true);
 
   switch (rta_type)
   {
@@ -204,54 +186,32 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
         //Serial.print("cont_timeout: "); Serial.println(cont_timeout);
       }
       if (rta) {
-        if (dbspk) {
-          Serial.println("-->ack ok");
-        }
         SF_is_set = 1;
-        //Elster_start();
-        return 1; //llego el ack, con retur rompemos el while y salimos
+        return 1;
       }
       else {
-        if (dbspk) {
-          Serial.println("-->NO ACK, time out");
-        }
         SF_is_set = 0;
-        //Elster_start();
-        return 0; //final por time out
+        return 0;
       }
       break;
 
     case espera_Dato:
-      //
-      while (!dato_ok && cont_timeout < timeout) { //termina el while cuando termina el time out. dato_ok es 1 solo si el procesamiento fue correcto, sino seguira intentando hasta que termine el timout
+      while (!dato_ok && cont_timeout < timeout) {
         lora.update();
-        //Serial.println(">>esperando dato<<");
-        rcv  = lora.readData(datoEntrante);   //cargo los datos leidos en el array, luego los proceso, si el procesamiento esta okey, ahi recien es dato_ok = 1
+        rcv  = lora.readData(datoEntrante);
         if (rcv > 1) {
           //dato_ok = procesarDatoEntrante();
         }
         delay(tick_time);
         yield();
-        cont_timeout++; //contador de time out
+        cont_timeout++;
       }
       if (dato_ok) {
-        if (dbspk) {
-          Serial.println("-->dato OK");
-          //if (nodo.modo_wifi) telnet.println("-->dato OK\r");
-        }
         SF_is_set = 1;
-
-        //Elster_start();
         return 1;
       }
       else {
-        if (dbspk) {
-          Serial.println("-->dato NO ok o ningun dato recibido, time out");
-          //if (nodo.modo_wifi) telnet.println("-->dato NO ok o ningun dato recibido, time out\r");
-        }
         SF_is_set = 0;
-        
-        //Elster_start();
         return 0;
       }
       break;
@@ -263,7 +223,7 @@ uint8_t sendPackage( char *data_to_send, uint8_t len, uint8_t rta_type, bool can
   }
 }
 
-// --- Recepcion LoRa: validacion de payload y log de depuracion (DEBUG_LORA_RX) ---
+// --- Recepcion LoRa: validacion de payload ---
 
 bool isValidLoraPayload(const char *buf) {
   if (buf == NULL) return false;
@@ -283,48 +243,4 @@ bool isValidLoraPayload(const char *buf) {
     p++;
   }
   return hasDigit;
-}
-
-#if DEBUG_LORA_RX
-static void loraRxPrintRaw(const char *buf, uint8_t status) {
-  Serial.print("LORA RAW status=");
-  Serial.print(status);
-  Serial.print(" data=<");
-  for (uint8_t i = 0; i < INPUTBUFF && buf[i] != '\0'; i++) {
-    char c = buf[i];
-    if (c == '\r') Serial.print("\\r");
-    else if (c == '\n') Serial.print("\\n");
-    else if (isPrintable(c)) Serial.print(c);
-    else {
-      Serial.print("\\x");
-      if ((uint8_t)c < 16) Serial.print("0");
-      Serial.print((uint8_t)c, HEX);
-    }
-  }
-  Serial.println(">");
-}
-#endif
-
-void loraRxDebugAfterRead(const char *buf, uint8_t status, bool by_irq) {
-#if DEBUG_LORA_RX
-  if (status > 0) {
-    if (by_irq) Serial.println("IRQ LORA");
-    else Serial.println("POLL LORA RX");
-    loraRxPrintRaw(buf, status);
-  }
-#else
-  (void)buf;
-  (void)status;
-  (void)by_irq;
-#endif
-}
-
-void loraRxDebugCtrlFrame(uint8_t status) {
-#if DEBUG_LORA_RX
-  if (status == 1) {
-    Serial.println("LORA CTRL frame (sin payload)");
-  }
-#else
-  (void)status;
-#endif
 }

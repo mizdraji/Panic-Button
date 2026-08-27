@@ -1,4 +1,9 @@
 /* Detalle de versiones
+ * V2.0:
+ *   RX Class C fijo SF7/500 (LoraTec). PDR en SF7; botones/ensayo con SF de prueba.
+ *   ISR seguras, SMS linea a linea, destino fijo, heap sin String, serial limpio.
+ * V1.9.5:
+ *   Heap: sin String globales, UART SIM800 512, reporte periodico.
  * V1.9.4:
  *   SMS diferido 1.5s tras LoRa; botones en taskManager (no interrupt); solo borra core dump si corrupto.
  * V1.9.3:
@@ -65,21 +70,14 @@ void setup() {
   Serial.print("Firmware ");
   Serial.println(VERSION);
 #if MODO_DEMO
-  Serial.println("MODO DEMO activo");
   disableLoopWDT();
-  Serial.println("Loop WDT deshabilitado");
 #endif
 
   if (!lora.init()) {
     Serial.println("RFM95 not detected");
-  } else {
-    Serial.println("RFM95 detected");
   }
 
   if (initLoraTec()) {
-    Serial.println("-->LoraTec OK");
-    Serial.print("-->devID: PB");
-    Serial.println(devID);
     config_task();
     t_pdr.enable();
     uint32_t pdr_deadline = millis() + PDR_SETUP_TIMEOUT_MS;
@@ -101,8 +99,6 @@ void setup() {
 #if MODO_ENSAYO
   ensayo_counter = 0;
   t_ensayo.enable();
-  Serial.print("MODO ENSAYO activo. Total mensajes: ");
-  Serial.println((unsigned long)ENSAYO_TOTAL_MENSAJES);
 #endif
 
   attachInterrupt(digitalPinToInterrupt(button1), buttonInterrupt1, RISING);
@@ -115,8 +111,7 @@ void setup() {
   print_wakeup_pins();
   delay(2000);
   slp = false;
-
-  Serial.println("--> Sistema listo");
+  report_heap(true);
 }
 
 void loop() {
@@ -147,11 +142,9 @@ void loop() {
   lora.update();
   yield();
   bool do_lora_read = false;
-  bool by_irq = false;
 
   if (processPendingLora()) {
     do_lora_read = true;
-    by_irq = true;
   } else if ((millis() - last_lora_poll_ms) >= 100) {
     do_lora_read = true;
   }
@@ -160,7 +153,6 @@ void loop() {
     last_lora_poll_ms = millis();
     recvStatus = lora.readData(datoEntrante);
     datoEntrante[INPUTBUFF - 1] = '\0';
-    loraRxDebugAfterRead(datoEntrante, recvStatus, by_irq);
     yield();
   }
 
@@ -180,7 +172,7 @@ void loop() {
         last_lora_payload[INPUTBUFF - 1] = '\0';
         last_lora_payload_ms = now;
 
-        Serial.print("====>> ");
+        Serial.print("LORA RX -> ");
         Serial.println(datoEntrante);
 
         timer = 0;
@@ -202,16 +194,15 @@ void loop() {
       }
     }
   }
-  loraRxDebugCtrlFrame(recvStatus);
   recvStatus = 0;
 
+  report_heap(false);
   yield();
 }
 
 void print_wakeup_pins() {
   uint64_t wakeup_pin_mask = esp_sleep_get_ext1_wakeup_status();
   if (wakeup_pin_mask == 0) {
-    Serial.println("No se detectó ningún pin de wakeup.");
     return;
   }
   despertarSIM800L();
@@ -220,19 +211,15 @@ void print_wakeup_pins() {
     if ((wakeup_pin_mask & (1ULL << i)) != 0) {
       switch (i) {
         case 36:
-          Serial.println("Wakeup causado por el pin 36");
           btn1_pending = true;
           break;
         case 38:
-          Serial.println("Wakeup causado por el pin 38");
           btn2_pending = true;
           break;
         case 39:
-          Serial.println("Wakeup causado por el pin 39");
           btn3_pending = true;
           break;
-        case 13:
-          Serial.println("Wakeup causado por el pin 13");
+        default:
           break;
       }
     }
